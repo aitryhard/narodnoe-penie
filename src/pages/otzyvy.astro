@@ -1,0 +1,101 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import Button from "../components/ui/Button.astro";
+import { links } from "../config/links";
+import { withBase } from "../utils/base";
+
+/** ЗАГЛУШКИ — заменить реальными отзывами из ВК */
+const reviews = [
+  {
+    text: "Раньше я боялась брать высокую ноту — думала, что не получится. За три месяца поняла, что всё дело в дыхании и опоре. Теперь пою открыто.",
+    name: "Имя — заглушка",
+    meta: "город — заглушка",
+    tone: "bg-surface",
+    avatar: "bg-rose-200",
+  },
+  {
+    text: "Мы работаем с записью свадебных песен, и впервые я услышала в ней то, что слышала бабушка. На курсе «Переходы» это объяснили спокойно и подробно.",
+    name: "Имя — заглушка",
+    meta: "город — заглушка",
+    tone: "bg-sand-50",
+    avatar: "bg-primary/25",
+  },
+  {
+    text: "Онлайн-занятия оказались очень живыми. Группа маленькая, слышно всех, и никто не торопится. Заклички весны я теперь пою всей семье.",
+    name: "Имя — заглушка",
+    meta: "город — заглушка",
+    tone: "bg-surface",
+    avatar: "bg-mustard/45",
+  },
+  {
+    text: "Пришла без слуха и без опыта. Через четыре месяца спела соло на домашнем концерте. Про «Песни банных обрядов» рассказать не могу — там слишком много всего.",
+    name: "Имя — заглушка",
+    meta: "город — заглушка",
+    tone: "bg-sand-50",
+    avatar: "bg-rose-300",
+  },
+  {
+    text: "Очень бережная подача. Никто не заставляет петь «как надо» — подстраиваются под голос. Это редкость и очень дорогого стоит.",
+    name: "Имя — заглушка",
+    meta: "город — заглушка",
+    tone: "bg-surface",
+    avatar: "bg-primary/25",
+  },
+  {
+    text: "Группа встретилась вживую в зале, и это совсем не похоже на «занятие у репетитора». После двух часов разбирали Троицу до позднего вечера.",
+    name: "Имя — заглушка",
+    meta: "город — заглушка",
+    tone: "bg-sand-50",
+    avatar: "bg-mustard/45",
+  },
+];
+---
+
+<BaseLayout title="Отзывы">
+  <PageHero
+    label="Отзывы"
+    title="Что говорят ученицы"
+    intro="Здесь появятся реальные отзывы из группы во ВКонтакте. Пока стоят заглушки — по структуре они уже готовы к замене."
+    tone="green"
+  />
+
+  <section class="wrap py-14 sm:py-16">
+    <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      {
+        reviews.map((review) => (
+          <figure class={`card flex flex-col p-6 sm:p-7 ${review.tone}`}>
+            <svg viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6 text-mustard-deep" aria-hidden="true">
+              <path
+                d="M9.6 5C6.5 6.3 4.8 8.8 4.8 12c0 3.6 2 6.2 5.2 6.2 2.2 0 3.9-1.5 3.9-3.6 0-2-1.4-3.4-3.3-3.4-.4 0-.8 0-1 .1.3-1.6 1.6-3.2 3.4-4.2L9.6 5Zm9.2 0c-3.1 1.3-4.8 3.8-4.8 7 0 3.6 2 6.2 5.2 6.2 2.2 0 3.9-1.5 3.9-3.6 0-2-1.4-3.4-3.3-3.4-.4 0-.8 0-1 .1.3-1.6 1.6-3.2 3.4-4.2L18.8 5Z"
+              ></path>
+            </svg>
+            <blockquote class="mt-4 flex-1 text-[15px] leading-relaxed text-ink-soft text-pretty">
+              {review.text}
+            </blockquote>
+            <figcaption class="mt-5 flex items-center gap-3 border-t border-ink/5 pt-4">
+              <span class={`h-9 w-9 rounded-full ${review.avatar}`}></span>
+              <span class="text-sm">
+                <span class="block font-medium text-ink">{review.name}</span>
+                <span class="block text-xs text-ink-mute">{review.meta}</span>
+              </span>
+            </figcaption>
+          </figure>
+        ))
+      }
+    </div>
+
+    <div class="card mt-8 flex flex-wrap items-center justify-between gap-5 bg-rose-100 p-7 sm:p-9">
+      <div class="max-w-md">
+        <h2 class="text-xl">Хотите оказаться в этом списке?</h2>
+        <p class="mt-2 text-[15px] leading-relaxed text-ink-soft">
+          Начните с пробного занятия или с любого обучающего проекта.
+        </p>
+      </div>
+      <div class="flex flex-wrap gap-3">
+        <Button href={withBase("/info-produkty")} variant="primary">Инфо-продукты</Button>
+        <Button href={links.signup} variant="mustard">Записаться</Button>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

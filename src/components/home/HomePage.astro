@@ -1,0 +1,302 @@
+﻿---
+import Button from "../ui/Button.astro";
+import PhotoFrame from "../ui/PhotoFrame.astro";
+import { links } from "../../config/links";
+import { lessons, courses } from "../../data/products";
+import { withBase } from "../../utils/base";
+---
+
+<section class="wrap pt-8 sm:pt-12">
+  <div class="card relative overflow-hidden bg-rose-100">
+    <div
+      class="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_100%_at_15%_0%,rgba(255,255,255,0.75),transparent_60%)]"
+      aria-hidden="true"
+    >
+    </div>
+
+    <div class="relative grid gap-12 p-8 sm:p-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:p-16">
+      <div>
+        <span class="eyebrow">
+          <span class="h-1.5 w-1.5 rounded-full bg-primary"></span>
+          Санкт-Петербург · онлайн по всему миру
+        </span>
+
+        <h1 class="mt-6 text-balance text-[2.1rem] leading-[1.1] sm:text-5xl lg:text-[3.4rem]">
+          Народное пение,<br class="hidden sm:block" />
+          которому учатся и которое радует
+        </h1>
+
+        <p class="prose-body mt-6 max-w-xl text-pretty">
+          Женская школа народного пения: живые занятия в центре Петербурга, камерные
+          онлайн-группы и обучающие проекты по песенному фольклору. Учимся не спеша —
+          интонации, строю и манере исполнения.
+        </p>
+
+        <div class="mt-9 flex flex-wrap items-center gap-3">
+          <Button href={withBase("/info-produkty")} variant="primary" size="lg">
+            Смотреть инфо-продукты
+          </Button>
+          <Button href={links.signup} variant="mustard" size="lg">
+            Записаться на занятие
+          </Button>
+        </div>
+
+        <dl class="mt-10 grid max-w-lg grid-cols-3 gap-6 border-t border-ink/10 pt-7">
+          <div>
+            <dt class="font-display text-2xl font-semibold text-primary-deep">8</dt>
+            <dd class="mt-1 text-xs leading-snug text-ink-soft">обучающих проектов</dd>
+          </div>
+          <div>
+            <dt class="font-display text-2xl font-semibold text-primary-deep">6</dt>
+            <dd class="mt-1 text-xs leading-snug text-ink-soft">человек в группе</dd>
+          </div>
+          <div>
+            <dt class="font-display text-2xl font-semibold text-primary-deep">100%</dt>
+            <dd class="mt-1 text-xs leading-snug text-ink-soft">живого звука</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="relative">
+        <PhotoFrame
+          class="shadow-lift"
+          ratio="aspect-[4/5]"
+          label="Фото ведущей"
+          hint="заглушка — заменить на фото из ВК"
+        />
+
+        <div
+          class="absolute -bottom-5 -left-5 hidden rounded-2xl border border-ink/5 bg-surface px-5 py-4 shadow-lift sm:block"
+        >
+          <p class="font-display text-lg font-semibold">Сегодня поём</p>
+          <p class="mt-0.5 text-xs text-ink-mute">заклички весны · 19:00</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap py-16 sm:py-20">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <span class="eyebrow bg-primary/10 text-primary-deep">Форматы</span>
+      <h2 class="mt-4 text-balance text-2xl sm:text-3xl">Выберите, как вам ближе</h2>
+    </div>
+    <a
+      href={withBase("/info-produkty")}
+      class="link-underline shrink-0 self-start text-[15px] text-ink-soft hover:text-ink sm:self-auto"
+    >
+      Все инфо-продукты
+    </a>
+  </div>
+
+  <div class="mt-8 grid gap-5 md:grid-cols-2">
+    {
+      lessons.map((lesson) => (
+        <a
+          href={
+            lesson.format.startsWith("Офлайн")
+              ? withBase("/info-produkty#zhivye")
+              : withBase("/info-produkty#online")
+          }
+          class="card group flex flex-col bg-surface p-7 transition-all duration-200 hover:-translate-y-1 hover:shadow-lift sm:p-8"
+        >
+          <span
+            class:list={[
+              "w-fit rounded-full px-3 py-1 text-xs font-medium",
+              lesson.tone === "green"
+                ? "bg-primary/12 text-primary-deep"
+                : "bg-rose-100 text-rose-accent",
+            ]}
+          >
+            {lesson.format}
+          </span>
+
+          <h3 class="mt-5 text-xl sm:text-2xl">{lesson.title}</h3>
+          <p class="prose-body mt-3 flex-1 text-pretty">{lesson.description}</p>
+
+          <ul class="mt-6 space-y-2 border-t border-ink/5 pt-5">
+            {lesson.bullets.map((bullet) => (
+              <li class="flex items-start gap-2.5 text-sm text-ink-soft">
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  class="mt-0.5 h-4 w-4 shrink-0 text-primary"
+                  aria-hidden="true"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M16.7 5.3a1 1 0 0 1 0 1.4l-7.5 7.5a1 1 0 0 1-1.4 0l-3.5-3.5a1 1 0 1 1 1.4-1.4l2.8 2.79 6.8-6.8a1 1 0 0 1 1.4 0Z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+                {bullet}
+              </li>
+            ))}
+          </ul>
+
+          <span class="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-primary-deep">
+            Узнать подробнее
+            <svg
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              class="h-4 w-4 transition-transform group-hover:translate-x-1"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M3 10a.75.75 0 0 1 .75-.75h12.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 10Zm4.22-4.72a.75.75 0 0 1 1.06 0l4.72 4.72-4.72 4.72a.75.75 0 1 1-1.06-1.06L11.44 10 7.28 5.78a.75.75 0 0 1 0-1.06Z"
+                clip-rule="evenodd"
+              ></path>
+            </svg>
+          </span>
+        </a>
+      ))
+    }
+  </div>
+
+  <div class="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    {
+      courses.slice(0, 3).map((course) => (
+        <a
+          href={withBase(`/kursy/${course.slug}`)}
+          class="card group flex flex-col bg-sand-50 p-6 transition-all duration-200 hover:-translate-y-1 hover:bg-surface hover:shadow-lift"
+        >
+          <span class="font-display text-sm font-semibold text-mustard-deep">
+            {course.letter})
+          </span>
+          <h3 class="mt-3 text-lg">{course.title}</h3>
+          <p class="mt-2 flex-1 text-sm leading-relaxed text-ink-soft">{course.lead}</p>
+          <span class="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary-deep">
+            Подробнее
+            <svg
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              class="h-4 w-4 transition-transform group-hover:translate-x-1"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M3 10a.75.75 0 0 1 .75-.75h12.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 10Zm4.22-4.72a.75.75 0 0 1 1.06 0l4.72 4.72-4.72 4.72a.75.75 0 1 1-1.06-1.06L11.44 10 7.28 5.78a.75.75 0 0 1 0-1.06Z"
+                clip-rule="evenodd"
+              ></path>
+            </svg>
+          </span>
+        </a>
+      ))
+    }
+  </div>
+</section>
+
+<section class="wrap pb-16 sm:pb-20">
+  <div class="grid gap-5 lg:grid-cols-2">
+    <article class="card bg-surface p-7 sm:p-9">
+      <h2 class="text-2xl">О школе</h2>
+      <p class="prose-body mt-4 text-pretty">
+        Мы собираем вокруг себя женщин, которым интересно петь настоящее: календарные,
+        свадебные и обрядовые песни. Занятия строятся от слуха — без переводов и
+        упрощения, но с бережным отношением к тому, как песня звучала в традиции.
+      </p>
+      <a
+        href={withBase("/o-shkole")}
+        class="link-underline mt-6 inline-flex items-center gap-2 text-[15px] font-medium text-primary-deep"
+      >
+        Подробнее о школе
+      </a>
+    </article>
+
+    <article class="card bg-sand-50 p-7 sm:p-9">
+      <h2 class="text-2xl">О ведущей</h2>
+      <p class="prose-body mt-4 text-pretty">
+        Ведущая — фольклорист и певица. Она собирает и поёт материал, разбирает песни
+        по частям, пока не станет слышно главное: почему именно так, а не иначе.
+      </p>
+      <a
+        href={withBase("/o-veduschej")}
+        class="link-underline mt-6 inline-flex items-center gap-2 text-[15px] font-medium text-primary-deep"
+      >
+        Прочитать историю
+      </a>
+    </article>
+  </div>
+</section>
+
+<section class="wrap pb-16 sm:pb-20">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <span class="eyebrow bg-mustard/25 text-mustard-deep">Голоса учениц</span>
+      <h2 class="mt-4 text-balance text-2xl sm:text-3xl">Что говорят после занятий</h2>
+    </div>
+    <a
+        href={withBase("/otzyvy")}
+      class="link-underline shrink-0 self-start text-[15px] text-ink-soft hover:text-ink sm:self-auto"
+    >
+      Все отзывы
+    </a>
+  </div>
+
+  <div class="mt-8 grid gap-5 md:grid-cols-3">
+    {
+      [
+        "Раньше я боялась брать высокую ноту — думала, что не получится. За три месяца поняла, что всё дело в дыхании и опоре. Теперь пою открыто.",
+        "Мы работаем с записью свадебных песен, и впервые я услышала в ней то, что слышала бабушка. На курсе «Переходы» это объяснили спокойно и подробно.",
+        "Онлайн-занятия оказались очень живыми. Группа маленькая, слышно всех, и никто не торопится. Заклички весны я теперь пою всей семье.",
+      ].map((quote) => (
+        <figure class="card flex flex-col bg-surface p-6">
+          <svg
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            class="h-6 w-6 text-mustard-deep"
+            aria-hidden="true"
+          >
+            <path
+              d="M9.6 5C6.5 6.3 4.8 8.8 4.8 12c0 3.6 2 6.2 5.2 6.2 2.2 0 3.9-1.5 3.9-3.6 0-2-1.4-3.4-3.3-3.4-.4 0-.8 0-1 .1.3-1.6 1.6-3.2 3.4-4.2L9.6 5Zm9.2 0c-3.1 1.3-4.8 3.8-4.8 7 0 3.6 2 6.2 5.2 6.2 2.2 0 3.9-1.5 3.9-3.6 0-2-1.4-3.4-3.3-3.4-.4 0-.8 0-1 .1.3-1.6 1.6-3.2 3.4-4.2L18.8 5Z"
+            ></path>
+          </svg>
+          <blockquote class="mt-4 flex-1 text-[15px] leading-relaxed text-ink-soft">
+            {quote}
+          </blockquote>
+          <figcaption class="mt-5 flex items-center gap-3 border-t border-ink/5 pt-4">
+            <span class="h-9 w-9 rounded-full bg-rose-200"></span>
+            <span class="text-sm">
+              <span class="block font-medium">Имя — заглушка</span>
+              <span class="block text-xs text-ink-mute">город — заглушка</span>
+            </span>
+          </figcaption>
+        </figure>
+      ))
+    }
+  </div>
+</section>
+
+<section class="wrap pb-4">
+  <div
+    class="card relative overflow-hidden bg-ink px-7 py-12 text-center text-sand-50 sm:px-12 sm:py-16"
+  >
+    <div
+      class="pointer-events-none absolute inset-0 bg-[radial-gradient(80%_100%_at_50%_0%,rgba(222,205,149,0.22),transparent_65%)]"
+      aria-hidden="true"
+    >
+    </div>
+    <div class="relative">
+      <h2 class="text-balance text-2xl sm:text-3xl">Начните с одной песни</h2>
+      <p class="mx-auto mt-4 max-w-xl text-pretty text-[17px] leading-relaxed text-sand-200">
+        Посмотрите инфо-продукты и выберите формат — живые занятия в Петербурге,
+        онлайн-группу или отдельный обучающий проект.
+      </p>
+      <div class="mt-9 flex flex-wrap justify-center gap-3">
+        <Button href={withBase("/info-produkty")} variant="mustard" size="lg">
+          Смотреть инфо-продукты
+        </Button>
+        <Button
+          href={links.signup}
+          variant="ghost"
+          size="lg"
+          class="border-sand-50/25 bg-transparent text-sand-50 hover:bg-sand-50/10"
+        >
+          Задать вопрос
+        </Button>
+      </div>
+    </div>
+  </div>
+</section>

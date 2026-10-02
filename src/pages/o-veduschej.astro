@@ -1,0 +1,109 @@
+﻿---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import Button from "../components/ui/Button.astro";
+import { links } from "../config/links";
+import { withBase } from "../utils/base";
+
+const steps = [
+  {
+    title: "Слушаю и записываю",
+    text: "Собираю материал в полевых и архивных экспедициях, веду рабочие расшифровки.",
+  },
+  {
+    title: "Разбираю по частям",
+    text: "Раскладываю песню на фразы и показываю, где меняется опора, а где — интонация.",
+  },
+  {
+    title: "Передаю в группе",
+    text: "Веду занятия так, чтобы ученица слышала себя и других, а не просто повторяла.",
+  },
+];
+---
+
+<BaseLayout title="О ведущей">
+  <PageHero
+    label="О ведущей"
+    title="Песня как живой разговор"
+    intro="Меня зовут [Имя Фамилия] — я фольклорист и певица. Собираю, разбираю и пою традиционные женские песни: календарные, свадебные, обрядовые."
+    tone="rose"
+  />
+
+  <section class="wrap py-14 sm:py-16">
+    <div class="grid gap-5 lg:grid-cols-[0.85fr_1.15fr]">
+      <div
+        class="placeholder-frame aspect-[3/4] shadow-card lg:aspect-auto lg:sticky lg:top-28 lg:self-start"
+      >
+        <div class="px-8 text-center">
+          <span
+            class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-surface text-primary-deep shadow-soft"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6" aria-hidden="true">
+              <path
+                d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 2c-4.2 0-7.5 2.7-7.5 6v1.5a.75.75 0 0 0 .75.75h13.5a.75.75 0 0 0 .75-.75V20c0-3.3-3.3-6-7.5-6Z"
+              ></path>
+            </svg>
+          </span>
+          <p class="mt-4 text-sm font-medium text-ink-soft">Фото ведущей</p>
+          <p class="mt-1 text-xs text-ink-mute">заглушка — заменить на фото из ВК</p>
+        </div>
+      </div>
+
+      <div>
+        <div class="card bg-surface p-7 sm:p-10">
+          <h2 class="text-2xl">Немного обо мне</h2>
+          <div class="prose-body mt-5 space-y-4">
+            <p class="text-pretty">
+              [Текст статьи — ЗАГЛУШКА, заменить материалом из ВК.] Я выросла в семье,
+              где пели всегда: на кухне, в дороге, за работой. Песня была не праздником,
+              а частью дня — и именно поэтому в неё попадали самые честные слова.
+            </p>
+            <p class="text-pretty">
+              Позже я начала собирать материал самой. Записываю пожилых женщин, бабушек,
+              участниц ансамблей — и слышу, что традиция жива и меняется на наших
+              глазах. Моя задача — не заморозить её, а помочь её услышать.
+            </p>
+            <p class="text-pretty">
+              На занятиях я не ставлю оценок и не прошу «петь как в записи». Мы ищем
+              естественное звучание конкретного человека: его дыхание, его тембр, его
+              манеру. Иногда это оказывается лучше эталонной записи.
+            </p>
+            <p class="text-pretty">
+              Если вы давно пели в душе, но боялись выйти на сцену — начните с одной
+              песни. Дальше будет проще, чем кажется.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-5 grid gap-5 sm:grid-cols-3">
+          {
+            steps.map((step, i) => (
+              <div class="card bg-sand-50 p-6">
+                <span class="font-display text-sm font-semibold text-mustard-deep">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3 class="mt-2.5 text-[17px]">{step.title}</h3>
+                <p class="mt-2 text-sm leading-relaxed text-ink-soft">{step.text}</p>
+              </div>
+            ))
+          }
+        </div>
+
+        <div
+          class="card mt-5 flex flex-wrap items-center justify-between gap-5 bg-rose-100 p-7"
+        >
+          <div class="max-w-sm">
+            <h3 class="text-xl">Хотите услышать, как это звучит?</h3>
+            <p class="mt-2 text-[15px] leading-relaxed text-ink-soft">
+              Посмотрите форматы занятий и выберите подходящий.
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-3">
+            <Button href={withBase("/info-produkty")} variant="primary">Инфо-продукты</Button>
+            <Button href={links.signup} variant="mustard">Записаться</Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

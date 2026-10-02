@@ -1,0 +1,42 @@
+---
+export interface Props {
+  label?: string;
+  title: string;
+  intro?: string;
+  tone?: "green" | "rose" | "sand";
+}
+
+const { label, title, intro, tone = "sand" } = Astro.props;
+
+const tones = {
+  green: "bg-primary/10 text-primary-deep",
+  rose: "bg-rose-100 text-rose-accent",
+  sand: "bg-sand-50 text-ink",
+};
+---
+
+<section class="wrap pt-10 sm:pt-14">
+  <nav class="flex items-center gap-2 text-sm text-ink-mute">
+    <a       href="https://vk.ru/narodnoe_penie" class="link-underline hover:text-ink-soft">Главная</a>
+    <span aria-hidden="true">/</span>
+    <span class="text-ink-soft">{title}</span>
+  </nav>
+
+  <div class="mt-6 max-w-3xl">
+    {
+      label && (
+        <span class={`inline-block rounded-full px-3.5 py-1.5 text-xs font-medium ${tones[tone]}`}>
+          {label}
+        </span>
+      )
+    }
+    <h1 class="mt-5 text-balance text-3xl leading-[1.15] sm:text-4xl lg:text-5xl">
+      {title}
+    </h1>
+    {
+      intro && (
+        <p class="prose-body mt-5 max-w-2xl text-pretty">{intro}</p>
+      )
+    }
+  </div>
+</section>

@@ -1,0 +1,165 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/PageHero.astro";
+import Button from "../../components/ui/Button.astro";
+import { links } from "../../config/links";
+import { courses, type Course } from "../../data/products";
+import { withBase } from "../../utils/base";
+
+export function getStaticPaths() {
+  return courses.map((course) => ({
+    params: { slug: course.slug },
+    props: { course },
+  }));
+}
+
+const toneClass: Record<Course["tone"], string> = {
+  green: "bg-primary/12 text-primary-deep",
+  rose: "bg-rose-100 text-rose-accent",
+  sand: "bg-sand-200 text-ink",
+  mustard: "bg-mustard/30 text-mustard-deep",
+};
+
+const { course } = Astro.props as { course: Course };
+
+const others = courses.filter((item) => item.slug !== course.slug).slice(0, 3);
+---
+
+<BaseLayout title={course.title} description={course.lead}>
+  <PageHero
+    label={`Курс «${course.letter}»`}
+    title={course.title}
+    intro={course.lead}
+    tone={course.tone}
+  />
+
+  <section class="wrap py-14 sm:py-16">
+    <div class="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
+      <div>
+        <div class="card bg-surface p-7 sm:p-10">
+          <div class="flex flex-wrap items-center gap-2.5">
+            <span class={`rounded-full px-3 py-1 text-xs font-medium ${toneClass[course.tone]}`}>
+              {course.format}
+            </span>
+            <span class="rounded-full bg-sand-50 px-3 py-1 text-xs font-medium text-ink-soft">
+              {course.duration}
+            </span>
+          </div>
+
+          <h2 class="mt-7 text-2xl">О курсе</h2>
+          <div class="mt-4 space-y-4 prose-body">
+            <p class="text-pretty">{course.description}</p>
+            <p class="text-pretty">
+              [Текст — ЗАГЛУШКА, заменить описанием из ВК.] Мы двигаемся небольшими
+              шагами: на первой встрече разбираем материал целиком, дальше работаем по
+              частям — интонация, опора, дыхание. Каждая неделя заканчивается записью,
+              которую можно послушать и сравнить с началом курса.
+            </p>
+          </div>
+
+          <h2 class="mt-10 text-2xl">Что внутри</h2>
+          <ul class="mt-5 space-y-3">
+            {
+              course.highlights.map((highlight) => (
+                <li class="flex items-start gap-3 text-[15px] text-ink-soft">
+                  <span class="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-primary/15 text-primary-deep">
+                    <svg viewBox="0 0 20 20" fill="currentColor" class="h-3 w-3" aria-hidden="true">
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.7 5.3a1 1 0 0 1 0 1.4l-7.5 7.5a1 1 0 0 1-1.4 0l-3.5-3.5a1 1 0 1 1 1.4-1.4l2.8 2.79 6.8-6.8a1 1 0 0 1 1.4 0Z"
+                        clip-rule="evenodd"
+                      ></path>
+                    </svg>
+                  </span>
+                  {highlight}
+                </li>
+              ))
+            }
+          </ul>
+
+          <div class="mt-8 rounded-2xl bg-sand-50 p-6">
+            <p class="text-sm font-medium">Занятия ведёт</p>
+            <p class="mt-1 text-[15px] leading-relaxed text-ink-soft">
+              Ведущая школы — фольклорист и певица. Все вопросы по программе можно
+              задать до записи.
+            </p>
+          </div>
+        </div>
+
+        <div class="placeholder-frame mt-5 aspect-video">
+          <div class="text-center">
+            <span
+              class="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-surface text-primary-deep shadow-soft"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5" aria-hidden="true">
+                <path d="M8 5.14v13.72L19 12 8 5.14Z"></path>
+              </svg>
+            </span>
+            <p class="mt-4 text-sm font-medium text-ink-soft">Видео-презентация курса</p>
+            <p class="mt-1 text-xs text-ink-mute">заглушка — добавить видео из ВК</p>
+          </div>
+        </div>
+      </div>
+
+      <aside class="lg:sticky lg:top-28 lg:self-start">
+        <div class="card bg-surface p-7">
+          <p class="text-xs uppercase tracking-[0.14em] text-ink-mute">Стоимость</p>
+          <p class="mt-2 font-display text-3xl font-semibold">{course.price}</p>
+          <p class="mt-2 text-sm text-ink-soft">
+            [Цена — заглушка. Будет добавлена после согласования с заказчиком.]
+          </p>
+
+          <div class="mt-7 flex flex-col gap-2.5">
+            <Button href={links.buy} variant="mustard" size="lg" fullWidth>
+              Купить курс
+            </Button>
+            <Button href={links.signup} variant="primary" size="lg" fullWidth>
+              Узнать подробнее
+            </Button>
+            <Button href={links.max} variant="ghost" size="lg" fullWidth>
+              Задать вопрос
+            </Button>
+          </div>
+
+          <p class="mt-4 text-center text-xs text-ink-mute">
+            Кнопки — заглушки. Оплата подключается позже.
+          </p>
+        </div>
+
+        <div class="card mt-5 bg-sand-50 p-7">
+          <p class="text-sm font-medium">Что важно знать</p>
+          <ul class="mt-4 space-y-3 text-sm leading-relaxed text-ink-soft">
+            <li>Группы небольшие, чтобы слышать каждый голос.</li>
+            <li>Материал согласовывается с ведущей до старта.</li>
+            <li>Записи остаются у вас после окончания.</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="wrap pb-16 sm:pb-20">
+    <h2 class="text-2xl">Другие проекты</h2>
+    <div class="mt-6 grid gap-4 md:grid-cols-3">
+      {
+        others.map((item) => (
+          <a
+            href={withBase(`/kursy/${item.slug}`)}
+            class="card group bg-surface p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-lift"
+          >
+            <span class={`rounded-full px-3 py-1 text-xs font-medium ${toneClass[item.tone]}`}>
+              {item.letter})
+            </span>
+            <h3 class="mt-4 text-lg">{item.title}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-ink-soft">{item.lead}</p>
+          </a>
+        ))
+      }
+    </div>
+
+    <div class="mt-8 flex flex-wrap gap-3">
+      <Button href={withBase("/info-produkty")} variant="primary">Все инфо-продукты</Button>
+      <Button href={withBase("/kontakty")} variant="ghost">Контакты</Button>
+    </div>
+  </section>
+</BaseLayout>

@@ -32,6 +32,7 @@ const showTabs = active !== "auth";
         showTabs && (
           <button
             type="button"
+            data-logout
             data-demo
             data-demo-message="Выход станет доступен после запуска сайта на хостинге."
             class="border-ink/15 text-ink-soft hover:border-ink/30 hover:text-ink inline-flex items-center gap-2 self-start rounded-full border bg-surface px-5 py-2.5 text-sm font-medium transition-colors sm:self-auto"
@@ -81,6 +82,7 @@ const showTabs = active !== "auth";
     }
 
     <div
+      data-demo-banner
       class="border-primary/15 bg-primary/10 mt-7 flex items-start gap-3 rounded-2xl border px-5 py-4"
       role="note"
     >
@@ -120,6 +122,9 @@ const showTabs = active !== "auth";
   ></div>
 
   <script>
+    import { API_ENABLED, API_BASE, DEMO_HINT } from "../config/api";
+    import { withBase } from "../utils/base";
+
     const toast = document.querySelector<HTMLElement>("[data-toast]");
     let timer: ReturnType<typeof setTimeout> | undefined;
 
@@ -133,21 +138,165 @@ const showTabs = active !== "auth";
       }, 5000);
     };
 
-    const DEFAULT =
-      "На демонстрационной версии форма не отправляется. Заработает после запуска сайта на хостинге.";
+    if (API_ENABLED) {
+      document.querySelector("[data-demo-banner]")?.classList.add("hidden");
+    }
+
+    // Сообщение, оставленное на предыдущей странице (после редиректа).
+    const flash = sessionStorage.getItem("lkToast");
+    if (flash) {
+      sessionStorage.removeItem("lkToast");
+      show(flash);
+    }
+
+    const flashTo = (message: string) => sessionStorage.setItem("lkToast", message);
+
+    const clearErrors = (form: HTMLFormElement) => {
+      form.querySelectorAll<HTMLElement>("[data-error-for]").forEach((el) => {
+        el.textContent = "";
+        el.classList.add("hidden");
+      });
+      form.querySelectorAll<HTMLInputElement>("[aria-invalid]").forEach((el) => {
+        el.removeAttribute("aria-invalid");
+      });
+    };
+
+    const showErrors = (form: HTMLFormElement, fields: Record<string, string>) => {
+      let shown = 0;
+      for (const [name, message] of Object.entries(fields)) {
+        if (!message) continue;
+        const el = form.querySelector<HTMLElement>(`[data-error-for="${name}"]`);
+        if (!el) continue;
+        el.textContent = message;
+        el.classList.remove("hidden");
+        form.querySelector<HTMLInputElement>(`[name="${name}"]`)?.setAttribute("aria-invalid", "true");
+        shown++;
+      }
+      return shown;
+    };
+
+    type ApiError = Error & {
+      status?: number;
+      fields?: Record<string, string>;
+      needsConfirm?: boolean;
+    };
+
+    const call = async (endpoint: string, body: unknown) => {
+      const response = await fetch(API_BASE + endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        credentials: "include",
+        body: JSON.stringify(body),
+      });
+
+      const json = await response.json().catch(() => null);
+
+      if (!response.ok || !json?.ok) {
+        const error = new Error(json?.error || "Сервер не ответил. Попробуйте позже.") as ApiError;
+        error.status = response.status;
+        error.fields = json?.fields ?? {};
+        error.needsConfirm = Boolean(json?.needsConfirm);
+        throw error;
+      }
+
+      return (json.data ?? {}) as Record<string, string>;
+    };
+
+    const showDevLink = (data: Record<string, string>) => {
+      const url = data.devConfirmationUrl || data.devResetUrl;
+      const slot = document.querySelector<HTMLElement>("[data-dev-link]");
+      if (!url || !slot) return;
+      if (slot instanceof HTMLAnchorElement) slot.href = url;
+      slot.textContent = url;
+      slot.classList.remove("hidden");
+      slot.closest("[data-dev-wrap]")?.classList.remove("hidden");
+    };
 
     document.querySelectorAll<HTMLFormElement>("[data-demo-form]").forEach((form) => {
-      form.addEventListener("submit", (event) => {
+      form.addEventListener("submit", async (event) => {
         event.preventDefault();
-        show(form.dataset.demoMessage || DEFAULT);
+        clearErrors(form);
+
+        const endpoint = form.dataset.endpoint;
+
+        if (!API_ENABLED || !endpoint) {
+          show(form.dataset.demoMessage || DEMO_HINT);
+          return;
+        }
+
+        const button = form.querySelector<HTMLButtonElement>("button[type='submit']");
+        if (button) button.disabled = true;
+
+        const body = Object.fromEntries(new FormData(form).entries()) as Record<string, string>;
+
+        if (form.dataset.tokenFrom === "query") {
+          const token = new URLSearchParams(window.location.search).get("token");
+          if (!token) {
+            if (button) button.disabled = false;
+            show("Ссылка для сброса пароля неполная. Откройте её из письма.");
+            return;
+          }
+          body.token = token;
+        }
+
+        try {
+          const data = await call(endpoint, body);
+
+          const redirect = form.dataset.redirect;
+          if (redirect) {
+            if (form.dataset.success) flashTo(form.dataset.success);
+            window.location.href = withBase(redirect);
+            return;
+          }
+
+          show(form.dataset.success || "Готово");
+          showDevLink(data);
+        } catch (error) {
+          const apiError = error as ApiError;
+          const shown = showErrors(form, apiError.fields ?? {});
+
+          if (apiError.needsConfirm) {
+            show("Подтвердите адрес почты — мы отправили письмо ещё раз.");
+            const email = String(new FormData(form).get("email") ?? "");
+            call("/api/resend.php", { email }).then(showDevLink).catch(() => {});
+            return;
+          }
+
+          // Если ошибка уже видна под полем, дублировать её тостом не нужно.
+          if (shown === 0) show(apiError.message);
+        } finally {
+          if (button) button.disabled = false;
+        }
       });
     });
 
-    document.querySelectorAll<HTMLElement>("[data-demo]").forEach((element) => {
-      element.addEventListener("click", (event) => {
+    document.querySelectorAll<HTMLElement>("[data-logout]").forEach((element) => {
+      element.addEventListener("click", async (event) => {
         event.preventDefault();
-        show(element.dataset.demoMessage || DEFAULT);
+
+        if (!API_ENABLED) {
+          show(element.dataset.demoMessage || DEMO_HINT);
+          return;
+        }
+
+        try {
+          await call("/api/logout.php", {});
+        } catch {
+          /* выход всё равно имитируем на месте */
+        }
+
+        sessionStorage.setItem("lkToast", "Вы вышли из аккаунта.");
+        window.location.href = withBase("/lk/login");
       });
     });
+
+    document
+      .querySelectorAll<HTMLElement>("[data-demo]:not([data-logout])")
+      .forEach((element) => {
+        element.addEventListener("click", (event) => {
+          event.preventDefault();
+          show(element.dataset.demoMessage || DEMO_HINT);
+        });
+      });
   </script>
 </BaseLayout>

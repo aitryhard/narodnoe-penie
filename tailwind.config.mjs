@@ -31,6 +31,7 @@ export default {
           soft: "rgb(var(--c-ink-soft) / <alpha-value>)",
           mute: "rgb(var(--c-ink-mute) / <alpha-value>)",
         },
+        danger: "rgb(var(--c-danger) / <alpha-value>)",
         surface: "rgb(var(--c-surface) / <alpha-value>)",
       },
       fontFamily: {

@@ -38,11 +38,16 @@ const {
     autocomplete={autocomplete}
     required={required}
     minlength={minlength}
+    aria-describedby={hint ? `${name}-hint` : undefined}
     class="border-ink/15 bg-surface placeholder:text-ink-mute/70 focus:border-primary/50 focus:ring-primary/15 text-ink mt-2 w-full rounded-2xl border px-4 py-3 text-[15px] outline-none transition-colors focus:ring-2"
   />
+  <p data-error-for={name} class="text-danger mt-1.5 hidden text-xs font-medium" role="alert">
+  </p>
   {
     hint && (
-      <p class="text-ink-mute mt-1.5 text-xs">{hint}</p>
+      <p id={`${name}-hint`} class="text-ink-mute mt-1.5 text-xs">
+        {hint}
+      </p>
     )
   }
 </div>

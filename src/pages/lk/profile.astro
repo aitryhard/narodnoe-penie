@@ -16,6 +16,8 @@ import { demoProfile } from "../../data/demoAccount";
       <form
         class="mt-7 space-y-5"
         data-demo-form
+        data-endpoint="/api/profile.php"
+        data-success="Личные данные сохранены."
         data-demo-message="Сохранение данных заработает после запуска сайта на хостинге."
       >
         <Field label="Имя" name="name" value={demoProfile.name} autocomplete="name" required />
@@ -41,6 +43,8 @@ import { demoProfile } from "../../data/demoAccount";
       <form
         class="mt-7 space-y-5"
         data-demo-form
+        data-endpoint="/api/change-password.php"
+        data-success="Пароль обновлён. На других устройствах вход завершён."
         data-demo-message="Смена пароля заработает после запуска сайта на хостинге."
       >
         <Field
@@ -76,6 +80,7 @@ import { demoProfile } from "../../data/demoAccount";
         </div>
         <Button
           variant="ghost"
+          data-logout
           data-demo
           data-demo-message="Выход станет доступен после запуска сайта на хостинге."
         >
@@ -84,4 +89,26 @@ import { demoProfile } from "../../data/demoAccount";
       </div>
     </article>
   </div>
+
+  <script>
+    import { API_ENABLED, API_BASE } from "../../config/api";
+    import { withBase } from "../../utils/base";
+
+    if (API_ENABLED) {
+      fetch(API_BASE + "/api/me.php", { credentials: "include" })
+        .then((response) => (response.ok ? response.json() : Promise.reject(response.status)))
+        .then(({ data }) => {
+          const fill = (name: string, value: string) => {
+            const input = document.querySelector<HTMLInputElement>(`[name="${name}"]`);
+            if (input) input.value = value;
+          };
+          fill("name", data.user.name);
+          fill("email", data.user.email);
+          fill("city", data.user.city);
+        })
+        .catch(() => {
+          window.location.href = withBase("/lk/login");
+        });
+    }
+  </script>
 </LkLayout>

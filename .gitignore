@@ -28,6 +28,10 @@ yarn-error.log*
 .env*
 !.env.example
 
+# api
+/var
+/api/config.local.php
+
 # typescript
 *.tsbuildinfo
 

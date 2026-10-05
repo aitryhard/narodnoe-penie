@@ -7,6 +7,9 @@ export interface Props {
   class?: string;
   target?: string;
   rel?: string;
+  type?: "button" | "submit" | "reset";
+  "data-demo"?: boolean;
+  "data-demo-message"?: string;
 }
 
 const {
@@ -17,6 +20,9 @@ const {
   class: className = "",
   target,
   rel,
+  type = "button",
+  "data-demo": demo,
+  "data-demo-message": demoMessage,
 } = Astro.props;
 
 const base =
@@ -50,7 +56,12 @@ const Tag = isPlaceholder ? "button" : "a";
 <Tag
   class={classes}
   {...isPlaceholder
-    ? { type: "button", "data-placeholder": "true" }
+    ? {
+        type,
+        "data-placeholder": "true",
+        ...(demo ? { "data-demo": "" } : {}),
+        ...(demoMessage ? { "data-demo-message": demoMessage } : {}),
+      }
     : { href, target, rel }}
 >
   <slot />

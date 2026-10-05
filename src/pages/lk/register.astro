@@ -1,0 +1,76 @@
+---
+import LkLayout from "../../layouts/LkLayout.astro";
+import Field from "../../components/lk/Field.astro";
+import Button from "../../components/ui/Button.astro";
+import { withBase } from "../../utils/base";
+---
+
+<LkLayout title="Регистрация" active="auth">
+  <div class="mx-auto max-w-md">
+    <div class="card bg-surface p-7 sm:p-9">
+      <p class="prose-body text-pretty">
+        Создайте аккаунт — после регистрации на почту придёт письмо с подтверждением.
+      </p>
+
+      <form
+        class="mt-7 space-y-5"
+        data-demo-form
+        data-demo-message="Регистрация заработает после запуска сайта на хостинге."
+      >
+        <Field
+          label="Как вас зовут"
+          name="name"
+          autocomplete="name"
+          placeholder="Анна"
+          required
+        />
+        <Field
+          label="Электронная почта"
+          name="email"
+          type="email"
+          autocomplete="email"
+          placeholder="you@mail.ru"
+          required
+          hint="На этот адрес придёт письмо для подтверждения"
+        />
+        <Field
+          label="Пароль"
+          name="password"
+          type="password"
+          autocomplete="new-password"
+          minlength={8}
+          placeholder="Минимум 8 символов"
+          required
+          hint="Минимум 8 символов, лучше — буквы и цифры"
+        />
+
+        <label class="text-ink-soft flex cursor-pointer items-start gap-3 text-sm leading-relaxed">
+          <input
+            type="checkbox"
+            name="agree"
+            required
+            class="border-ink/20 text-primary focus:ring-primary/30 mt-1 h-4 w-4 shrink-0 rounded"
+          />
+          <span>
+            Согласен(на) на обработку персональных данных и с условиями участия в
+            занятиях
+          </span>
+        </label>
+
+        <Button type="submit" variant="mustard" fullWidth>Создать аккаунт</Button>
+      </form>
+
+      <p class="text-ink-mute mt-5 text-center text-xs leading-relaxed">
+        Письмо с подтверждением отправляется автоматически. Если его нет — проверьте
+        папку «Промоакции».
+      </p>
+
+      <p class="text-ink-soft mt-6 text-center text-sm">
+        Уже есть аккаунт?
+        <a href={withBase("/lk/login")} class="link-underline text-primary-deep font-medium">
+          Войти
+        </a>
+      </p>
+    </div>
+  </div>
+</LkLayout>

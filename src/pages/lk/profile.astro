@@ -1,0 +1,87 @@
+---
+import LkLayout from "../../layouts/LkLayout.astro";
+import Field from "../../components/lk/Field.astro";
+import Button from "../../components/ui/Button.astro";
+import { demoProfile } from "../../data/demoAccount";
+---
+
+<LkLayout title="Профиль" active="profile">
+  <div class="grid gap-5 lg:grid-cols-2">
+    <article class="card bg-surface p-7 sm:p-9">
+      <h2 class="text-2xl">Личные данные</h2>
+      <p class="prose-body mt-2 text-pretty">
+        Имя и почта видны только вам. На почту приходят письма о занятиях и покупках.
+      </p>
+
+      <form
+        class="mt-7 space-y-5"
+        data-demo-form
+        data-demo-message="Сохранение данных заработает после запуска сайта на хостинге."
+      >
+        <Field label="Имя" name="name" value={demoProfile.name} autocomplete="name" required />
+        <Field
+          label="Электронная почта"
+          name="email"
+          type="email"
+          value={demoProfile.email}
+          autocomplete="email"
+          required
+        />
+        <Field label="Город" name="city" value={demoProfile.city} placeholder="Не указан" />
+        <Button type="submit" variant="mustard">Сохранить изменения</Button>
+      </form>
+    </article>
+
+    <article class="card bg-surface p-7 sm:p-9">
+      <h2 class="text-2xl">Смена пароля</h2>
+      <p class="prose-body mt-2 text-pretty">
+        Меняя пароль, вы завершаете вход на всех остальных устройствах.
+      </p>
+
+      <form
+        class="mt-7 space-y-5"
+        data-demo-form
+        data-demo-message="Смена пароля заработает после запуска сайта на хостинге."
+      >
+        <Field
+          label="Текущий пароль"
+          name="current_password"
+          type="password"
+          autocomplete="current-password"
+          required
+        />
+        <Field
+          label="Новый пароль"
+          name="password"
+          type="password"
+          autocomplete="new-password"
+          minlength={8}
+          required
+        />
+        <Field
+          label="Повторите новый пароль"
+          name="password_confirm"
+          type="password"
+          autocomplete="new-password"
+          minlength={8}
+          required
+        />
+        <Button type="submit" variant="ghost">Обновить пароль</Button>
+      </form>
+
+      <div class="border-ink/10 mt-8 flex flex-wrap items-center justify-between gap-3 border-t pt-6">
+        <div>
+          <p class="font-medium">Выйти из аккаунта</p>
+          <p class="text-ink-mute mt-0.5 text-sm">Завершит текущую сессию</p>
+        </div>
+        <Button
+          variant="ghost"
+          data-demo
+          data-demo-message="Выход станет доступен после запуска сайта на хостинге."
+        >
+          Выйти
+        </Button>
+      </div>
+    </article>
+  </div>
+</LkLayout>

@@ -1,0 +1,48 @@
+---
+export interface Props {
+  label: string;
+  name: string;
+  type?: string;
+  placeholder?: string;
+  autocomplete?: string;
+  required?: boolean;
+  hint?: string;
+  minlength?: number;
+  value?: string;
+}
+
+const {
+  label,
+  name,
+  type = "text",
+  placeholder,
+  autocomplete,
+  required = false,
+  hint,
+  minlength,
+  value,
+} = Astro.props;
+---
+
+<div>
+  <label for={name} class="text-ink block text-sm font-medium">
+    {label}
+    {required && <span class="text-mustard-deep">*</span>}
+  </label>
+  <input
+    id={name}
+    name={name}
+    type={type}
+    value={value}
+    placeholder={placeholder}
+    autocomplete={autocomplete}
+    required={required}
+    minlength={minlength}
+    class="border-ink/15 bg-surface placeholder:text-ink-mute/70 focus:border-primary/50 focus:ring-primary/15 text-ink mt-2 w-full rounded-2xl border px-4 py-3 text-[15px] outline-none transition-colors focus:ring-2"
+  />
+  {
+    hint && (
+      <p class="text-ink-mute mt-1.5 text-xs">{hint}</p>
+    )
+  }
+</div>

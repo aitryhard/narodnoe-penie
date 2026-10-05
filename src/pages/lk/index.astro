@@ -1,0 +1,145 @@
+---
+import LkLayout from "../../layouts/LkLayout.astro";
+import Button from "../../components/ui/Button.astro";
+import { withBase } from "../../utils/base";
+import { courses } from "../../data/products";
+import {
+  demoOrders,
+  demoAccess,
+  demoProfile,
+  orderStatusLabel,
+} from "../../data/demoAccount";
+
+const purchased = courses.filter((course) => demoAccess.includes(course.slug));
+const pending = demoOrders.filter((order) => order.status === "pending");
+const paid = demoOrders.filter((order) => order.status === "paid");
+
+const stats = [
+  { label: "Куплено курсов", value: String(paid.length), href: "/lk/courses" },
+  { label: "Оплачено", value: String(paid.length), href: "/lk/orders" },
+  { label: "Ждут оплаты", value: String(pending.length), href: "/lk/orders" },
+];
+---
+
+<LkLayout title="Обзор" active="overview">
+  <div class="grid gap-5 lg:grid-cols-3">
+    <article class="card bg-surface p-7 lg:col-span-2">
+      <p class="text-ink-mute text-xs font-medium uppercase tracking-[0.14em]">
+        Здравствуйте
+      </p>
+      <h2 class="mt-3 text-2xl">{demoProfile.name}</h2>
+      <p class="prose-body mt-2 text-pretty">
+        Аккаунт создан {demoProfile.since}. Здесь собраны ваши курсы, материалы и покупки.
+      </p>
+
+      <dl class="mt-7 grid gap-4 sm:grid-cols-3">
+        {
+          stats.map((stat) => (
+            <a
+              href={withBase(stat.href)}
+              class="border-ink/10 hover:border-primary/40 hover:bg-primary/5 block rounded-2xl border p-4 transition-colors"
+            >
+              <dt class="text-ink-mute text-xs">{stat.label}</dt>
+              <dd class="text-ink mt-1 text-2xl font-semibold">{stat.value}</dd>
+            </a>
+          ))
+        }
+      </dl>
+    </article>
+
+    <article class="card bg-sand-50 p-7">
+      <p class="text-ink-mute text-xs font-medium uppercase tracking-[0.14em]">Быстрый доступ</p>
+      <div class="mt-5 flex flex-col gap-2.5">
+        <Button href={withBase("/lk/profile")} variant="ghost" fullWidth>
+          Профиль и пароль
+        </Button>
+        <Button href={withBase("/lk/courses")} variant="ghost" fullWidth>
+          Мои курсы
+        </Button>
+        <Button href={withBase("/lk/orders")} variant="ghost" fullWidth>
+          История покупок
+        </Button>
+      </div>
+    </article>
+  </div>
+
+  <section class="mt-5">
+    <div class="flex items-end justify-between gap-4">
+      <h2 class="text-2xl">Мои курсы</h2>
+      <a
+        href={withBase("/lk/courses")}
+        class="link-underline text-primary-deep text-sm font-medium"
+      >
+        Все курсы
+      </a>
+    </div>
+
+    {
+      purchased.length > 0 ? (
+        <div class="mt-5 grid gap-5 sm:grid-cols-2">
+          {purchased.map((course) => (
+            <a
+              href={withBase(`/lk/courses/${course.slug}`)}
+              class="card group block bg-surface p-7 transition-shadow hover:shadow-lift"
+            >
+              <span class="bg-primary/10 text-primary-deep inline-block rounded-full px-3 py-1 text-xs font-medium">
+                {course.format}
+              </span>
+              <h3 class="mt-4 text-xl group-hover:text-primary-deep transition-colors">
+                {course.title}
+              </h3>
+              <p class="prose-body mt-2 text-pretty">{course.lead}</p>
+              <span class="text-primary-deep mt-5 inline-block text-sm font-medium">
+                Открыть материалы →
+              </span>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <div class="card bg-surface mt-5 p-9 text-center">
+          <p class="prose-body">Купленных курсов пока нет.</p>
+          <Button href={withBase("/info-produkty")} variant="mustard" class="mt-5">
+            Посмотреть курсы
+          </Button>
+        </div>
+      )
+    }
+  </section>
+
+  <section class="mt-10">
+    <div class="flex items-end justify-between gap-4">
+      <h2 class="text-2xl">Последние покупки</h2>
+      <a href={withBase("/lk/orders")} class="link-underline text-primary-deep text-sm font-medium">
+        Все покупки
+      </a>
+    </div>
+
+    <div class="card bg-surface mt-5 divide-y divide-ink/10 overflow-hidden">
+      {
+        demoOrders.map((order) => (
+          <div class="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
+            <div>
+              <p class="font-medium">{order.courseTitle}</p>
+              <p class="text-ink-mute mt-0.5 text-sm">
+                № {order.id} · {order.date}
+              </p>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="font-medium">{order.amount}</span>
+              <span
+                class:list={[
+                  "rounded-full px-3 py-1 text-xs font-medium",
+                  order.status === "paid"
+                    ? "bg-primary/15 text-primary-deep"
+                    : "bg-mustard/40 text-mustard-deep",
+                ]}
+              >
+                {orderStatusLabel[order.status]}
+              </span>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+</LkLayout>

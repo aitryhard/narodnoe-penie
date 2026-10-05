@@ -1,0 +1,39 @@
+---
+import LkLayout from "../../layouts/LkLayout.astro";
+import Field from "../../components/lk/Field.astro";
+import Button from "../../components/ui/Button.astro";
+import { withBase } from "../../utils/base";
+---
+
+<LkLayout title="Восстановление пароля" active="auth">
+  <div class="mx-auto max-w-md">
+    <div class="card bg-surface p-7 sm:p-9">
+      <p class="prose-body text-pretty">
+        Укажите почту, на которую зарегистрирован аккаунт — пришлём ссылку для смены
+        пароля.
+      </p>
+
+      <form
+        class="mt-7 space-y-5"
+        data-demo-form
+        data-demo-message="Письмо для восстановления отправится после запуска сайта на хостинге."
+      >
+        <Field
+          label="Электронная почта"
+          name="email"
+          type="email"
+          autocomplete="email"
+          placeholder="you@mail.ru"
+          required
+        />
+        <Button type="submit" variant="mustard" fullWidth>Отправить ссылку</Button>
+      </form>
+
+      <p class="text-ink-soft mt-7 text-center text-sm">
+        <a href={withBase("/lk/login")} class="link-underline text-primary-deep font-medium">
+          Вернуться ко входу
+        </a>
+      </p>
+    </div>
+  </div>
+</LkLayout>

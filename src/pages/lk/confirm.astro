@@ -1,0 +1,48 @@
+---
+import LkLayout from "../../layouts/LkLayout.astro";
+import Button from "../../components/ui/Button.astro";
+import { withBase } from "../../utils/base";
+---
+
+<LkLayout title="Подтверждение почты" active="auth">
+  <div class="mx-auto max-w-md">
+    <div class="card bg-surface p-7 text-center sm:p-9">
+      <span
+        class="bg-primary/15 text-primary-deep ring-primary/20 mx-auto grid h-16 w-16 place-items-center rounded-full ring-1"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="h-8 w-8"
+          aria-hidden="true"
+        >
+          <path d="M20 6 9 17l-5-5"></path>
+        </svg>
+      </span>
+
+      <h2 class="mt-6 text-2xl">Почта подтверждена</h2>
+      <p class="prose-body mt-3 text-pretty">
+        Спасибо! Активен. Теперь можно войти в личный кабинет — там уже лежат ваши курсы
+        и материалы.
+      </p>
+
+      <div class="mt-7 flex flex-col gap-2.5">
+        <Button href={withBase("/lk/login")} variant="mustard" fullWidth>
+          Перейти ко входу
+        </Button>
+        <Button href={withBase("/")} variant="ghost" fullWidth>
+          На главную
+        </Button>
+      </div>
+
+      <p class="text-ink-mute mt-6 text-xs leading-relaxed">
+        Письмо отправляется автоматически после регистрации. Если ссылка не открывается —
+        скопируйте её из письма в адресную строку.
+      </p>
+    </div>
+  </div>
+</LkLayout>

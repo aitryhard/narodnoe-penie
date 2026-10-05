@@ -1,0 +1,97 @@
+---
+import LkLayout from "../../layouts/LkLayout.astro";
+import Button from "../../components/ui/Button.astro";
+import { withBase } from "../../utils/base";
+import { demoOrders, orderStatusLabel } from "../../data/demoAccount";
+
+const paid = demoOrders.filter((order) => order.status === "paid");
+const total = paid.reduce((sum, order) => sum + Number(order.amount.replace(/\D/g, "")), 0);
+const totalLabel = `${total.toLocaleString("ru-RU")} ₽`;
+---
+
+<LkLayout title="История покупок" active="orders">
+  <p class="prose-body max-w-2xl text-pretty">
+    Все заказы школы: что куплено, что ожидает оплаты. Чек можно скачать после
+    подключения оплаты.
+  </p>
+
+  <div class="mt-7 grid gap-5 lg:grid-cols-3">
+    <div class="card bg-surface p-7">
+      <p class="text-ink-mute text-sm">Оплачено</p>
+      <p class="mt-1.5 text-2xl font-semibold">{paid.length}</p>
+      <p class="text-ink-mute mt-1 text-xs">заказов</p>
+    </div>
+    <div class="card bg-surface p-7">
+      <p class="text-ink-mute text-sm">Сумма покупок</p>
+      <p class="mt-1.5 text-2xl font-semibold">{totalLabel}</p>
+      <p class="text-ink-mute mt-1 text-xs">включая только оплаченные</p>
+    </div>
+    <div class="card bg-surface p-7">
+      <p class="text-ink-mute text-sm">Ожидают оплаты</p>
+      <p class="mt-1.5 text-2xl font-semibold">
+        {demoOrders.length - paid.length}
+      </p>
+      <p class="text-ink-mute mt-1 text-xs">заказов</p>
+    </div>
+  </div>
+
+  <div class="card bg-surface mt-5 overflow-hidden">
+    <div class="border-ink/10 hidden border-b px-6 py-4 md:grid md:grid-cols-12 md:gap-4">
+      <span class="text-ink-mute md:col-span-2 text-xs font-medium uppercase tracking-[0.14em]">№</span>
+      <span class="text-ink-mute md:col-span-3 text-xs font-medium uppercase tracking-[0.14em]">Дата</span>
+      <span class="text-ink-mute md:col-span-3 text-xs font-medium uppercase tracking-[0.14em]">Курс</span>
+      <span class="text-ink-mute md:col-span-2 text-xs font-medium uppercase tracking-[0.14em]">Сумма</span>
+      <span class="text-ink-mute md:col-span-2 text-xs font-medium uppercase tracking-[0.14em]">Статус</span>
+    </div>
+
+    <div class="divide-y divide-ink/10">
+      {
+        demoOrders.map((order) => (
+          <div class="flex flex-col gap-3 px-6 py-5 md:grid md:grid-cols-12 md:items-center md:gap-4">
+            <span class="text-ink-mute text-sm md:col-span-2">№ {order.id}</span>
+            <span class="text-sm md:col-span-3">{order.date}</span>
+            <a
+              href={withBase(`/kursy/${order.courseSlug}`)}
+              class="link-underline hover:text-ink-soft md:col-span-3 text-[15px] font-medium"
+            >
+              {order.courseTitle}
+            </a>
+            <span class="text-[15px] font-medium md:col-span-2">{order.amount}</span>
+            <span class="md:col-span-2 flex flex-wrap items-center gap-2">
+              <span
+                class:list={[
+                  "rounded-full px-3 py-1 text-xs font-medium",
+                  order.status === "paid"
+                    ? "bg-primary/15 text-primary-deep"
+                    : "bg-mustard/40 text-mustard-deep",
+                ]}
+              >
+                {orderStatusLabel[order.status]}
+              </span>
+              {order.status === "pending" && (
+                <button
+                  type="button"
+                  data-demo
+                  data-demo-message="Оплата подключается отдельно: для демо нажатие показывает, как будет проходить покупка."
+                  class="text-primary-deep hover:bg-primary/10 rounded-full px-3 py-1 text-xs font-medium transition-colors"
+                >
+                  Оплатить
+                </button>
+              )}
+            </span>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="mt-5 flex flex-wrap items-center justify-between gap-4">
+    <p class="text-ink-mute max-w-xl text-xs leading-relaxed">
+      Это демонстрационные данные: заказы и суммы вымышлены, чтобы показать, как будет
+      выглядеть история покупок после подключения оплаты.
+    </p>
+    <Button href={withBase("/lk/courses")} variant="ghost" size="sm">
+      Мои курсы
+    </Button>
+  </div>
+</LkLayout>

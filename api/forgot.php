@@ -23,7 +23,10 @@ if ($user !== null) {
         'reset',
         (int) api_config()['reset_ttl_hours']
     );
-    send_reset_email($user, $token);
+
+    if (!send_reset_email($user, $token)) {
+        api_fail('Не удалось отправить письмо. Попробуйте чуть позже.', [], 502);
+    }
 
     if (api_dev_mode()) {
         $data['devResetUrl'] = api_site_url() . '/lk/update-password/?token=' . urlencode($token);

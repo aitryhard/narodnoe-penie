@@ -2,42 +2,30 @@
 declare(strict_types=1);
 
 /**
- * Применяет схему базы данных.
+ * Проверяет подключение к базе и создаёт таблицы, если их ещё нет.
  *
  *   php database/install.php
  *
- * Схема выбирается по настройке db_dsn в api/config.php:
- * sqlite -> schema.sqlite.sql,  mysql -> schema.mysql.sql.
- * Повторный запуск безопасен (IF NOT EXISTS).
+ * В боевом окружении делать это вручную не нужно: API создаёт таблицы
+ * само при первом обращении (см. api/lib/schema.php).
  */
 
 require __DIR__ . '/../api/bootstrap.php';
 
 $dsn = (string) api_config()['db_dsn'];
-$file = str_starts_with($dsn, 'sqlite:') ? 'schema.sqlite.sql' : 'schema.mysql.sql';
-$path = __DIR__ . '/' . $file;
+$dialect = str_starts_with($dsn, 'sqlite:') ? 'sqlite' : 'mysql';
 
-$sql = file_get_contents($path);
-if ($sql === false) {
-    fwrite(STDERR, "Не найден файл схемы: {$path}\n");
-    exit(1);
-}
-
-// Убираем комментарии — иначе они попадут внутрь запросов.
-$sql = preg_replace('/^\s*--.*$/m', '', $sql);
-
-$statements = array_filter(array_map('trim', explode(';', $sql)));
+db();
 
 $pdo = db();
-$applied = 0;
+$tables = $dialect === 'sqlite'
+    ? $pdo->query("SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('users', 'auth_tokens')")->fetchAll()
+    : $pdo->query(
+        "SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name IN ('users', 'auth_tokens')"
+    )->fetchAll();
 
-foreach ($statements as $statement) {
-    if ($statement === '') {
-        continue;
-    }
-    $pdo->exec($statement);
-    $applied++;
-}
-
-echo "Схема применена ({$file}), запросов: {$applied}\n";
-echo "База: {$dsn}\n";
+echo 'Подключение: ' . ($dialect === 'sqlite' ? 'SQLite' : 'MySQL') . "\n";
+echo 'База: ' . $dsn . "\n";
+echo 'Таблицы: ' . count($tables) . " из 2 (users, auth_tokens)\n";
+echo count($tables) === 2 ? "Готово.\n" : "Таблицы не созданы — смотрите лог ошибок PHP.\n";
+exit(count($tables) === 2 ? 0 : 1);

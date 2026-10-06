@@ -23,7 +23,10 @@ if ($user !== null && $user['email_verified_at'] === null) {
         'confirm',
         (int) api_config()['confirm_ttl_hours']
     );
-    send_confirm_email($user, $token);
+
+    if (!send_confirm_email($user, $token)) {
+        api_fail('Не удалось отправить письмо. Попробуйте чуть позже.', [], 502);
+    }
 
     if (api_dev_mode()) {
         $data['devConfirmationUrl'] = confirm_url($token);

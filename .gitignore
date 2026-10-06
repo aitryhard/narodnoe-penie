@@ -32,6 +32,9 @@ yarn-error.log*
 /var
 /api/config.local.php
 
+# сборки под хостинг
+/*.zip
+
 # typescript
 *.tsbuildinfo
 

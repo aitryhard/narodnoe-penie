@@ -2,7 +2,6 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PageHero from "../components/PageHero.astro";
 import Button from "../components/ui/Button.astro";
-import { links } from "../config/links";
 import { withBase } from "../utils/base";
 
 const steps = [
@@ -100,7 +99,6 @@ const steps = [
           </div>
           <div class="flex flex-wrap gap-3">
             <Button href={withBase("/info-produkty")} variant="primary">Инфо-продукты</Button>
-            <Button href={links.signup} variant="mustard">Записаться</Button>
           </div>
         </div>
       </div>

@@ -4,20 +4,20 @@ declare(strict_types=1);
 /**
  * Настройки API.
  *
- * Локально работает SQLite (файл var/app.sqlite) — базу ставить не нужно.
- * На Beget создайте config.local.php с MySQL-подключением (пример ниже),
- * этот файл трогать не придётся.
+ * Локально работает SQLite (файл var/app.sqlite) — базу ставить не нужно,
+ * таблицы создаются сами при первом обращении.
  *
- * Пример config.local.php для Beget:
+ * На Beget создайте рядом файл config.local.php — он подключается поверх
+ * этих настроек, поэтому сам config.php править не придётся.
+ *
+ * Пример config.local.php для Beget (имя базы = имя пользователя MySQL):
  *
  *   <?php
  *   return [
- *       'dev'        => false,
- *       'site_url'   => 'https://www.narodnoe-penie.ru',
- *       'db_dsn'     => 'mysql:host=localhost;dbname=пользователь_БД;charset=utf8mb4',
- *       'db_user'    => 'пользователь_БД',
- *       'db_pass'    => 'пароль',
- *       'mail_from'  => 'no-reply@narodnoe-penie.ru',
+ *       'dev'      => false,
+ *       'db_dsn'   => 'mysql:host=localhost;dbname=ваша_база;charset=utf8mb4',
+ *       'db_user'  => 'ваша_база',
+ *       'db_pass'  => 'ваш_пароль',
  *   ];
  */
 
@@ -26,14 +26,17 @@ return [
     // false — письма уходят по-настоящему (нужен рабочий mail на хостинге)
     'dev' => true,
 
-    'site_url' => 'http://localhost:8000',
+    // null — адрес сайта определяется автоматически из запроса.
+    // Задайте явно, только если сайт открывается по нескольким доменам.
+    'site_url' => null,
+
+    // null — письма уходят с no-reply@ваш-домен.
+    'mail_from' => null,
+    'mail_from_name' => 'Народное пение',
 
     'db_dsn' => 'sqlite:' . dirname(__DIR__) . '/var/app.sqlite',
     'db_user' => null,
     'db_pass' => null,
-
-    'mail_from' => 'no-reply@localhost',
-    'mail_from_name' => 'Народное пение',
 
     // Время жизни ссылки подтверждения и ссылки сброса пароля, в часах
     'confirm_ttl_hours' => 24,

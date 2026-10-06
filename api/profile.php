@@ -53,7 +53,16 @@ if ($emailChanged) {
     // Новый адрес нужно подтвердить заново — иначе письма уйдут не туда.
     $fresh = find_user_by_id((int) $user['id']);
     $token = create_token((int) $fresh['id'], 'confirm', (int) api_config()['confirm_ttl_hours']);
-    send_confirm_email($fresh, $token);
+
+    if (!send_confirm_email($fresh, $token)) {
+        // Письмо не ушло — возвращаем прежнюю почту, иначе вход закроется
+        // навсегда: подтвердить новый адрес будет нечем.
+        db_write(
+            'UPDATE users SET email = ?, email_verified_at = ?, updated_at = ? WHERE id = ?',
+            [$user['email'], $user['email_verified_at'], $now, (int) $user['id']]
+        );
+        api_fail('Не удалось отправить письмо на новый адрес. Попробуйте позже.', ['fields' => ['email' => '']], 502);
+    }
 
     $data['emailChanged'] = true;
     if (api_dev_mode()) {

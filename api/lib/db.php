@@ -11,6 +11,7 @@ function db(): PDO
     $config = api_config();
     $dsn = (string) $config['db_dsn'];
     $isSqlite = str_starts_with($dsn, 'sqlite:');
+    $dialect = $isSqlite ? 'sqlite' : 'mysql';
 
     if ($isSqlite) {
         $path = substr($dsn, strlen('sqlite:'));
@@ -20,17 +21,57 @@ function db(): PDO
         }
     }
 
-    $pdo = new PDO($dsn, $config['db_user'], $config['db_pass'], [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES => false,
-    ]);
+    try {
+        $pdo = new PDO($dsn, $config['db_user'], $config['db_pass'], [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false,
+        ]);
 
-    if ($isSqlite) {
-        $pdo->exec('PRAGMA foreign_keys = ON');
+        if ($isSqlite) {
+            $pdo->exec('PRAGMA foreign_keys = ON');
+        }
+
+        db_ensure_schema($pdo, $dialect);
+    } catch (PDOException $exception) {
+        error_log('[api] База данных: ' . $exception->getMessage());
+
+        if (PHP_SAPI === 'cli') {
+            throw $exception;
+        }
+
+        api_fail(
+            'Не удалось подключиться к базе данных. Проверьте данные в api/config.local.php.',
+            [],
+            500
+        );
     }
 
     return $pdo;
+}
+
+/**
+ * Создаёт таблицы, если их ещё нет. Повторные обращения ничего не делают —
+ * лишний запрос к information_schema выполняется один раз за запрос к API.
+ */
+function db_ensure_schema(PDO $pdo, string $dialect): void
+{
+    $exists = $dialect === 'sqlite'
+        ? $pdo->query("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'users'")->fetch()
+        : $pdo->query(
+            "SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'users' LIMIT 1"
+        )->fetch();
+
+    if ($exists !== false) {
+        return;
+    }
+
+    $statements = require __DIR__ . '/schema.php';
+    $statements = $statements[$dialect] ?? [];
+
+    foreach ($statements as $statement) {
+        $pdo->exec($statement);
+    }
 }
 
 function db_one(string $sql, array $params = []): ?array

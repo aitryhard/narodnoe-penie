@@ -3,60 +3,15 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import PageHero from "../components/PageHero.astro";
 import Button from "../components/ui/Button.astro";
 import { links } from "../config/links";
+import { reviews } from "../data/reviews";
 import { withBase } from "../utils/base";
-
-/** ЗАГЛУШКИ — заменить реальными отзывами из ВК */
-const reviews = [
-  {
-    text: "Раньше я боялась брать высокую ноту — думала, что не получится. За три месяца поняла, что всё дело в дыхании и опоре. Теперь пою открыто.",
-    name: "Имя — заглушка",
-    meta: "город — заглушка",
-    tone: "bg-surface",
-    avatar: "bg-rose-200",
-  },
-  {
-    text: "Мы работаем с записью свадебных песен, и впервые я услышала в ней то, что слышала бабушка. На курсе «Переходы» это объяснили спокойно и подробно.",
-    name: "Имя — заглушка",
-    meta: "город — заглушка",
-    tone: "bg-sand-50",
-    avatar: "bg-primary/25",
-  },
-  {
-    text: "Онлайн-занятия оказались очень живыми. Группа маленькая, слышно всех, и никто не торопится. Заклички весны я теперь пою всей семье.",
-    name: "Имя — заглушка",
-    meta: "город — заглушка",
-    tone: "bg-surface",
-    avatar: "bg-mustard/45",
-  },
-  {
-    text: "Пришла без слуха и без опыта. Через четыре месяца спела соло на домашнем концерте. Про «Песни банных обрядов» рассказать не могу — там слишком много всего.",
-    name: "Имя — заглушка",
-    meta: "город — заглушка",
-    tone: "bg-sand-50",
-    avatar: "bg-rose-300",
-  },
-  {
-    text: "Очень бережная подача. Никто не заставляет петь «как надо» — подстраиваются под голос. Это редкость и очень дорогого стоит.",
-    name: "Имя — заглушка",
-    meta: "город — заглушка",
-    tone: "bg-surface",
-    avatar: "bg-primary/25",
-  },
-  {
-    text: "Группа встретилась вживую в зале, и это совсем не похоже на «занятие у репетитора». После двух часов разбирали Троицу до позднего вечера.",
-    name: "Имя — заглушка",
-    meta: "город — заглушка",
-    tone: "bg-sand-50",
-    avatar: "bg-mustard/45",
-  },
-];
 ---
 
 <BaseLayout title="Отзывы">
   <PageHero
     label="Отзывы"
     title="Что говорят ученицы"
-    intro="Здесь появятся реальные отзывы из группы во ВКонтакте. Пока стоят заглушки — по структуре они уже готовы к замене."
+    intro="Реальные отзывы из ВКонтакте: отзывы к курсам каталога и комментарии к записям школы. Здесь — все, что удалось собрать, без сокращений."
     tone="green"
   />
 
@@ -74,7 +29,18 @@ const reviews = [
               {review.text}
             </blockquote>
             <figcaption class="mt-5 flex items-center gap-3 border-t border-ink/5 pt-4">
-              <span class={`h-9 w-9 rounded-full ${review.avatar}`}></span>
+              {review.avatar ? (
+                <img
+                  src={withBase(review.avatar)}
+                  alt=""
+                  width="36"
+                  height="36"
+                  loading="lazy"
+                  class="h-9 w-9 shrink-0 rounded-full object-cover"
+                />
+              ) : (
+                <span class={`h-9 w-9 shrink-0 rounded-full ${review.avatarTone}`}></span>
+              )}
               <span class="text-sm">
                 <span class="block font-medium text-ink">{review.name}</span>
                 <span class="block text-xs text-ink-mute">{review.meta}</span>
@@ -93,8 +59,7 @@ const reviews = [
         </p>
       </div>
       <div class="flex flex-wrap gap-3">
-        <Button href={withBase("/info-produkty")} variant="primary">Инфо-продукты</Button>
-        <Button href={links.signup} variant="mustard">Записаться</Button>
+        <Button href={links.signup} variant="primary">Записаться</Button>
       </div>
     </div>
   </section>

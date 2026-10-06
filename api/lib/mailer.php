@@ -33,10 +33,18 @@ function send_mail(string $to, string $subject, string $body): bool
         'MIME-Version: 1.0',
         'Content-Type: text/plain; charset=UTF-8',
         'Content-Transfer-Encoding: 8bit',
-        sprintf('From: %s <%s>', $config['mail_from_name'], $config['mail_from']),
+        sprintf('From: %s <%s>', $config['mail_from_name'], api_mail_from()),
     ]);
 
-    return mail($to, '=?UTF-8?B?' . base64_encode($subject) . '?=', $body, $headers);
+    // @ подавляет Warning от mail(): он попал бы в вывод, сломал бы заголовки
+    // и превратил бы JSON-ответ в HTML со статусом 200.
+    $sent = @mail($to, '=?UTF-8?B?' . base64_encode($subject) . '?=', $body, $headers);
+
+    if (!$sent) {
+        error_log(sprintf('[api] Не удалось отправить письмо "%s" на %s', $subject, $to));
+    }
+
+    return $sent;
 }
 
 function confirm_url(string $rawToken): string

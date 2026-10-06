@@ -31,9 +31,44 @@ function api_is_https(): bool
     return ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
 }
 
+/** Имя сайта из запроса: www.example.ru → example.ru */
+function api_site_host(): string
+{
+    $host = (string) ($_SERVER['HTTP_HOST'] ?? 'localhost');
+
+    // Защита от подстановки мусора в заголовке Host.
+    if (!preg_match('/^[A-Za-z0-9.\-]+(:\d+)?$/', $host)) {
+        return 'localhost';
+    }
+
+    return preg_replace('/^www\./i', '', $host) ?? 'localhost';
+}
+
+/**
+ * Адрес сайта. Задаётся в config.php/config.local.php, а если не задан —
+ * берётся из запроса, чтобы ссылки в письмах работали на любом домене.
+ */
 function api_site_url(): string
 {
-    return rtrim(api_config()['site_url'], '/');
+    $configured = api_config()['site_url'] ?? null;
+
+    if (is_string($configured) && $configured !== '') {
+        return rtrim($configured, '/');
+    }
+
+    return (api_is_https() ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
+}
+
+/** Отправитель письма. По умолчанию — no-reply@домен-сайта. */
+function api_mail_from(): string
+{
+    $configured = api_config()['mail_from'] ?? null;
+
+    if (is_string($configured) && $configured !== '') {
+        return $configured;
+    }
+
+    return 'no-reply@' . api_site_host();
 }
 
 function api_dev_mode(): bool
@@ -162,6 +197,15 @@ function api_session_start(): void
     session_name('napp_sid');
     session_set_cookie_params($params);
     session_start();
+}
+
+/**
+ * В боевом режиме предупреждения PHP не должны попадать в тело ответа:
+ * лишний текст до JSON ломает разбор на клиенте. Ошибки при этом остаются
+ * в error_log (их видно в логах хостинга).
+ */
+if (!api_dev_mode()) {
+    ini_set('display_errors', '0');
 }
 
 api_session_start();

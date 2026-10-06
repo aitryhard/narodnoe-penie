@@ -10,7 +10,7 @@ import { siteConfig } from "../config/site";
   <PageHero
     label="Контакты"
     title="Свяжитесь с нами"
-    intro="Мы на связи во ВКонтакте и в мессенджере «Макс». Отвечаем быстро и отвечаем сами — без менеджеров-роботов."
+    intro="Мы на связи во ВКонтакте, в Telegram и в мессенджере «Макс», а также на почте. Отвечаем быстро и отвечаем сами — без менеджеров-роботов."
     tone="rose"
   />
 
@@ -65,6 +65,56 @@ import { siteConfig } from "../config/site";
           <Button href={links.max} variant="ghost">Задать вопрос</Button>
         </div>
         <p class="mt-4 text-xs text-ink-mute">Ссылка — заглушка, ждём реальный ник</p>
+      </article>
+
+      <article class="card flex flex-col bg-surface p-7 sm:p-9">
+        <span class="grid h-12 w-12 place-items-center rounded-2xl bg-primary/15 text-primary-deep">
+          <svg viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6" aria-hidden="true">
+            <path
+              d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"
+            ></path>
+          </svg>
+        </span>
+
+        <h2 class="mt-6 text-2xl">Telegram</h2>
+        <p class="prose-body mt-3 flex-1 text-pretty">
+          Анонсы, короткие новости и быстрые ответы. Удобно, если не хочется
+          открывать соцсеть.
+        </p>
+
+        <div class="mt-7 flex flex-wrap gap-2.5">
+          <Button href={links.telegram} variant="primary">Написать в Telegram</Button>
+        </div>
+        <p class="mt-4 text-xs text-ink-mute">Ссылка — заглушка, ждём реальный канал</p>
+      </article>
+
+      <article class="card flex flex-col bg-surface p-7 sm:p-9">
+        <span class="grid h-12 w-12 place-items-center rounded-2xl bg-rose-100 text-rose-accent">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.75"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="h-6 w-6"
+            aria-hidden="true"
+          >
+            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+          </svg>
+        </span>
+
+        <h2 class="mt-6 text-2xl">Почта</h2>
+        <p class="prose-body mt-3 flex-1 text-pretty">
+          Для длинных вопросов, договоров и всего, что нужно сохранить:
+          ответим письмом и никуда не денем.
+        </p>
+
+        <div class="mt-7 flex flex-wrap gap-2.5">
+          <Button href={links.email} variant="primary">Написать на почту</Button>
+        </div>
+        <p class="mt-4 text-xs text-ink-mute">Адрес — заглушка, ждём реальную почту</p>
       </article>
     </div>
 

@@ -56,7 +56,12 @@ $token = create_token(
     (int) api_config()['confirm_ttl_hours']
 );
 
-send_confirm_email($user, $token);
+if (!send_confirm_email($user, $token)) {
+    // Письмо не ушло — убираем аккаунт, иначе человек останется
+    // с неподтверждённой записью и без возможности повторить попытку.
+    db_write('DELETE FROM users WHERE id = ?', [(int) $user['id']]);
+    api_fail('Не удалось отправить письмо с подтверждением. Попробуйте чуть позже.', [], 502);
+}
 
 $data = ['email' => $email];
 

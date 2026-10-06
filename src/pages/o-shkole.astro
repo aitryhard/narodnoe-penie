@@ -4,7 +4,6 @@ import PageHero from "../components/PageHero.astro";
 import Button from "../components/ui/Button.astro";
 import PhotoFrame from "../components/ui/PhotoFrame.astro";
 import VideoFrame from "../components/ui/VideoFrame.astro";
-import { links } from "../config/links";
 import { withBase } from "../utils/base";
 
 const values = [
@@ -59,7 +58,6 @@ const values = [
 
         <div class="mt-8 flex flex-wrap gap-3 border-t border-ink/5 pt-7">
           <Button href={withBase("/info-produkty")} variant="primary">Смотреть инфо-продукты</Button>
-          <Button href={links.signup} variant="ghost">Записаться на занятие</Button>
         </div>
       </div>
 
@@ -89,9 +87,6 @@ const values = [
           Сюда можно вставить запись открытого занятия, фрагмент концерта или рассказ
           ведущей о школе.
         </p>
-        <div class="mt-6">
-          <Button href={withBase("/info-produkty")} variant="primary">Смотреть инфо-продукты</Button>
-        </div>
       </div>
     </div>
   </section>

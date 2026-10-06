@@ -4,7 +4,6 @@ import PageHero from "../../components/PageHero.astro";
 import Button from "../../components/ui/Button.astro";
 import { links } from "../../config/links";
 import { courses, type Course } from "../../data/products";
-import { withBase } from "../../utils/base";
 
 export function getStaticPaths() {
   return courses.map((course) => ({
@@ -21,8 +20,6 @@ const toneClass: Record<Course["tone"], string> = {
 };
 
 const { course } = Astro.props as { course: Course };
-
-const others = courses.filter((item) => item.slug !== course.slug).slice(0, 3);
 ---
 
 <BaseLayout title={course.title} description={course.lead}>
@@ -104,19 +101,13 @@ const others = courses.filter((item) => item.slug !== course.slug).slice(0, 3);
           </p>
 
           <div class="mt-7 flex flex-col gap-2.5">
-            <Button href={links.buy} variant="mustard" size="lg" fullWidth>
+            <Button href={links.buy} variant="primary" size="lg" fullWidth>
               Купить курс
-            </Button>
-            <Button href={links.signup} variant="primary" size="lg" fullWidth>
-              Узнать подробнее
-            </Button>
-            <Button href={links.max} variant="ghost" size="lg" fullWidth>
-              Задать вопрос
             </Button>
           </div>
 
           <p class="mt-4 text-center text-xs text-ink-mute">
-            Кнопки — заглушки. Оплата подключается позже.
+            Оплата подключается позже.
           </p>
         </div>
 
@@ -129,31 +120,6 @@ const others = courses.filter((item) => item.slug !== course.slug).slice(0, 3);
           </ul>
         </div>
       </aside>
-    </div>
-  </section>
-
-  <section class="wrap pb-16 sm:pb-20">
-    <h2 class="text-2xl">Другие проекты</h2>
-    <div class="mt-6 grid gap-4 md:grid-cols-3">
-      {
-        others.map((item) => (
-          <a
-            href={withBase(`/kursy/${item.slug}`)}
-            class="card group bg-surface p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-lift"
-          >
-            <span class={`rounded-full px-3 py-1 text-xs font-medium ${toneClass[item.tone]}`}>
-              {item.letter})
-            </span>
-            <h3 class="mt-4 text-lg">{item.title}</h3>
-            <p class="mt-2 text-sm leading-relaxed text-ink-soft">{item.lead}</p>
-          </a>
-        ))
-      }
-    </div>
-
-    <div class="mt-8 flex flex-wrap gap-3">
-      <Button href={withBase("/info-produkty")} variant="primary">Все инфо-продукты</Button>
-      <Button href={withBase("/kontakty")} variant="ghost">Контакты</Button>
     </div>
   </section>
 </BaseLayout>

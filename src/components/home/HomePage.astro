@@ -22,7 +22,7 @@ import { withBase } from "../../utils/base";
           Санкт-Петербург · онлайн по всему миру
         </span>
 
-        <h1 class="mt-6 text-balance text-[2.1rem] leading-[1.1] sm:text-5xl lg:text-[3.4rem]">
+        <h1 class="mt-6 text-balance text-3xl leading-[1.15] sm:text-4xl sm:leading-[1.15] lg:text-5xl lg:leading-[1.1]">
           Народное пение,<br class="hidden sm:block" />
           которому учатся и которое радует
         </h1>
@@ -41,16 +41,16 @@ import { withBase } from "../../utils/base";
 
         <dl class="mt-10 grid max-w-lg grid-cols-3 gap-6 border-t border-ink/10 pt-7">
           <div>
-            <dt class="font-display text-2xl font-semibold text-primary-deep">6</dt>
-            <dd class="mt-1 text-xs leading-snug text-ink-soft">обучающих проектов</dd>
+            <dt class="font-display text-2xl font-semibold text-primary-deep">3</dt>
+            <dd class="mt-1 text-sm leading-snug text-ink-soft">формата занятий</dd>
           </div>
           <div>
             <dt class="font-display text-2xl font-semibold text-primary-deep">6</dt>
-            <dd class="mt-1 text-xs leading-snug text-ink-soft">человек в группе</dd>
+            <dd class="mt-1 text-sm leading-snug text-ink-soft">человек в группе</dd>
           </div>
           <div>
             <dt class="font-display text-2xl font-semibold text-primary-deep">100%</dt>
-            <dd class="mt-1 text-xs leading-snug text-ink-soft">живого звука</dd>
+            <dd class="mt-1 text-sm leading-snug text-ink-soft">живого звука</dd>
           </div>
         </dl>
       </div>
@@ -66,8 +66,8 @@ import { withBase } from "../../utils/base";
         <div
           class="absolute -bottom-5 -left-5 hidden rounded-2xl border border-ink/5 bg-surface px-5 py-4 shadow-lift sm:block"
         >
-          <p class="font-display text-lg font-semibold">Сегодня поём</p>
-          <p class="mt-0.5 text-xs text-ink-mute">заклички весны · 19:00</p>
+          <p class="font-display text-lg font-semibold">Онлайн-занятия</p>
+          <p class="mt-0.5 text-xs text-ink-mute">по средам · 11:00–12:00</p>
         </div>
       </div>
     </div>
@@ -82,13 +82,13 @@ import { withBase } from "../../utils/base";
     </div>
     <a
       href={withBase("/info-produkty")}
-      class="link-underline shrink-0 self-start text-[15px] text-ink-soft hover:text-ink sm:self-auto"
+      class="link-underline shrink-0 self-start inline-flex min-h-8 items-center text-[15px] text-ink-soft hover:text-ink sm:self-auto"
     >
       Все инфо-продукты
     </a>
   </div>
 
-  <div class="mt-8 grid gap-5 md:grid-cols-2">
+  <div class="mt-8 grid gap-5 md:grid-cols-2 md:[&>*:last-child:nth-child(odd)]:col-span-2 md:[&>*:last-child:nth-child(odd)]:justify-self-center md:[&>*:last-child:nth-child(odd)]:w-[calc(50%-10px)]">
     {
       lessons.map((lesson) => (
         <a
@@ -149,17 +149,17 @@ import { withBase } from "../../utils/base";
     }
   </div>
 
-  <div class="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+  <div class="mt-5 grid gap-5 sm:grid-cols-2 sm:[&>*:last-child:nth-child(odd)]:col-span-2 sm:[&>*:last-child:nth-child(odd)]:justify-self-center sm:[&>*:last-child:nth-child(odd)]:w-[calc(50%-10px)] lg:grid-cols-3 lg:[&>*:last-child:nth-child(odd)]:col-span-1 lg:[&>*:last-child:nth-child(odd)]:w-auto lg:[&>*:last-child:nth-child(odd)]:justify-self-auto">
     {
-      courses.slice(0, 3).map((course) => (
+      courses.slice(0, 3).map((course, i) => (
         <a
           href={withBase(`/kursy/${course.slug}`)}
           class="card group flex flex-col bg-sand-50 p-6 transition-all duration-200 hover:-translate-y-1 hover:bg-surface hover:shadow-lift"
         >
           <span class="font-display text-sm font-semibold text-mustard-deep">
-            {course.letter})
+            {String(i + 1).padStart(2, "0")}
           </span>
-          <h3 class="mt-3 text-lg">{course.title}</h3>
+          <h3 class="mt-3 text-xl">{course.title}</h3>
           <p class="mt-2 flex-1 text-sm leading-relaxed text-ink-soft">{course.lead}</p>
           <span class="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary-deep">
             Подробнее
@@ -193,7 +193,7 @@ import { withBase } from "../../utils/base";
       </p>
       <a
         href={withBase("/o-shkole")}
-        class="link-underline mt-6 inline-flex items-center gap-2 text-[15px] font-medium text-primary-deep"
+        class="link-underline mt-6 inline-flex min-h-8 items-center gap-2 text-[15px] font-medium text-primary-deep"
       >
         Подробнее о школе
       </a>
@@ -207,7 +207,7 @@ import { withBase } from "../../utils/base";
       </p>
       <a
         href={withBase("/o-veduschej")}
-        class="link-underline mt-6 inline-flex items-center gap-2 text-[15px] font-medium text-primary-deep"
+        class="link-underline mt-6 inline-flex min-h-8 items-center gap-2 text-[15px] font-medium text-primary-deep"
       >
         Прочитать историю
       </a>
@@ -222,14 +222,14 @@ import { withBase } from "../../utils/base";
       <h2 class="mt-4 text-balance text-2xl sm:text-3xl">Что говорят после занятий</h2>
     </div>
     <a
-        href={withBase("/otzyvy")}
-      class="link-underline shrink-0 self-start text-[15px] text-ink-soft hover:text-ink sm:self-auto"
+      href={withBase("/otzyvy")}
+      class="link-underline shrink-0 self-start inline-flex min-h-8 items-center text-[15px] text-ink-soft hover:text-ink sm:self-auto"
     >
       Все отзывы
     </a>
   </div>
 
-  <div class="mt-8 grid gap-5 md:grid-cols-3" id="home-reviews">
+  <div class="mt-8 grid gap-5 md:grid-cols-3 md:[&>*:last-child:nth-child(3n+1)]:col-start-2" id="home-reviews">
     {
       reviews.map((review) => (
         <figure class="card flex flex-col bg-surface p-6">
@@ -247,21 +247,23 @@ import { withBase } from "../../utils/base";
             {review.text}
           </blockquote>
           <figcaption class="mt-5 flex items-center gap-3 border-t border-ink/5 pt-4">
-            {review.avatar ? (
-              <img
-                src={withBase(review.avatar)}
-                alt=""
-                width="36"
-                height="36"
-                loading="lazy"
-                class="h-9 w-9 shrink-0 rounded-full object-cover"
-              />
-            ) : (
-              <span class={`h-9 w-9 shrink-0 rounded-full ${review.avatarTone}`}></span>
-            )}
+            <span
+              class:list={[
+                "grid h-10 w-10 shrink-0 place-items-center rounded-full font-display text-[13px] font-semibold uppercase tracking-wide text-primary-deep ring-1 ring-ink/5",
+                review.avatarTone,
+              ]}
+            >
+              {
+                review.name
+                  .split(/\s+/)
+                  .slice(0, 2)
+                  .map((word) => word[0])
+                  .join("")
+              }
+            </span>
             <span class="text-sm">
               <span class="block font-medium text-ink">{review.name}</span>
-              <span class="block text-xs text-ink-mute">{review.meta}</span>
+              <span class="block text-sm text-ink-mute">{review.meta}</span>
             </span>
           </figcaption>
         </figure>
@@ -288,7 +290,7 @@ import { withBase } from "../../utils/base";
   </script>
 </section>
 
-<section class="wrap pb-4">
+<section class="wrap pb-16 sm:pb-20">
   <div
     class="card relative overflow-hidden bg-ink px-7 py-12 text-center text-sand-50 sm:px-12 sm:py-16"
   >

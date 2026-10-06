@@ -23,14 +23,14 @@ const toneClass = {
     tone="sand"
   />
 
-  <section class="wrap py-14 sm:py-16">
+  <section class="wrap pt-14 pb-16 sm:pt-16 sm:pb-20">
     <h2 class="text-balance text-2xl sm:text-3xl">Регулярные занятия</h2>
     <p class="prose-body mt-3 max-w-2xl">
       Постоянная работа: слушаем, разбираем, поём вместе. Подходит, если хочется
       двигаться постепенно и с живым откликом.
     </p>
 
-    <div class="mt-8 grid gap-5 md:grid-cols-2">
+    <div class="mt-8 grid gap-5 md:grid-cols-2 md:[&>*:last-child:nth-child(odd)]:col-span-2 md:[&>*:last-child:nth-child(odd)]:justify-self-center md:[&>*:last-child:nth-child(odd)]:w-[calc(50%-10px)]">
       {
         lessons.map((lesson, i) => (
           <article
@@ -105,14 +105,14 @@ const toneClass = {
 
     <div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
       {
-        courses.map((course) => (
+        courses.map((course, i) => (
           <article class="card flex flex-col bg-surface p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-lift sm:p-7">
             <div class="flex items-center justify-between gap-3">
               <span class:list={["rounded-full px-3 py-1 text-xs font-medium", toneClass[course.tone]]}>
                 {course.format}
               </span>
               <span class="font-display text-sm font-semibold text-mustard-deep">
-                {course.letter})
+                {String(i + 1).padStart(2, "0")}
               </span>
             </div>
 
@@ -134,7 +134,7 @@ const toneClass = {
 
             <a
               href={withBase(`/kursy/${course.slug}`)}
-              class="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 text-[15px] font-medium text-sand-50 transition-all duration-200 hover:bg-ink/90 active:scale-[0.98]"
+              class="mt-6 inline-flex h-[52px] items-center justify-center gap-2 rounded-full bg-ink px-6 text-[15px] font-medium text-sand-50 transition-all duration-200 hover:bg-ink/90 active:scale-[0.98]"
             >
               Узнать подробнее
               <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
@@ -151,7 +151,7 @@ const toneClass = {
     </div>
   </section>
 
-  <section class="wrap pb-4">
+  <section class="wrap pb-16 sm:pb-20">
     <div class="card bg-rose-100 p-8 text-center sm:p-12">
       <h2 class="text-balance text-2xl sm:text-3xl">Не знаете, что выбрать?</h2>
       <p class="mx-auto mt-4 max-w-xl text-pretty text-[17px] leading-relaxed text-ink-soft">

@@ -4,7 +4,6 @@ import PageHero from "../components/PageHero.astro";
 import Button from "../components/ui/Button.astro";
 import { links } from "../config/links";
 import { reviews } from "../data/reviews";
-import { withBase } from "../utils/base";
 ---
 
 <BaseLayout title="Отзывы">
@@ -15,8 +14,8 @@ import { withBase } from "../utils/base";
     tone="green"
   />
 
-  <section class="wrap py-14 sm:py-16">
-    <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+  <section class="wrap pt-14 pb-16 sm:pt-16 sm:pb-20">
+    <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3 xl:[&>*:last-child:nth-child(3n+1)]:col-start-2">
       {
         reviews.map((review) => (
           <figure class={`card flex flex-col p-6 sm:p-7 ${review.tone}`}>
@@ -29,21 +28,23 @@ import { withBase } from "../utils/base";
               {review.text}
             </blockquote>
             <figcaption class="mt-5 flex items-center gap-3 border-t border-ink/5 pt-4">
-              {review.avatar ? (
-                <img
-                  src={withBase(review.avatar)}
-                  alt=""
-                  width="36"
-                  height="36"
-                  loading="lazy"
-                  class="h-9 w-9 shrink-0 rounded-full object-cover"
-                />
-              ) : (
-                <span class={`h-9 w-9 shrink-0 rounded-full ${review.avatarTone}`}></span>
-              )}
+              <span
+                class:list={[
+                  "grid h-10 w-10 shrink-0 place-items-center rounded-full font-display text-[13px] font-semibold uppercase tracking-wide text-primary-deep ring-1 ring-ink/5",
+                  review.avatarTone,
+                ]}
+              >
+                {
+                  review.name
+                    .split(/\s+/)
+                    .slice(0, 2)
+                    .map((word) => word[0])
+                    .join("")
+                }
+              </span>
               <span class="text-sm">
                 <span class="block font-medium text-ink">{review.name}</span>
-                <span class="block text-xs text-ink-mute">{review.meta}</span>
+                <span class="block text-sm text-ink-mute">{review.meta}</span>
               </span>
             </figcaption>
           </figure>
@@ -53,7 +54,7 @@ import { withBase } from "../utils/base";
 
     <div class="card mt-8 flex flex-wrap items-center justify-between gap-5 bg-rose-100 p-7 sm:p-9">
       <div class="max-w-md">
-        <h2 class="text-xl">Хотите оказаться в этом списке?</h2>
+        <h2 class="text-balance text-2xl sm:text-3xl">Хотите оказаться в этом списке?</h2>
         <p class="mt-2 text-[15px] leading-relaxed text-ink-soft">
           Начните с пробного занятия или с любого обучающего проекта.
         </p>

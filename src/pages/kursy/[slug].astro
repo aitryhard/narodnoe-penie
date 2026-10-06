@@ -24,14 +24,14 @@ const { course } = Astro.props as { course: Course };
 
 <BaseLayout title={course.title} description={course.lead}>
   <PageHero
-    label={`Курс «${course.letter}»`}
+    label={course.format}
     title={course.title}
     intro={course.lead}
     tone={course.tone}
   />
 
-  <section class="wrap py-14 sm:py-16">
-    <div class="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
+  <section class="wrap pt-14 pb-16 sm:pt-16 sm:pb-20">
+    <div class="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
       <div>
         <div class="card bg-surface p-7 sm:p-10">
           <div class="flex flex-wrap items-center gap-2.5">

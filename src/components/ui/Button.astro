@@ -26,19 +26,20 @@ const {
 } = Astro.props;
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20 focus-visible:ring-offset-2 focus-visible:ring-offset-sand-100 active:scale-[0.98]";
+  "inline-flex items-center justify-center gap-2 border rounded-full font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/20 focus-visible:ring-offset-2 focus-visible:ring-offset-sand-100 active:scale-[0.98]";
 
 const sizes = {
-  sm: "px-4 py-2 text-sm",
-  md: "px-6 py-3 text-[15px]",
-  lg: "px-8 py-3.5 text-base sm:text-[17px]",
+  sm: "h-9 px-4 text-sm",
+  md: "h-11 px-6 text-[15px]",
+  lg: "h-[52px] px-8 text-base sm:text-[17px]",
 };
 
 const variants = {
-  primary: "bg-primary text-white shadow-soft hover:bg-primary-hover hover:shadow-lift",
-  mustard: "bg-mustard text-ink shadow-soft hover:bg-mustard-hover hover:shadow-lift",
-  ghost: "border border-ink/10 bg-surface text-ink hover:border-ink/20 hover:bg-sand-50",
-  dark: "bg-ink text-sand-50 shadow-soft hover:bg-ink/90 hover:shadow-lift",
+  primary: "border-transparent bg-primary text-white shadow-soft hover:bg-primary-hover hover:shadow-lift",
+  mustard:
+    "border-transparent bg-mustard text-ink shadow-soft hover:bg-mustard-hover hover:shadow-lift",
+  ghost: "border-ink/10 bg-surface text-ink hover:border-ink/20 hover:bg-sand-50",
+  dark: "border-transparent bg-ink text-sand-50 shadow-soft hover:bg-ink/90 hover:shadow-lift",
 };
 
 const classes = [

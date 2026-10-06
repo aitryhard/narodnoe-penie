@@ -26,10 +26,10 @@
     --c-mustard-hover: 210 194 140;
     --c-mustard-deep: 92 82 40;
 
-    /* Текст */
+    /* Текст (ink-mute затемнён: контраст 12px текста на бежевом ≥ 4.5) */
     --c-ink: 38 37 34;
     --c-ink-soft: 78 76 68;
-    --c-ink-mute: 86 83 70;
+    --c-ink-mute: 74 71 59;
 
     --c-surface: 255 255 255;
   }
@@ -54,7 +54,7 @@
   h4 {
     font-family: theme("fontFamily.display");
     font-weight: 600;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.01em;
   }
 
   ::selection {

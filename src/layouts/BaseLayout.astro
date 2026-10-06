@@ -15,6 +15,11 @@ const pageTitle = title ? `${title} — ${siteConfig.shortName}` : siteConfig.na
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site) : undefined;
 const year = new Date().getFullYear();
 
+/** Абсолютный адрес картинки для превью в соцсетях и мессенджерах. */
+const siteOrigin = process.env.PUBLIC_SITE_URL || `https://${siteConfig.domain}`;
+const ogImage = new URL(withBase("/og.png"), siteOrigin).href;
+const pageUrl = new URL(withBase(stripBase(Astro.url.pathname)), siteOrigin).href;
+
 const isActive = (href: string) =>
   normalizePath(stripBase(Astro.url.pathname)) === normalizePath(href);
 ---
@@ -34,6 +39,21 @@ const isActive = (href: string) =>
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:locale" content="ru_RU" />
+    <meta property="og:url" content={canonical?.href ?? pageUrl} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={siteConfig.name} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <noscript>
+      <style>
+        .reveal {
+          opacity: 1 !important;
+          translate: none !important;
+        }
+      </style>
+    </noscript>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -69,7 +89,7 @@ const isActive = (href: string) =>
             <span class="block font-display text-[17px] font-semibold tracking-tight">
               {siteConfig.shortName}
             </span>
-            <span class="text-ink-mute block text-[11px] uppercase tracking-[0.14em]">
+            <span class="text-ink-mute block text-xs uppercase tracking-[0.14em]">
               женская школа
             </span>
           </span>
@@ -79,7 +99,7 @@ const isActive = (href: string) =>
           {
             navLinks.map((link) => (
               <a
-                      href={withBase(link.href)}
+                href={withBase(link.href)}
                 aria-current={isActive(link.href) ? "page" : undefined}
                 class:list={[
                   "rounded-full px-5 py-2.5 text-base transition-colors",
@@ -199,7 +219,7 @@ const isActive = (href: string) =>
       <slot />
     </main>
 
-    <footer class="mt-20 border-t border-ink/10 bg-surface">
+    <footer class="border-t border-ink/10 bg-surface">
       <div class="wrap py-14">
         <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-12">
           <div class="lg:col-span-4">
@@ -212,7 +232,7 @@ const isActive = (href: string) =>
               <a
                 href={links.vk}
                 class="text-ink-soft hover:border-ink/25 hover:text-ink grid h-10 w-10 place-items-center rounded-full border border-ink/10 bg-surface transition-colors"
-                aria-label="ВКонтакте — ссылка-заглушка"
+                aria-label="ВКонтакте"
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4" aria-hidden="true">
                   <path
@@ -243,7 +263,7 @@ const isActive = (href: string) =>
               <a
                 href={links.telegram}
                 class="text-ink-soft hover:border-ink/25 hover:text-ink grid h-10 w-10 place-items-center rounded-full border border-ink/10 bg-surface transition-colors"
-                aria-label="Telegram — ссылка-заглушка"
+                aria-label="Telegram"
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4" aria-hidden="true">
                   <path
@@ -254,7 +274,7 @@ const isActive = (href: string) =>
               <a
                 href={links.email}
                 class="text-ink-soft hover:border-ink/25 hover:text-ink grid h-10 w-10 place-items-center rounded-full border border-ink/10 bg-surface transition-colors"
-                aria-label="Почта — ссылка-заглушка"
+                aria-label="Почта"
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -281,7 +301,7 @@ const isActive = (href: string) =>
                   <li>
                     <a
                 href={withBase(link.href)}
-                      class="text-ink-soft hover:text-ink text-[15px] transition-colors"
+                      class="text-ink-soft hover:text-ink inline-flex min-h-8 items-center text-[15px] transition-colors"
                     >
                       {link.label}
                     </a>
@@ -297,7 +317,7 @@ const isActive = (href: string) =>
               <li>
                 <a
                   href={withBase("/info-produkty#zhivye")}
-                  class="text-ink-soft hover:text-ink text-[15px] transition-colors"
+                  class="text-ink-soft hover:text-ink inline-flex min-h-8 items-center text-[15px] transition-colors"
                 >
                   Живые занятия в Петербурге
                 </a>
@@ -305,7 +325,7 @@ const isActive = (href: string) =>
               <li>
                 <a
                   href={withBase("/info-produkty#online")}
-                  class="text-ink-soft hover:text-ink text-[15px] transition-colors"
+                  class="text-ink-soft hover:text-ink inline-flex min-h-8 items-center text-[15px] transition-colors"
                 >
                   Онлайн-занятия
                 </a>
@@ -313,7 +333,7 @@ const isActive = (href: string) =>
               <li>
                 <a
                   href={withBase("/info-produkty#proekty")}
-                  class="text-ink-soft hover:text-ink text-[15px] transition-colors"
+                  class="text-ink-soft hover:text-ink inline-flex min-h-8 items-center text-[15px] transition-colors"
                 >
                   Обучающие проекты
                 </a>
@@ -325,16 +345,16 @@ const isActive = (href: string) =>
             <p class="text-ink-mute text-xs font-medium uppercase tracking-[0.14em]">Контакты</p>
             <ul class="text-ink-soft mt-4 space-y-2.5 text-[15px]">
               <li>
-                <a href={links.vk} class="hover:text-ink transition-colors">ВКонтакте</a>
+                <a href={links.vk} class="hover:text-ink inline-flex min-h-8 items-center transition-colors">ВКонтакте</a>
               </li>
               <li>
-                <a href={links.max} class="hover:text-ink transition-colors">Макс</a>
+                <a href={links.max} class="hover:text-ink inline-flex min-h-8 items-center transition-colors">Макс</a>
               </li>
               <li>
-                <a href={links.telegram} class="hover:text-ink transition-colors">Telegram</a>
+                <a href={links.telegram} class="hover:text-ink inline-flex min-h-8 items-center transition-colors">Telegram</a>
               </li>
               <li>
-                <a href={links.email} class="hover:text-ink transition-colors">Почта</a>
+                <a href={links.email} class="hover:text-ink inline-flex min-h-8 items-center transition-colors">Почта</a>
               </li>
             </ul>
           </div>

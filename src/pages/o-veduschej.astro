@@ -28,8 +28,8 @@ const steps = [
     tone="rose"
   />
 
-  <section class="wrap py-14 sm:py-16">
-    <div class="grid gap-5 lg:grid-cols-[0.85fr_1.15fr]">
+  <section class="wrap pt-14 pb-16 sm:pt-16 sm:pb-20">
+    <div class="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
       <div
         class="placeholder-frame aspect-[3/4] shadow-card lg:aspect-auto lg:sticky lg:top-28 lg:self-start"
       >
@@ -81,7 +81,7 @@ const steps = [
                 <span class="font-display text-sm font-semibold text-mustard-deep">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <h3 class="mt-2.5 text-[17px]">{step.title}</h3>
+                <h3 class="mt-2.5 text-xl">{step.title}</h3>
                 <p class="mt-2 text-sm leading-relaxed text-ink-soft">{step.text}</p>
               </div>
             ))

@@ -26,7 +26,7 @@ export const demoOrders: {
     date: "4 октября 2026",
     courseTitle: "Песни Масленицы",
     courseSlug: "pesni-maslenicy",
-    amount: "3 400 ₽",
+    amount: "3 400 ₽",
     status: "pending",
   },
   {
@@ -34,7 +34,7 @@ export const demoOrders: {
     date: "3 октября 2026",
     courseTitle: "Переходы",
     courseSlug: "perehody",
-    amount: "4 900 ₽",
+    amount: "4 900 ₽",
     status: "paid",
   },
   {
@@ -42,7 +42,7 @@ export const demoOrders: {
     date: "21 сентября 2026",
     courseTitle: "Заклички весны",
     courseSlug: "zaklichki-vesny",
-    amount: "2 900 ₽",
+    amount: "2 900 ₽",
     status: "paid",
   },
 ];

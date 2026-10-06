@@ -1,36 +1,71 @@
 ---
+import { navLinks } from "../config/site";
+import { withBase, stripBase, normalizePath } from "../utils/base";
+
 export interface Props {
   label?: string;
   title: string;
   intro?: string;
-  tone?: "green" | "rose" | "sand";
+  tone?: "green" | "rose" | "sand" | "mustard";
 }
 
 const { label, title, intro, tone = "sand" } = Astro.props;
 
-const tones = {
-  green: "bg-primary/10 text-primary-deep",
-  rose: "bg-rose-100 text-rose-accent",
-  sand: "bg-sand-50 text-ink",
+const toneText = {
+  green: "text-primary-deep",
+  rose: "text-rose-accent",
+  sand: "text-ink",
+  mustard: "text-mustard-deep",
 };
+
+const path = normalizePath(stripBase(Astro.url.pathname));
+const section = navLinks.find((link) => normalizePath(link.href) === path);
+const isCourse = path.startsWith("/kursy/");
+const parent = navLinks.find((link) => link.href === "/info-produkty");
+
+const crumbs: { label: string; href?: string }[] = [{ label: "Главная", href: withBase("/") }];
+if (isCourse && parent) crumbs.push({ label: parent.label, href: withBase(parent.href) });
+crumbs.push(section ? { label: section.label } : { label: title });
+
+const current = crumbs[crumbs.length - 1].label;
+const showBadge = Boolean(label) && label !== current && label !== title;
 ---
 
 <section class="wrap pt-10 sm:pt-14">
-  <nav class="flex items-center gap-2 text-sm text-ink-mute">
-    <a       href="https://vk.ru/narodnoe_penie" class="link-underline hover:text-ink-soft">Главная</a>
-    <span aria-hidden="true">/</span>
-    <span class="text-ink-soft">{title}</span>
+  <nav class="flex min-h-8 flex-wrap items-center gap-2 text-sm" aria-label="Хлебные крошки">
+    {
+      crumbs.map((crumb, i) => (
+        <>
+          {i > 0 && <span aria-hidden="true" class="text-ink-mute">/</span>}
+          {crumb.href ? (
+            <a
+              href={crumb.href}
+              class="text-ink-mute link-underline hover:text-ink-soft inline-flex min-h-8 items-center"
+            >
+              {crumb.label}
+            </a>
+          ) : (
+            <span class={`font-medium ${toneText[tone]}`}>{crumb.label}</span>
+          )}
+        </>
+      ))
+    }
   </nav>
 
   <div class="mt-6 max-w-3xl">
     {
-      label && (
-        <span class={`inline-block rounded-full px-3.5 py-1.5 text-xs font-medium ${tones[tone]}`}>
+      showBadge && (
+        <span class={`inline-block rounded-full px-3.5 py-1.5 text-xs font-medium ${toneText[tone]} bg-sand-50`}>
           {label}
         </span>
       )
     }
-    <h1 class="mt-5 text-balance text-3xl leading-[1.15] sm:text-4xl lg:text-5xl">
+    <h1
+      class:list={[
+        "text-balance text-3xl leading-[1.15] sm:text-4xl sm:leading-[1.15] lg:text-5xl lg:leading-[1.1]",
+        showBadge ? "mt-5" : "mt-0",
+      ]}
+    >
       {title}
     </h1>
     {

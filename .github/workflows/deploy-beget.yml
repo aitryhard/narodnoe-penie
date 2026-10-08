@@ -44,6 +44,6 @@ jobs:
           lftp -u "$BEGET_USER","$BEGET_PASS" "ftp://$BEGET_HOST" -e '
             set ftp:ssl-allow no;
             set net:max-retries 3;
-            mirror -R --verbose --no-perms --no-time ./dist/ ./;
+            mirror -R --verbose ./dist/ ./;
             bye
           '

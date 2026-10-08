@@ -1,6 +1,5 @@
 ﻿---
 import Button from "../ui/Button.astro";
-import PhotoFrame from "../ui/PhotoFrame.astro";
 import Ornament from "../Ornament.astro";
 import { links } from "../../config/links";
 import { lessons, courses } from "../../data/products";
@@ -25,12 +24,7 @@ const toneClass = {
 
     <div class="relative grid gap-12 p-8 sm:p-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:p-16">
       <div>
-        <span class="eyebrow">
-          <span class="h-1.5 w-1.5 rounded-full bg-primary"></span>
-          Санкт-Петербург · онлайн по всему миру
-        </span>
-
-        <h1 class="mt-6 text-balance text-3xl leading-[1.15] sm:text-4xl sm:leading-[1.15] lg:text-5xl lg:leading-[1.1]">
+        <h1 class="text-balance text-3xl leading-[1.15] sm:text-4xl sm:leading-[1.15] lg:text-5xl lg:leading-[1.1]">
           Народное пение,<br class="hidden sm:block" />
           которому учатся и которое радует
         </h1>
@@ -64,7 +58,13 @@ const toneClass = {
       </div>
 
       <div class="relative">
-        <PhotoFrame class="shadow-lift" ratio="aspect-[4/5]" />
+        <img
+          src={withBase("/img/hero-field.jpg")}
+          alt="Золотое поле у русской деревни на закате"
+          width="1400"
+          height="1750"
+          class="border-ink/10 shadow-lift aspect-[4/5] w-full rounded-3xl border object-cover"
+        />
 
         <div
           class="absolute -bottom-5 -left-5 hidden rounded-2xl border border-ink/5 bg-surface px-5 py-4 shadow-lift sm:block"
@@ -82,8 +82,7 @@ const toneClass = {
 
   <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
-      <span class="eyebrow bg-primary/10 text-primary-deep">Форматы</span>
-      <h2 class="mt-4 text-balance text-2xl sm:text-3xl">Выберите, как вам ближе</h2>
+      <h2 class="text-balance text-2xl sm:text-3xl">Выберите, как вам ближе</h2>
     </div>
     <a
       href={withBase("/info-produkty")}
@@ -223,10 +222,11 @@ const toneClass = {
 </section>
 
 <section class="wrap pb-16 sm:pb-20">
+  <Ornament class="mb-10" />
+
   <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
-      <span class="eyebrow bg-mustard/25 text-mustard-deep">Голоса учениц</span>
-      <h2 class="mt-4 text-balance text-2xl sm:text-3xl">Что говорят после занятий</h2>
+      <h2 class="text-balance text-2xl sm:text-3xl">Что говорят после занятий</h2>
     </div>
     <a
       href={withBase("/otzyvy")}

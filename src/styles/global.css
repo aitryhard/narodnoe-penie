@@ -69,10 +69,6 @@
     @apply mx-auto w-full max-w-content px-5 sm:px-8;
   }
 
-  .eyebrow {
-    @apply inline-flex items-center gap-2 rounded-full border border-ink/5 bg-surface/80 px-3.5 py-1.5 text-xs font-medium tracking-wide text-ink-soft backdrop-blur;
-  }
-
   .card {
     @apply rounded-3xl border border-ink/10 shadow-card;
   }

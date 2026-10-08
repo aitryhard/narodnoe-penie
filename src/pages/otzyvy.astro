@@ -2,6 +2,7 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PageHero from "../components/PageHero.astro";
 import Button from "../components/ui/Button.astro";
+import Ornament from "../components/Ornament.astro";
 import { links } from "../config/links";
 import { reviews } from "../data/reviews";
 ---
@@ -15,6 +16,8 @@ import { reviews } from "../data/reviews";
   />
 
   <section class="wrap pt-14 pb-16 sm:pt-16 sm:pb-20">
+    <Ornament class="mb-10" />
+
     <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3 xl:[&>*:last-child:nth-child(3n+1)]:col-start-2">
       {
         reviews.map((review) => (

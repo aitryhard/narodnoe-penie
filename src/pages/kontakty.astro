@@ -2,6 +2,7 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PageHero from "../components/PageHero.astro";
 import Button from "../components/ui/Button.astro";
+import Ornament from "../components/Ornament.astro";
 import { links } from "../config/links";
 import { siteConfig } from "../config/site";
 ---
@@ -15,6 +16,8 @@ import { siteConfig } from "../config/site";
   />
 
   <section class="wrap pt-14 pb-16 sm:pt-16 sm:pb-20">
+    <Ornament class="mb-10" />
+
     <div class="grid gap-5 lg:grid-cols-2">
       <article class="card flex flex-col bg-surface p-7 sm:p-9">
         <span class="grid h-12 w-12 place-items-center rounded-2xl bg-primary/15 text-primary-deep">

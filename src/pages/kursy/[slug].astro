@@ -2,6 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PageHero from "../../components/PageHero.astro";
 import Button from "../../components/ui/Button.astro";
+import Ornament from "../../components/Ornament.astro";
 import { links } from "../../config/links";
 import { courses, type Course } from "../../data/products";
 
@@ -31,6 +32,8 @@ const { course } = Astro.props as { course: Course };
   />
 
   <section class="wrap pt-14 pb-16 sm:pt-16 sm:pb-20">
+    <Ornament class="mb-10" />
+
     <div class="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
       <div>
         <div class="card bg-surface p-7 sm:p-10">

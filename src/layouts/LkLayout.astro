@@ -1,66 +1,30 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
-import { withBase } from "../utils/base";
 
 export interface Props {
   title: string;
   description?: string;
-  active?: "overview" | "profile" | "courses" | "orders" | "auth";
-  /** Заголовок по центру без надпаши «Личный кабинет» (страницы авторизации). */
+  /** Страницы авторизации — без кнопки «Выйти». */
+  auth?: boolean;
+  /** Заголовок по центру (страницы авторизации). */
   titleCentered?: boolean;
 }
 
-const { title, description, active = "auth", titleCentered = false } = Astro.props;
-
-const tabs = [
-  { key: "overview", label: "Обзор", href: "/lk" },
-  { key: "profile", label: "Профиль", href: "/lk/profile" },
-  { key: "courses", label: "Мои курсы", href: "/lk/courses" },
-  { key: "orders", label: "Покупки", href: "/lk/orders" },
-];
-
-const showTabs = active !== "auth";
+const { title, description, auth = false, titleCentered = false } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description}>
   <div class="wrap py-10 sm:py-14">
     <div class:list={[titleCentered && "text-center"]}>
-      {!titleCentered && <span class="eyebrow">Личный кабинет</span>}
-      <h1 class:list={["text-3xl leading-tight sm:text-4xl", titleCentered ? "mt-0" : "mt-3"]}>
-        {title}
-      </h1>
+      <h1 class="text-3xl leading-tight sm:text-4xl">{title}</h1>
     </div>
-
-    {
-      showTabs && (
-        <nav
-          class="border-ink/10 bg-surface/70 mt-8 flex flex-wrap gap-1 rounded-2xl border p-1.5"
-          aria-label="Разделы личного кабинета"
-        >
-          {tabs.map((tab) => (
-            <a
-              href={withBase(tab.href)}
-              aria-current={active === tab.key ? "page" : undefined}
-              class:list={[
-                "shrink-0 rounded-xl px-4 py-2.5 text-sm transition-colors",
-                active === tab.key
-                  ? "bg-primary text-white font-medium"
-                  : "text-ink-soft hover:bg-ink/5 hover:text-ink",
-              ]}
-            >
-              {tab.label}
-            </a>
-          ))}
-        </nav>
-      )
-    }
 
     <div class="mt-7">
       <slot />
     </div>
 
     {
-      showTabs && (
+      !auth && (
         <div class="mt-12 flex justify-end">
           <button
             type="button"

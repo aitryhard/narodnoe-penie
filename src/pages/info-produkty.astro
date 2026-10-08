@@ -3,6 +3,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import PageHero from "../components/PageHero.astro";
 import Button from "../components/ui/Button.astro";
 import PhotoFrame from "../components/ui/PhotoFrame.astro";
+import Ornament from "../components/Ornament.astro";
 import { links } from "../config/links";
 import { lessons, courses } from "../data/products";
 import { withBase } from "../utils/base";
@@ -42,6 +43,8 @@ const lessonCards = lessons.map((lesson) => {
   />
 
   <section class="wrap pt-14 pb-16 sm:pt-16 sm:pb-20">
+    <Ornament class="mb-10" />
+
     <h2 class="text-balance text-2xl sm:text-3xl">Форматы участия</h2>
 
     <div class="mt-8 grid gap-5 md:grid-cols-2">

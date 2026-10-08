@@ -1,68 +1,112 @@
 ---
 import LkLayout from "../../layouts/LkLayout.astro";
+import Field from "../../components/lk/Field.astro";
 import Button from "../../components/ui/Button.astro";
 import { withBase } from "../../utils/base";
 ---
 
-<LkLayout title="Обзор" active="overview">
-  <div class="grid gap-5 lg:grid-cols-3">
-    <article class="card bg-surface p-7 lg:col-span-2">
-      <p class="text-ink-mute text-xs font-medium uppercase tracking-[0.14em]">
-        Здравствуйте
-      </p>
-      <h2 class="mt-3 text-2xl" data-lk-name>Учётная запись</h2>
+<LkLayout title="Личный кабинет">
+  <article class="card bg-surface p-7 sm:p-9">
+    <p class="text-ink-mute text-xs font-medium uppercase tracking-[0.14em]">Здравствуйте</p>
+    <h2 class="mt-3 text-2xl" data-lk-name>Учётная запись</h2>
+    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2">
+      <p class="text-ink text-lg" data-lk-email>—</p>
+      <span
+        data-lk-verified
+        class="bg-primary/15 text-primary-deep hidden w-fit rounded-full px-3 py-1 text-xs font-medium"
+      >
+        Почта подтверждена
+      </span>
+      <span
+        data-lk-unverified
+        class="bg-mustard/40 text-mustard-deep hidden w-fit rounded-full px-3 py-1 text-xs font-medium"
+      >
+        Подтвердите почту — письмо уже отправлено
+      </span>
+    </div>
+  </article>
 
-      <dl class="mt-7 grid gap-4">
-        <div class="rounded-2xl border border-ink/10 p-4">
-          <dt class="text-ink-mute text-xs">Почта</dt>
-          <dd class="text-ink mt-1 text-lg" data-lk-email>—</dd>
-          <dd class="mt-2">
-            <span
-              data-lk-verified
-              class="bg-primary/15 text-primary-deep hidden w-fit rounded-full px-3 py-1 text-xs font-medium"
-            >
-              Почта подтверждена
-            </span>
-            <span
-              data-lk-unverified
-              class="bg-mustard/40 text-mustard-deep hidden w-fit rounded-full px-3 py-1 text-xs font-medium"
-            >
-              Подтвердите почту — письмо уже отправлено
-            </span>
-          </dd>
-        </div>
-      </dl>
+  <div class="mt-5 grid gap-5 lg:grid-cols-2">
+    <article class="card bg-surface p-7 sm:p-9">
+      <h2 class="text-2xl">Личные данные</h2>
+      <p class="prose-body mt-2 text-pretty">
+        Имя и почта видны только вам. На почту приходят письма о занятиях и покупках.
+      </p>
+
+      <form
+        class="mt-7 space-y-5"
+        data-api-form
+        data-endpoint="/api/profile.php"
+        data-success="Личные данные сохранены."
+      >
+        <Field label="Имя" name="name" value="" autocomplete="name" required />
+        <Field
+          label="Электронная почта"
+          name="email"
+          type="email"
+          value=""
+          autocomplete="email"
+          required
+        />
+        <Field label="Город" name="city" value="" placeholder="Не указан" />
+        <Button type="submit" variant="mustard">Сохранить изменения</Button>
+      </form>
     </article>
 
-    <article class="card bg-sand-50 p-7">
-      <p class="text-ink-mute text-xs font-medium uppercase tracking-[0.14em]">Быстрый доступ</p>
-      <div class="mt-5 flex flex-col gap-2.5">
-        <Button href={withBase("/lk/profile")} variant="ghost" fullWidth>
-          Профиль и пароль
-        </Button>
-        <Button href={withBase("/lk/courses")} variant="ghost" fullWidth>
-          Мои курсы
-        </Button>
-      </div>
+    <article class="card bg-surface p-7 sm:p-9">
+      <h2 class="text-2xl">Смена пароля</h2>
+      <p class="prose-body mt-2 text-pretty">
+        Меняя пароль, вы завершаете вход на всех остальных устройствах.
+      </p>
+
+      <form
+        class="mt-7 space-y-5"
+        data-api-form
+        data-endpoint="/api/change-password.php"
+        data-success="Пароль обновлён. На других устройствах вход завершён."
+      >
+        <Field
+          label="Текущий пароль"
+          name="current_password"
+          type="password"
+          autocomplete="current-password"
+          required
+        />
+        <Field
+          label="Новый пароль"
+          name="password"
+          type="password"
+          autocomplete="new-password"
+          minlength={8}
+          required
+        />
+        <Field
+          label="Повторите новый пароль"
+          name="password_confirm"
+          type="password"
+          autocomplete="new-password"
+          minlength={8}
+          required
+        />
+        <Button type="submit" variant="ghost">Обновить пароль</Button>
+      </form>
     </article>
   </div>
 
-  <section class="mt-5">
-    <div class="flex items-end justify-between gap-4">
-      <h2 class="text-2xl">Мои курсы</h2>
-      <a
-        href={withBase("/lk/courses")}
-        class="link-underline text-primary-deep text-sm font-medium"
-      >
-        Все курсы
-      </a>
-    </div>
-
+  <section class="mt-10">
+    <h2 class="text-2xl">Мои курсы</h2>
     <div class="card bg-surface mt-5 p-9 text-center">
       <p class="prose-body">Купленных курсов пока нет.</p>
       <Button href={withBase("/info-produkty")} variant="mustard" class="mt-5">
         Посмотреть курсы
       </Button>
+    </div>
+  </section>
+
+  <section class="mt-10">
+    <h2 class="text-2xl">Покупки</h2>
+    <div class="card bg-surface mt-5 p-9 text-center">
+      <p class="prose-body">Покупок пока нет. Здесь появятся чеки после оплаты.</p>
     </div>
   </section>
 
@@ -82,6 +126,14 @@ import { withBase } from "../../utils/base";
           document
             .querySelector<HTMLElement>(user.emailVerified ? "[data-lk-verified]" : "[data-lk-unverified]")
             ?.classList.remove("hidden");
+
+          const fill = (field: string, value: string) => {
+            const input = document.querySelector<HTMLInputElement>(`[name="${field}"]`);
+            if (input) input.value = value;
+          };
+          fill("name", user.name);
+          fill("email", user.email);
+          fill("city", user.city);
         })
         .catch(() => {
           window.location.href = withBase("/lk/login");

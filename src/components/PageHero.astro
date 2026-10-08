@@ -3,13 +3,14 @@ import { navLinks } from "../config/site";
 import { withBase, stripBase, normalizePath } from "../utils/base";
 
 export interface Props {
+  /** Устарело: бейдж больше не показывается, проп оставлен для совместимости. */
   label?: string;
   title: string;
   intro?: string;
   tone?: "green" | "rose" | "sand" | "mustard";
 }
 
-const { label, title, intro, tone = "sand" } = Astro.props;
+const { title, intro, tone = "sand" } = Astro.props;
 
 const toneText = {
   green: "text-primary-deep",
@@ -26,9 +27,6 @@ const parent = navLinks.find((link) => link.href === "/info-produkty");
 const crumbs: { label: string; href?: string }[] = [{ label: "Главная", href: withBase("/") }];
 if (isCourse && parent) crumbs.push({ label: parent.label, href: withBase(parent.href) });
 crumbs.push(section ? { label: section.label } : { label: title });
-
-const current = crumbs[crumbs.length - 1].label;
-const showBadge = Boolean(label) && label !== current && label !== title;
 ---
 
 <section class="wrap pt-10 sm:pt-14">
@@ -53,18 +51,8 @@ const showBadge = Boolean(label) && label !== current && label !== title;
   </nav>
 
   <div class="mt-6 max-w-3xl">
-    {
-      showBadge && (
-        <span class={`inline-block rounded-full px-3.5 py-1.5 text-xs font-medium ${toneText[tone]} bg-sand-50`}>
-          {label}
-        </span>
-      )
-    }
     <h1
-      class:list={[
-        "text-balance text-3xl leading-[1.15] sm:text-4xl sm:leading-[1.15] lg:text-5xl lg:leading-[1.1]",
-        showBadge ? "mt-5" : "mt-0",
-      ]}
+      class="text-balance text-3xl leading-[1.15] sm:text-4xl sm:leading-[1.15] lg:text-5xl lg:leading-[1.1]"
     >
       {title}
     </h1>

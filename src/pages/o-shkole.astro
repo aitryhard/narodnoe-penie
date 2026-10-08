@@ -4,6 +4,7 @@ import PageHero from "../components/PageHero.astro";
 import Button from "../components/ui/Button.astro";
 import PhotoFrame from "../components/ui/PhotoFrame.astro";
 import VideoFrame from "../components/ui/VideoFrame.astro";
+import Ornament from "../components/Ornament.astro";
 import { links } from "../config/links";
 import { withBase } from "../utils/base";
 
@@ -36,6 +37,8 @@ const values = [
   />
 
   <section class="wrap pt-14 pb-16 sm:pt-16 sm:pb-20">
+    <Ornament class="mb-10" />
+
     <div class="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
       <div class="card bg-surface p-7 sm:p-10">
         <h2 class="text-2xl">Как всё устроено</h2>
@@ -71,12 +74,7 @@ const values = [
   </section>
 
   <section class="wrap pb-16 sm:pb-20">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <span class="eyebrow bg-rose-100 text-rose-accent">Видео</span>
-        <h2 class="mt-4 text-balance text-2xl sm:text-3xl">Как проходят занятия</h2>
-      </div>
-    </div>
+    <h2 class="text-balance text-2xl sm:text-3xl">Как проходят занятия</h2>
 
     <div class="mt-6 grid gap-5 lg:grid-cols-[1.4fr_1fr]">
       <VideoFrame />

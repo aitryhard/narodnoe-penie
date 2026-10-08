@@ -2,6 +2,7 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PageHero from "../components/PageHero.astro";
 import Button from "../components/ui/Button.astro";
+import Ornament from "../components/Ornament.astro";
 import { withBase } from "../utils/base";
 
 const steps = [
@@ -29,6 +30,8 @@ const steps = [
   />
 
   <section class="wrap pt-14 pb-16 sm:pt-16 sm:pb-20">
+    <Ornament class="mb-10" />
+
     <div class="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
       <div
         class="placeholder-frame aspect-[3/4] shadow-card lg:aspect-auto lg:sticky lg:top-28 lg:self-start"

@@ -14,9 +14,9 @@ export function getStaticPaths() {
 const { course } = Astro.props as { course: Course };
 ---
 
-<LkLayout title={course.title} active="courses">
+<LkLayout title={course.title}>
   <nav class="text-ink-mute flex items-center gap-2 text-sm" aria-label="Хлебные крошки">
-    <a href={withBase("/lk/courses")} class="link-underline hover:text-ink-soft">Мои курсы</a>
+    <a href={withBase("/lk")} class="link-underline hover:text-ink-soft">Личный кабинет</a>
     <span aria-hidden="true">/</span>
     <span class="text-ink-soft">{course.title}</span>
   </nav>
@@ -65,8 +65,8 @@ const { course } = Astro.props as { course: Course };
               <Button href={withBase(`/kursy/${course.slug}`)} variant="mustard" size="sm">
                 Купить курс
               </Button>
-              <Button href={withBase("/lk/courses")} variant="ghost" size="sm">
-                Мои курсы
+              <Button href={withBase("/lk")} variant="ghost" size="sm">
+                Личный кабинет
               </Button>
             </div>
           </div>

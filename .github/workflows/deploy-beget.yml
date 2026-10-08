@@ -1,0 +1,49 @@
+name: Deploy to Beget
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: beget
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          SITE_BASE: /
+          PUBLIC_SITE_URL: https://narodnoe-penie.ru
+          PUBLIC_API_ENABLED: "1"
+
+      - name: Install lftp
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Upload to Beget
+        env:
+          BEGET_HOST: ${{ secrets.BEGET_HOST }}
+          BEGET_USER: ${{ secrets.BEGET_USER }}
+          BEGET_PASS: ${{ secrets.BEGET_PASS }}
+        run: |
+          lftp -u "$BEGET_USER","$BEGET_PASS" "ftp://$BEGET_HOST" -e '
+            set ftp:ssl-allow no;
+            set net:max-retries 3;
+            mirror -R --verbose --no-perms --no-time ./dist/ ./;
+            bye
+          '

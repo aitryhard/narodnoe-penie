@@ -184,12 +184,20 @@ const toneClass = {
     <article
       class="card bg-surface p-7 transition-all duration-200 hover:-translate-y-1 hover:shadow-lift sm:p-9"
     >
+    <article
+      class="card flex flex-col bg-surface p-7 transition-all duration-200 hover:-translate-y-1 hover:shadow-lift sm:p-9"
+    >
       <h2 class="text-2xl">О школе</h2>
-      <p class="prose-body mt-4 text-pretty">
-        Мы собираем вокруг себя женщин, которым интересно петь настоящее: календарные,
-        свадебные и обрядовые песни. Занятия строятся от слуха — без переводов и
-        упрощения, но с бережным отношением к тому, как песня звучала в традиции.
-      </p>
+      <div class="prose-body mt-4 flex-1 text-pretty">
+        <p>
+          Мы собираем женщин, которым интересно петь настоящее: календарные,
+          свадебные и обрядовые песни.
+        </p>
+        <p>
+          Занятия строятся от слуха — без переводов и упрощения, но с бережным
+          отношением к тому, как песня звучала в традиции.
+        </p>
+      </div>
       <a
         href={withBase("/o-shkole")}
         class="link-underline mt-6 inline-flex min-h-8 items-center gap-2 text-[16px] font-medium text-primary-deep"
@@ -199,13 +207,19 @@ const toneClass = {
     </article>
 
     <article
-      class="card bg-sand-50 p-7 transition-all duration-200 hover:-translate-y-1 hover:shadow-lift sm:p-9"
+      class="card flex flex-col bg-sand-50 p-7 transition-all duration-200 hover:-translate-y-1 hover:shadow-lift sm:p-9"
     >
       <h2 class="text-2xl">О ведущей</h2>
-      <p class="prose-body mt-4 text-pretty">
-        Ведущая — фольклорист и певица. Она собирает и поёт материал, разбирает песни
-        по частям, пока не станет слышно главное: почему именно так, а не иначе.
-      </p>
+      <div class="prose-body mt-4 flex-1 text-pretty">
+        <p>
+          Ведущая — фольклорист и певица. Она собирает и поёт материал, разбирает
+          песни по частям.
+        </p>
+        <p>
+          На занятиях не ставит оценок и не просит «петь как в записи» — ищет
+          естественное звучание каждого голоса.
+        </p>
+      </div>
       <a
         href={withBase("/o-veduschej")}
         class="link-underline mt-6 inline-flex min-h-8 items-center gap-2 text-[16px] font-medium text-primary-deep"

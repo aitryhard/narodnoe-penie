@@ -1,6 +1,7 @@
 ﻿---
 import Button from "../ui/Button.astro";
 import PhotoFrame from "../ui/PhotoFrame.astro";
+import Ornament from "../Ornament.astro";
 import { links } from "../../config/links";
 import { lessons, courses } from "../../data/products";
 import { reviews } from "../../data/reviews";
@@ -77,6 +78,8 @@ const toneClass = {
 </section>
 
 <section class="wrap py-16 sm:py-20">
+  <Ornament class="mb-12 -mt-4" />
+
   <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
       <span class="eyebrow bg-primary/10 text-primary-deep">Форматы</span>
@@ -107,9 +110,9 @@ const toneClass = {
           </span>
 
           <h3 class="mt-5 text-xl sm:text-2xl">{lesson.title}</h3>
-          <p class="prose-body mt-3 flex-1 text-pretty">{lesson.description}</p>
+          <p class="prose-body mt-3 text-pretty">{lesson.description}</p>
 
-          <ul class="mt-6 space-y-2 border-t border-ink/5 pt-5">
+          <ul class="mt-4 space-y-2">
             {lesson.bullets.map((bullet) => (
               <li class="flex items-start gap-2.5 text-sm text-ink-soft">
                 <svg
@@ -129,7 +132,7 @@ const toneClass = {
             ))}
           </ul>
 
-          <span class="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-primary-deep">
+          <span class="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary-deep">
             Узнать подробнее
             <svg
               viewBox="0 0 20 20"
@@ -184,7 +187,9 @@ const toneClass = {
 
 <section class="wrap pb-16 sm:pb-20">
   <div class="grid gap-5 lg:grid-cols-2">
-    <article class="card bg-surface p-7 sm:p-9">
+    <article
+      class="card bg-surface p-7 transition-all duration-200 hover:-translate-y-1 hover:shadow-lift sm:p-9"
+    >
       <h2 class="text-2xl">О школе</h2>
       <p class="prose-body mt-4 text-pretty">
         Мы собираем вокруг себя женщин, которым интересно петь настоящее: календарные,
@@ -199,7 +204,9 @@ const toneClass = {
       </a>
     </article>
 
-    <article class="card bg-sand-50 p-7 sm:p-9">
+    <article
+      class="card bg-sand-50 p-7 transition-all duration-200 hover:-translate-y-1 hover:shadow-lift sm:p-9"
+    >
       <h2 class="text-2xl">О ведущей</h2>
       <p class="prose-body mt-4 text-pretty">
         Ведущая — фольклорист и певица. Она собирает и поёт материал, разбирает песни

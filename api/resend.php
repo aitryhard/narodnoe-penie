@@ -18,18 +18,25 @@ $user = find_user_by_email($email);
 $data = ['email' => $email];
 
 if ($user !== null && $user['email_verified_at'] === null) {
-    $token = create_token(
+    // Не чаще раза в минуту — иначе можно затопить чужой ящик письмами.
+    $existing = find_confirm_code_token((int) $user['id']);
+    $minuteAgo = gmdate('Y-m-d\TH:i:s\Z', time() - 60);
+
+    if ($existing !== null && $existing['created_at'] >= $minuteAgo) {
+        api_fail('Письмо уже отправлено только что — подождите минуту и проверьте почту.', [], 429);
+    }
+
+    $code = create_confirm_code(
         (int) $user['id'],
-        'confirm',
-        (int) api_config()['confirm_ttl_hours']
+        (int) api_config()['confirm_code_ttl_minutes']
     );
 
-    if (!send_confirm_email($user, $token)) {
+    if (!send_confirm_email($user, $code)) {
         api_fail('Не удалось отправить письмо. Попробуйте чуть позже.', [], 502);
     }
 
     if (api_dev_mode()) {
-        $data['devConfirmationUrl'] = confirm_url($token);
+        $data['devCode'] = $code;
     }
 }
 

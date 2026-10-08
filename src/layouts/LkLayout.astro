@@ -169,9 +169,19 @@ const showTabs = active !== "auth";
     };
 
     const showDevLink = (data: Record<string, string>) => {
-      const url = data.devConfirmationUrl || data.devResetUrl;
       const slot = document.querySelector<HTMLElement>("[data-dev-link]");
-      if (!url || !slot) return;
+      if (!slot) return;
+
+      if (data.devCode) {
+        slot.removeAttribute("href");
+        slot.classList.remove("link-underline");
+        slot.textContent = `Код для проверки: ${data.devCode}`;
+        slot.closest("[data-dev-wrap]")?.classList.remove("hidden");
+        return;
+      }
+
+      const url = data.devConfirmationUrl || data.devResetUrl;
+      if (!url) return;
       if (slot instanceof HTMLAnchorElement) slot.href = url;
       slot.textContent = url;
       slot.classList.remove("hidden");
@@ -208,10 +218,31 @@ const showTabs = active !== "auth";
         try {
           const data = await call(endpoint, body);
 
+          // Успешный ввод кода: показываем панель успеха прямо на странице.
+          if (form.dataset.completeStep !== undefined) {
+            document.querySelector<HTMLElement>("[data-code-step]")?.classList.add("hidden");
+            document.querySelector<HTMLElement>("[data-confirm-ok]")?.classList.remove("hidden");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            return;
+          }
+
+          // Смена почты в профиле — новый адрес подтверждается кодом.
+          if (data.emailChanged) {
+            const email = String(new FormData(form).get("email") ?? "");
+            flashTo("Подтвердите новый адрес — мы отправили на него код.");
+            window.location.href = withBase("/lk/confirm/") + "?email=" + encodeURIComponent(email);
+            return;
+          }
+
           const redirect = form.dataset.redirect;
           if (redirect) {
             if (form.dataset.success) flashTo(form.dataset.success);
-            window.location.href = withBase(redirect);
+            let url = withBase(redirect);
+            if (form.dataset.redirectEmail !== undefined) {
+              const email = String(new FormData(form).get("email") ?? "");
+              url += (url.includes("?") ? "&" : "?") + "email=" + encodeURIComponent(email);
+            }
+            window.location.href = url;
             return;
           }
 
@@ -222,9 +253,10 @@ const showTabs = active !== "auth";
           const shown = showErrors(form, apiError.fields ?? {});
 
           if (apiError.needsConfirm) {
-            show("Подтвердите адрес почты — мы отправили письмо ещё раз.");
             const email = String(new FormData(form).get("email") ?? "");
             call("/api/resend.php", { email }).then(showDevLink).catch(() => {});
+            flashTo("Мы отправили код на почту — введите его для подтверждения.");
+            window.location.href = withBase("/lk/confirm/") + "?email=" + encodeURIComponent(email);
             return;
           }
 

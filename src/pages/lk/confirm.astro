@@ -6,8 +6,81 @@ import { withBase } from "../../utils/base";
 
 <LkLayout title="Подтверждение почты" active="auth">
   <div class="mx-auto max-w-md">
-    <div class="card bg-surface p-7 text-center sm:p-9">
-      <div data-confirm-ok>
+    <div class="card bg-surface p-7 sm:p-9">
+      <div data-code-step>
+        <h2 class="text-2xl">Введите код из письма</h2>
+
+        <p class="prose-body mt-3 text-pretty">
+          Мы отправили шестизначный код на
+          <span data-email-out class="text-ink font-medium">вашу почту</span>. Он действует
+          30 минут.
+        </p>
+
+        <form
+          class="mt-7 space-y-5"
+          data-api-form
+          data-endpoint="/api/confirm.php"
+          data-complete-step
+        >
+          <input type="hidden" name="email" data-email-field />
+
+          <div>
+            <label for="code" class="text-ink block text-sm font-medium">
+              Код из письма <span class="text-mustard-deep">*</span>
+            </label>
+            <input
+              id="code"
+              name="code"
+              type="text"
+              required
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              pattern="[0-9]{6}"
+              maxlength="6"
+              placeholder="6 цифр"
+              class="border-ink/15 bg-surface placeholder:text-ink-mute/70 focus:border-primary/50 focus:ring-primary/15 text-ink mt-2 w-full rounded-2xl border px-4 py-3.5 text-center text-[26px] font-semibold tracking-[0.35em] outline-none transition-colors focus:ring-2"
+            />
+            <p data-error-for="code" class="text-danger mt-1.5 hidden text-xs font-medium" role="alert">
+            </p>
+            <p class="text-ink-mute mt-1.5 text-xs">Шесть цифр из письма — без пробелов</p>
+          </div>
+
+          <Button type="submit" variant="mustard" fullWidth>Подтвердить</Button>
+        </form>
+
+        <div
+          class="border-ink/10 mt-6 flex flex-wrap items-center justify-between gap-3 border-t pt-5 text-sm"
+        >
+          <form
+            data-api-form
+            data-endpoint="/api/resend.php"
+            data-success="Код отправлен заново. Проверьте почту."
+          >
+            <input type="hidden" name="email" data-email-field />
+            <button type="submit" class="link-underline text-primary-deep font-medium">
+              Отправить код ещё раз
+            </button>
+          </form>
+          <a href={withBase("/lk/register")} class="link-underline text-ink-soft">
+            Изменить почту
+          </a>
+        </div>
+
+        <div data-dev-wrap class="hidden mt-5 rounded-2xl border border-primary/20 bg-primary/10 p-4">
+          <p class="text-ink text-xs font-medium">
+            Отладка: письмо не отправляется, код подтверждения ниже.
+          </p>
+          <span data-dev-link class="text-primary-deep mt-1.5 block break-all text-xs font-medium"
+          ></span>
+        </div>
+
+        <p class="text-ink-mute mt-6 text-center text-xs leading-relaxed">
+          Письмо отправляется автоматически. Если его нет — проверьте папку «Промоакции»
+          или нажмите «Отправить код ещё раз».
+        </p>
+      </div>
+
+      <div data-confirm-ok class="hidden text-center">
         <span
           class="bg-primary/15 text-primary-deep ring-primary/20 mx-auto grid h-16 w-16 place-items-center rounded-full ring-1"
         >
@@ -40,53 +113,27 @@ import { withBase } from "../../utils/base";
           </Button>
         </div>
       </div>
-
-      <div data-confirm-error class="hidden">
-        <span
-          class="bg-danger/10 text-danger ring-danger/25 mx-auto grid h-16 w-16 place-items-center rounded-full ring-1"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="h-8 w-8"
-            aria-hidden="true"
-          >
-            <path d="M18 6 6 18"></path>
-            <path d="m6 6 12 12"></path>
-          </svg>
-        </span>
-
-        <h2 class="mt-6 text-2xl">Ссылка не сработала</h2>
-        <p class="prose-body mt-3 text-pretty">
-          Ссылка недействительна, уже использована или устарела. Зарегистрируйтесь ещё
-          раз — письмо с подтверждением придёт заново.
-        </p>
-
-        <div class="mt-7 flex flex-col gap-2.5">
-          <Button href={withBase("/lk/register")} variant="mustard" fullWidth>
-            Зарегистрироваться заново
-          </Button>
-          <Button href={withBase("/lk/login")} variant="ghost" fullWidth>
-            Вернуться ко входу
-          </Button>
-        </div>
-      </div>
-
-      <p class="text-ink-mute mt-6 text-xs leading-relaxed">
-        Письмо отправляется автоматически после регистрации. Если ссылка не открывается —
-        скопируйте её из письма в адресную строку.
-      </p>
     </div>
   </div>
 
   <script>
-    if (new URLSearchParams(window.location.search).get("error")) {
-      document.querySelector("[data-confirm-ok]")?.classList.add("hidden");
-      document.querySelector("[data-confirm-error]")?.classList.remove("hidden");
+    const params = new URLSearchParams(window.location.search);
+    const email = (params.get("email") || "").trim();
+
+    if (email) {
+      document.querySelectorAll<HTMLInputElement>("[data-email-field]").forEach((input) => {
+        input.value = email;
+      });
+      const out = document.querySelector<HTMLElement>("[data-email-out]");
+      if (out) out.textContent = email;
+    }
+
+    const code = document.querySelector<HTMLInputElement>("input[name='code']");
+    if (code) {
+      code.addEventListener("input", () => {
+        code.value = code.value.replace(/\D/g, "").slice(0, 6);
+      });
+      code.focus();
     }
   </script>
 </LkLayout>

@@ -52,9 +52,12 @@ $data = [];
 if ($emailChanged) {
     // Новый адрес нужно подтвердить заново — иначе письма уйдут не туда.
     $fresh = find_user_by_id((int) $user['id']);
-    $token = create_token((int) $fresh['id'], 'confirm', (int) api_config()['confirm_ttl_hours']);
+    $code = create_confirm_code(
+        (int) $fresh['id'],
+        (int) api_config()['confirm_code_ttl_minutes']
+    );
 
-    if (!send_confirm_email($fresh, $token)) {
+    if (!send_confirm_email($fresh, $code)) {
         // Письмо не ушло — возвращаем прежнюю почту, иначе вход закроется
         // навсегда: подтвердить новый адрес будет нечем.
         db_write(
@@ -66,7 +69,7 @@ if ($emailChanged) {
 
     $data['emailChanged'] = true;
     if (api_dev_mode()) {
-        $data['devConfirmationUrl'] = confirm_url($token);
+        $data['devCode'] = $code;
     }
 }
 

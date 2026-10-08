@@ -50,13 +50,12 @@ if ($user === null) {
     api_fail('Не удалось создать аккаунт. Попробуйте ещё раз.', [], 500);
 }
 
-$token = create_token(
+$code = create_confirm_code(
     (int) $user['id'],
-    'confirm',
-    (int) api_config()['confirm_ttl_hours']
+    (int) api_config()['confirm_code_ttl_minutes']
 );
 
-if (!send_confirm_email($user, $token)) {
+if (!send_confirm_email($user, $code)) {
     // Письмо не ушло — убираем аккаунт, иначе человек останется
     // с неподтверждённой записью и без возможности повторить попытку.
     db_write('DELETE FROM users WHERE id = ?', [(int) $user['id']]);
@@ -66,7 +65,7 @@ if (!send_confirm_email($user, $token)) {
 $data = ['email' => $email];
 
 if (api_dev_mode()) {
-    $data['devConfirmationUrl'] = confirm_url($token);
+    $data['devCode'] = $code;
 }
 
 api_ok($data);

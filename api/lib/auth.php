@@ -147,3 +147,45 @@ function drop_tokens(int $userId, string $purpose): void
 {
     db_write('DELETE FROM auth_tokens WHERE user_id = ? AND purpose = ?', [$userId, $purpose]);
 }
+
+/* ------------------------------------------------------------------ */
+/* Коды подтверждения почты                                            */
+/* ------------------------------------------------------------------ */
+
+/** Хеш кода привязан к пользователю — одинаковые коды у разных не конфликтуют. */
+function confirm_code_hash(int $userId, string $code): string
+{
+    return hash('sha256', $userId . ':' . $code);
+}
+
+/**
+ * Создаёт новый шестизначный код подтверждения, старые отменяет.
+ * В базу попадает только SHA-256 от «id:код», возвращает сам код.
+ */
+function create_confirm_code(int $userId, int $ttlMinutes): string
+{
+    $code = (string) random_int(100000, 999999);
+
+    db_write('DELETE FROM auth_tokens WHERE user_id = ? AND purpose = ?', [$userId, 'confirm_code']);
+    db_write(
+        'INSERT INTO auth_tokens (user_id, token_hash, purpose, expires_at, created_at, attempts)
+         VALUES (?, ?, ?, ?, ?, 0)',
+        [
+            $userId,
+            confirm_code_hash($userId, $code),
+            'confirm_code',
+            iso_plus_minutes($ttlMinutes),
+            now_iso(),
+        ]
+    );
+
+    return $code;
+}
+
+function find_confirm_code_token(int $userId): ?array
+{
+    return db_one(
+        'SELECT * FROM auth_tokens WHERE user_id = ? AND purpose = ?',
+        [$userId, 'confirm_code']
+    );
+}

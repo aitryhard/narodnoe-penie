@@ -3,46 +3,90 @@ declare(strict_types=1);
 
 require __DIR__ . '/bootstrap.php';
 
-$token = (string) (api_input()['token'] ?? ($_GET['token'] ?? ''));
+api_method('POST');
+api_check_origin();
+api_headers();
 
-$isJson = ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST'
-    || str_contains($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json');
+$email = normalize_email(api_str('email', 254));
+$code = preg_replace('/\D+/', '', (string) (api_input()['code'] ?? '')) ?? '';
 
-if ($isJson) {
-    api_check_origin();
-    api_headers();
+$fields = [];
+
+if (!is_valid_email($email)) {
+    $fields['email'] = 'Введите корректный почтовый адрес';
+}
+if (!preg_match('/^\d{6}$/', $code)) {
+    $fields['code'] = 'Код состоит из шести цифр';
 }
 
-if ($token === '') {
-    if ($isJson) {
-        api_fail('Ссылка подтверждения неполная', [], 422);
-    }
-    header('Location: ' . api_site_url() . '/lk/confirm/?error=1');
-    exit;
+if ($fields !== []) {
+    api_fail('Проверьте заполнение полей', ['fields' => $fields]);
 }
 
-$user = consume_token($token, 'confirm');
+$maxAttempts = 5;
 
+$user = find_user_by_email($email);
+
+// Ответ одинаков для несуществующего и неверного кода — по нему нельзя
+// перебрать, кто зарегистрирован.
 if ($user === null) {
-    if ($isJson) {
-        api_fail('Ссылка недействительна или устарела', [], 410);
-    }
-    header('Location: ' . api_site_url() . '/lk/confirm/?error=1');
-    exit;
+    api_fail('Код не подошёл. Проверьте цифры или запросите новый код.', [
+        'fields' => ['code' => 'Неверный код'],
+    ]);
 }
+
+// Повторное подтверждение (например, на другой вкладке) — просто засчитываем.
+if ($user['email_verified_at'] !== null) {
+    session_login([
+        'id' => (int) $user['id'],
+        'password_hash' => $user['password_hash'],
+    ]);
+    api_ok(['email' => $user['email']]);
+}
+
+$token = find_confirm_code_token((int) $user['id']);
+
+if ($token === null || $token['expires_at'] < now_iso()) {
+    if ($token !== null) {
+        db_write('DELETE FROM auth_tokens WHERE id = ?', [(int) $token['id']]);
+    }
+    api_fail('Код устарел. Запросите новый код.', [
+        'fields' => ['code' => 'Код устарел — запросите новый'],
+    ]);
+}
+
+if ((int) $token['attempts'] >= $maxAttempts) {
+    db_write('DELETE FROM auth_tokens WHERE id = ?', [(int) $token['id']]);
+    api_fail('Слишком много попыток. Запросите новый код.', [
+        'fields' => ['code' => 'Попытки закончились — запросите новый код'],
+    ]);
+}
+
+if (!hash_equals((string) $token['token_hash'], confirm_code_hash((int) $user['id'], $code))) {
+    $attempts = (int) $token['attempts'] + 1;
+    db_write('UPDATE auth_tokens SET attempts = ? WHERE id = ?', [$attempts, (int) $token['id']]);
+
+    $left = $maxAttempts - $attempts;
+    if ($left <= 0) {
+        db_write('DELETE FROM auth_tokens WHERE id = ?', [(int) $token['id']]);
+        api_fail('Попытки закончились. Запросите новый код.', [
+            'fields' => ['code' => 'Попытки закончились — запросите новый код'],
+        ]);
+    }
+
+    api_fail("Неверный код. Осталось попыток: {$left}.", [
+        'fields' => ['code' => "Неверный код — осталось попыток: {$left}"],
+    ]);
+}
+
+db_write('DELETE FROM auth_tokens WHERE id = ?', [(int) $token['id']]);
 
 $now = now_iso();
 db_write('UPDATE users SET email_verified_at = ?, updated_at = ? WHERE id = ?', [$now, $now, (int) $user['id']]);
 
-// Заодно открываем вход, если человек уже стоял в сессии.
 session_login([
     'id' => (int) $user['id'],
     'password_hash' => $user['password_hash'],
 ]);
 
-if ($isJson) {
-    api_ok(['email' => $user['email']]);
-}
-
-header('Location: ' . api_site_url() . '/lk/confirm/');
-exit;
+api_ok(['email' => $user['email']]);

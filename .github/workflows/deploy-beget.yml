@@ -32,6 +32,9 @@ jobs:
           PUBLIC_SITE_URL: https://narodnoe-penie.ru
           PUBLIC_API_ENABLED: "1"
 
+      - name: Copy API into dist
+        run: cp -R api dist/api
+
       - name: Install lftp
         run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
 

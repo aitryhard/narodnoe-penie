@@ -240,15 +240,12 @@ const showTabs = active !== "auth";
       element.addEventListener("click", async (event) => {
         event.preventDefault();
 
-        if (!API_ENABLED) {
-          show(element.dataset.demoMessage || DEMO_HINT);
-          return;
-        }
-
-        try {
-          await call("/api/logout.php", {});
-        } catch {
-          /* выход всё равно имитируем на месте */
+        if (API_ENABLED) {
+          try {
+            await call("/api/logout.php", {});
+          } catch {
+            /* выход всё равно показываем на месте */
+          }
         }
 
         sessionStorage.setItem("lkToast", "Вы вышли из аккаунта.");

@@ -20,6 +20,17 @@ const photoTone = {
   sand: "sand",
   mustard: "sand",
 } as const;
+
+// «2 100 ₽ · абонемент на 4 занятия» → цена отдельно, пояснение отдельно.
+// В данных тире-делитель окружено неразрывными пробелами — режем по «·» и обрезаем.
+const lessonCards = lessons.map((lesson) => {
+  const parts = lesson.price.split("·").map((part) => part.trim());
+  return {
+    ...lesson,
+    priceMain: parts[0],
+    priceNote: parts.length > 1 ? parts.slice(1).join("·") : null,
+  };
+});
 ---
 
 <BaseLayout title="Инфо-продукты">
@@ -35,7 +46,7 @@ const photoTone = {
 
     <div class="mt-8 grid gap-5 md:grid-cols-2">
       {
-        lessons.map((lesson, i) => (
+        lessonCards.map((lesson, i) => (
           <article
             id={lesson.anchor}
             class="card flex flex-col scroll-mt-28 bg-surface p-7 sm:p-9"
@@ -50,7 +61,9 @@ const photoTone = {
             </div>
 
             <h3 class="mt-5 text-xl sm:text-2xl">{lesson.title}</h3>
-            <p class="prose-body mt-3 text-pretty">{lesson.description}</p>
+            <p class="prose-body mt-3 text-pretty sm:min-h-[4.875em]">
+              {lesson.description}
+            </p>
 
             <PhotoFrame
               class="mt-5"
@@ -79,8 +92,17 @@ const photoTone = {
 
             <div class="mt-auto flex flex-wrap items-center justify-between gap-4 pt-6">
               <div>
-                <p class="text-xs text-ink-mute">Стоимость</p>
-                <p class="font-display text-lg font-semibold">{lesson.price}</p>
+                <p class="text-xs uppercase tracking-[0.14em] text-ink-mute">
+                  Стоимость
+                </p>
+                <p
+                  class="mt-1.5 inline-block border-b-[3px] border-mustard pb-1 font-display text-2xl font-semibold"
+                >
+                  {lesson.priceMain}
+                </p>
+                <p class="mt-1.5 min-h-[1.25rem] text-xs text-ink-mute">
+                  {lesson.priceNote}
+                </p>
               </div>
               <div class="flex flex-wrap gap-2.5">
                 <Button href={lesson.href ?? links.buy} variant="primary">
@@ -132,7 +154,9 @@ const photoTone = {
               </div>
               <div>
                 <dt class="text-ink-mute">Стоимость</dt>
-                <dd class="mt-0.5 font-medium text-ink-soft">{course.price}</dd>
+                <dd class="mt-1 font-display text-lg font-semibold text-ink">
+                  {course.price}
+                </dd>
               </div>
             </dl>
 

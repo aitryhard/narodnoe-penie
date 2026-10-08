@@ -91,7 +91,11 @@ const { course } = Astro.props as { course: Course };
       <aside class="lg:sticky lg:top-28 lg:self-start">
         <div class="card bg-surface p-7">
           <p class="text-xs uppercase tracking-[0.14em] text-ink-mute">Стоимость</p>
-          <p class="mt-2 font-display text-3xl font-semibold">{course.price}</p>
+          <p
+            class="mt-2 inline-block border-b-4 border-mustard pb-1.5 font-display text-3xl font-semibold"
+          >
+            {course.price}
+          </p>
           <p class="mt-2 text-sm text-ink-soft">
             Цена указана по каталогу школы во ВКонтакте.
           </p>

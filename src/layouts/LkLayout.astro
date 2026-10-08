@@ -6,9 +6,11 @@ export interface Props {
   title: string;
   description?: string;
   active?: "overview" | "profile" | "courses" | "orders" | "auth";
+  /** Заголовок по центру без надпаши «Личный кабинет» (страницы авторизации). */
+  titleCentered?: boolean;
 }
 
-const { title, description, active = "auth" } = Astro.props;
+const { title, description, active = "auth", titleCentered = false } = Astro.props;
 
 const tabs = [
   { key: "overview", label: "Обзор", href: "/lk" },
@@ -22,9 +24,11 @@ const showTabs = active !== "auth";
 
 <BaseLayout title={title} description={description}>
   <div class="wrap py-10 sm:py-14">
-    <div>
-      <span class="eyebrow">Личный кабинет</span>
-      <h1 class="mt-3 text-3xl leading-tight sm:text-4xl">{title}</h1>
+    <div class:list={[titleCentered && "text-center"]}>
+      {!titleCentered && <span class="eyebrow">Личный кабинет</span>}
+      <h1 class:list={["text-3xl leading-tight sm:text-4xl", titleCentered ? "mt-0" : "mt-3"]}>
+        {title}
+      </h1>
     </div>
 
     {

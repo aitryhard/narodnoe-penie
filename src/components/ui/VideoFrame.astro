@@ -1,15 +1,9 @@
 ---
 export interface Props {
   class?: string;
-  label?: string;
-  hint?: string;
 }
 
-const {
-  class: className = "",
-  label = "Видео",
-  hint = "заглушка — добавить видео из ВК",
-} = Astro.props;
+const { class: className = "" } = Astro.props;
 ---
 
 <div
@@ -18,13 +12,9 @@ const {
     className,
   ]}
 >
-  <div class="text-center">
-    <span class="mx-auto grid h-14 w-14 place-items-center rounded-full bg-mustard text-ink shadow-lift">
-      <svg viewBox="0 0 24 24" fill="currentColor" class="ml-0.5 h-6 w-6" aria-hidden="true">
-        <path d="M8 5.14v13.72L19 12 8 5.14Z"></path>
-      </svg>
-    </span>
-    <p class="mt-4 text-sm font-medium text-sand-200">{label}</p>
-    <p class="mt-0.5 text-xs text-sand-50/50">{hint}</p>
-  </div>
+  <span class="mx-auto grid h-14 w-14 place-items-center rounded-full bg-mustard text-ink shadow-lift">
+    <svg viewBox="0 0 24 24" fill="currentColor" class="ml-0.5 h-6 w-6" aria-hidden="true">
+      <path d="M8 5.14v13.72L19 12 8 5.14Z"></path>
+    </svg>
+  </span>
 </div>

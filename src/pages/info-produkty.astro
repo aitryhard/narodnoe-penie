@@ -13,29 +13,32 @@ const toneClass = {
   sand: "bg-sand-200 text-ink",
   mustard: "bg-mustard/30 text-mustard-deep",
 };
+
+const photoTone = {
+  green: "green",
+  rose: "rose",
+  sand: "sand",
+  mustard: "sand",
+} as const;
 ---
 
 <BaseLayout title="Инфо-продукты">
   <PageHero
     label="Инфо-продукты"
-    title="Инфо-продукты"
-    intro="Три формата регулярных занятий и шесть обучающих проектов по песенному фольклору. Здесь собрано всё, на что можно записаться прямо сейчас — с ценами из каталога школы."
+    title="Что можно выбрать"
+    intro="Четыре формата: живые занятия в центре Петербурга, онлайн по средам, обучающие проекты и ансамбль «Реченька». Цены и детали — в карточках."
     tone="sand"
   />
 
   <section class="wrap pt-14 pb-16 sm:pt-16 sm:pb-20">
-    <h2 class="text-balance text-2xl sm:text-3xl">Регулярные занятия</h2>
-    <p class="prose-body mt-3 max-w-2xl">
-      Постоянная работа: слушаем, разбираем, поём вместе. Подходит, если хочется
-      двигаться постепенно и с живым откликом.
-    </p>
+    <h2 class="text-balance text-2xl sm:text-3xl">Форматы участия</h2>
 
-    <div class="mt-8 grid gap-5 md:grid-cols-2 md:[&>*:last-child:nth-child(odd)]:col-span-2 md:[&>*:last-child:nth-child(odd)]:justify-self-center md:[&>*:last-child:nth-child(odd)]:w-[calc(50%-10px)]">
+    <div class="mt-8 grid gap-5 md:grid-cols-2">
       {
         lessons.map((lesson, i) => (
           <article
             id={lesson.anchor}
-            class="card scroll-mt-28 bg-surface p-7 sm:p-9"
+            class="card flex flex-col scroll-mt-28 bg-surface p-7 sm:p-9"
           >
             <div class="flex items-center justify-between gap-4">
               <span class:list={["rounded-full px-3 py-1 text-xs font-medium", toneClass[lesson.tone]]}>
@@ -51,8 +54,7 @@ const toneClass = {
 
             <PhotoFrame
               class="mt-5"
-              tone={lesson.tone === "green" ? "green" : "rose"}
-              label={`Фото — ${lesson.title.toLowerCase()}`}
+              tone={photoTone[lesson.tone]}
             />
 
             <ul class="mt-6 grid gap-2 border-y border-ink/5 py-5 sm:grid-cols-2">
@@ -75,13 +77,15 @@ const toneClass = {
               ))}
             </ul>
 
-            <div class="mt-6 flex flex-wrap items-center justify-between gap-4">
+            <div class="mt-auto flex flex-wrap items-center justify-between gap-4 pt-6">
               <div>
                 <p class="text-xs text-ink-mute">Стоимость</p>
                 <p class="font-display text-lg font-semibold">{lesson.price}</p>
               </div>
               <div class="flex flex-wrap gap-2.5">
-                <Button href={links.buy} variant="primary">Купить курс</Button>
+                <Button href={lesson.href ?? links.buy} variant="primary">
+                  {lesson.cta ?? "Купить курс"}
+                </Button>
               </div>
             </div>
           </article>
@@ -97,10 +101,10 @@ const toneClass = {
       календарные песни. Каждый — с разбором и итоговым исполнением.
     </p>
 
-    <div class="mt-7 grid gap-4 sm:grid-cols-3">
-      <PhotoFrame tone="rose" label="Фото с занятия" ratio="aspect-[4/3]" />
-      <PhotoFrame tone="sand" label="Фото с занятия" ratio="aspect-[4/3]" />
-      <PhotoFrame tone="green" label="Фото с занятия" ratio="aspect-[4/3]" />
+    <div class="mt-7 grid gap-5 sm:grid-cols-3">
+      <PhotoFrame tone="rose" ratio="aspect-[4/3]" />
+      <PhotoFrame tone="sand" ratio="aspect-[4/3]" />
+      <PhotoFrame tone="green" ratio="aspect-[4/3]" />
     </div>
 
     <div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -117,7 +121,7 @@ const toneClass = {
             </div>
 
             <h3 class="mt-5 text-xl">{course.title}</h3>
-            <p class="mt-2.5 flex-1 text-[15px] leading-relaxed text-ink-soft text-pretty">
+            <p class="mt-2.5 flex-1 text-[16px] leading-relaxed text-ink-soft text-pretty">
               {course.lead}
             </p>
 
@@ -134,7 +138,7 @@ const toneClass = {
 
             <a
               href={withBase(`/kursy/${course.slug}`)}
-              class="mt-6 inline-flex h-[52px] items-center justify-center gap-2 rounded-full bg-ink px-6 text-[15px] font-medium text-sand-50 transition-all duration-200 hover:bg-ink/90 active:scale-[0.98]"
+              class="mt-6 inline-flex h-[52px] items-center justify-center gap-2 rounded-full bg-ink px-6 text-[16px] font-medium text-sand-50 transition-all duration-200 hover:bg-ink/90 active:scale-[0.98]"
             >
               Узнать подробнее
               <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
@@ -154,7 +158,7 @@ const toneClass = {
   <section class="wrap pb-16 sm:pb-20">
     <div class="card bg-rose-100 p-8 text-center sm:p-12">
       <h2 class="text-balance text-2xl sm:text-3xl">Не знаете, что выбрать?</h2>
-      <p class="mx-auto mt-4 max-w-xl text-pretty text-[17px] leading-relaxed text-ink-soft">
+      <p class="mx-auto mt-4 max-w-xl text-pretty text-[18px] leading-relaxed text-ink-soft">
         Напишите нам — подберём формат под ваш уровень и задачу.
       </p>
       <div class="mt-8 flex flex-wrap justify-center gap-3">

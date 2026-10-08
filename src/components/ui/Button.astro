@@ -8,8 +8,7 @@ export interface Props {
   target?: string;
   rel?: string;
   type?: "button" | "submit" | "reset";
-  "data-demo"?: boolean;
-  "data-demo-message"?: string;
+  "data-logout"?: boolean;
 }
 
 const {
@@ -21,8 +20,7 @@ const {
   target,
   rel,
   type = "button",
-  "data-demo": demo,
-  "data-demo-message": demoMessage,
+  "data-logout": logout,
 } = Astro.props;
 
 const base =
@@ -30,8 +28,8 @@ const base =
 
 const sizes = {
   sm: "h-9 px-4 text-sm",
-  md: "h-11 px-6 text-[15px]",
-  lg: "h-[52px] px-8 text-base sm:text-[17px]",
+  md: "h-11 px-6 text-[16px]",
+  lg: "h-[52px] px-8 text-base sm:text-[18px]",
 };
 
 const variants = {
@@ -52,18 +50,13 @@ const classes = [
 
 const isPlaceholder = !href || href === "#";
 const Tag = isPlaceholder ? "button" : "a";
+
+const attrs = {
+  ...(isPlaceholder ? { type, "data-placeholder": "true" } : { href, target, rel }),
+  ...(logout ? { "data-logout": "" } : {}),
+};
 ---
 
-<Tag
-  class={classes}
-  {...isPlaceholder
-    ? {
-        type,
-        "data-placeholder": "true",
-        ...(demo ? { "data-demo": "" } : {}),
-        ...(demoMessage ? { "data-demo-message": demoMessage } : {}),
-      }
-    : { href, target, rel }}
->
+<Tag class={classes} {...attrs}>
   <slot />
 </Tag>

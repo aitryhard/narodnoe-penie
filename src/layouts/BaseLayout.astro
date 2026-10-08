@@ -86,7 +86,7 @@ const isActive = (href: string) =>
             </svg>
           </span>
           <span class="leading-tight">
-            <span class="block font-display text-[17px] font-semibold tracking-tight">
+            <span class="block font-display text-[18px] font-semibold tracking-tight">
               {siteConfig.shortName}
             </span>
             <span class="text-ink-mute block text-xs uppercase tracking-[0.14em]">
@@ -188,7 +188,7 @@ const isActive = (href: string) =>
                   href={withBase(link.href)}
                   aria-current={isActive(link.href) ? "page" : undefined}
                   class:list={[
-                    "rounded-2xl px-4 py-3 text-[17px] transition-colors",
+                    "rounded-2xl px-4 py-3 text-[18px] transition-colors",
                     isActive(link.href)
                       ? "bg-ink/10 text-ink font-medium"
                       : "text-ink-soft hover:bg-ink/5 hover:text-ink",
@@ -202,7 +202,7 @@ const isActive = (href: string) =>
               href={withBase("/lk")}
               aria-current={isActive("/lk") ? "page" : undefined}
               class:list={[
-                "rounded-2xl px-4 py-3 text-[17px] transition-colors",
+                "rounded-2xl px-4 py-3 text-[18px] transition-colors",
                 isActive("/lk")
                   ? "bg-ink/10 text-ink font-medium"
                   : "text-ink-soft hover:bg-ink/5 hover:text-ink",
@@ -301,7 +301,7 @@ const isActive = (href: string) =>
                   <li>
                     <a
                 href={withBase(link.href)}
-                      class="text-ink-soft hover:text-ink inline-flex min-h-8 items-center text-[15px] transition-colors"
+                      class="text-ink-soft hover:text-ink inline-flex min-h-8 items-center text-[16px] transition-colors"
                     >
                       {link.label}
                     </a>
@@ -317,7 +317,7 @@ const isActive = (href: string) =>
               <li>
                 <a
                   href={withBase("/info-produkty#zhivye")}
-                  class="text-ink-soft hover:text-ink inline-flex min-h-8 items-center text-[15px] transition-colors"
+                  class="text-ink-soft hover:text-ink inline-flex min-h-8 items-center text-[16px] transition-colors"
                 >
                   Живые занятия в Петербурге
                 </a>
@@ -325,7 +325,7 @@ const isActive = (href: string) =>
               <li>
                 <a
                   href={withBase("/info-produkty#online")}
-                  class="text-ink-soft hover:text-ink inline-flex min-h-8 items-center text-[15px] transition-colors"
+                  class="text-ink-soft hover:text-ink inline-flex min-h-8 items-center text-[16px] transition-colors"
                 >
                   Онлайн-занятия
                 </a>
@@ -333,7 +333,7 @@ const isActive = (href: string) =>
               <li>
                 <a
                   href={withBase("/info-produkty#proekty")}
-                  class="text-ink-soft hover:text-ink inline-flex min-h-8 items-center text-[15px] transition-colors"
+                  class="text-ink-soft hover:text-ink inline-flex min-h-8 items-center text-[16px] transition-colors"
                 >
                   Обучающие проекты
                 </a>
@@ -343,7 +343,7 @@ const isActive = (href: string) =>
 
           <div class="lg:col-span-2">
             <p class="text-ink-mute text-xs font-medium uppercase tracking-[0.14em]">Контакты</p>
-            <ul class="text-ink-soft mt-4 space-y-2.5 text-[15px]">
+            <ul class="text-ink-soft mt-4 space-y-2.5 text-[16px]">
               <li>
                 <a href={links.vk} class="hover:text-ink inline-flex min-h-8 items-center transition-colors">ВКонтакте</a>
               </li>
@@ -408,7 +408,7 @@ const isActive = (href: string) =>
 
       const all = Array.from(
         document.querySelectorAll<HTMLElement>(
-          "main .card, main figure, main article, main h2"
+          "main .card, main figure, main article, main h2, main .placeholder-frame"
         )
       );
 

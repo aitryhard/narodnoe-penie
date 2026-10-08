@@ -52,7 +52,7 @@ const { course } = Astro.props as { course: Course };
           <ul class="mt-5 space-y-3">
             {
               course.highlights.map((highlight) => (
-                <li class="flex items-start gap-3 text-[15px] text-ink-soft">
+                <li class="flex items-start gap-3 text-[16px] text-ink-soft">
                   <span class="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-primary/15 text-primary-deep">
                     <svg viewBox="0 0 20 20" fill="currentColor" class="h-3 w-3" aria-hidden="true">
                       <path
@@ -70,7 +70,7 @@ const { course } = Astro.props as { course: Course };
 
           <div class="mt-8 rounded-2xl bg-sand-50 p-6">
             <p class="text-sm font-medium">Занятия ведёт</p>
-            <p class="mt-1 text-[15px] leading-relaxed text-ink-soft">
+            <p class="mt-1 text-[16px] leading-relaxed text-ink-soft">
               Ведущая школы — фольклорист и певица. Все вопросы по программе можно
               задать до записи.
             </p>
@@ -78,17 +78,13 @@ const { course } = Astro.props as { course: Course };
         </div>
 
         <div class="placeholder-frame mt-5 aspect-video">
-          <div class="text-center">
-            <span
-              class="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-surface text-primary-deep shadow-soft"
-            >
-              <svg viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5" aria-hidden="true">
-                <path d="M8 5.14v13.72L19 12 8 5.14Z"></path>
-              </svg>
-            </span>
-            <p class="mt-4 text-sm font-medium text-ink-soft">Видео-презентация курса</p>
-            <p class="mt-1 text-xs text-ink-mute">заглушка — добавить видео из ВК</p>
-          </div>
+          <span
+            class="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-surface text-primary-deep shadow-soft"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5" aria-hidden="true">
+              <path d="M8 5.14v13.72L19 12 8 5.14Z"></path>
+            </svg>
+          </span>
         </div>
       </div>
 
@@ -105,10 +101,6 @@ const { course } = Astro.props as { course: Course };
               Купить курс
             </Button>
           </div>
-
-          <p class="mt-4 text-center text-xs text-ink-mute">
-            Оплата подключается позже.
-          </p>
         </div>
 
         <div class="card mt-5 bg-sand-50 p-7">

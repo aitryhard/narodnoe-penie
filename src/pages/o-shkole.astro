@@ -4,6 +4,7 @@ import PageHero from "../components/PageHero.astro";
 import Button from "../components/ui/Button.astro";
 import PhotoFrame from "../components/ui/PhotoFrame.astro";
 import VideoFrame from "../components/ui/VideoFrame.astro";
+import { links } from "../config/links";
 import { withBase } from "../utils/base";
 
 const values = [
@@ -64,8 +65,6 @@ const values = [
       <PhotoFrame
         class="shadow-card lg:aspect-auto lg:min-h-full"
         ratio="aspect-[3/4]"
-        label="Фото о школе"
-        hint="заглушка — заменить материалом из ВК"
         tone="green"
       />
     </div>
@@ -82,11 +81,14 @@ const values = [
     <div class="mt-6 grid gap-5 lg:grid-cols-[1.4fr_1fr]">
       <VideoFrame />
       <div class="card flex flex-col justify-center bg-rose-100 p-7">
-        <h3 class="text-xl">Видео — заглушка</h3>
+        <h3 class="text-xl">Как это звучит вживую</h3>
         <p class="prose-body mt-3 text-pretty">
-          Сюда можно вставить запись открытого занятия, фрагмент концерта или рассказ
-          ведущей о школе.
+          Записи открытых занятий, фрагменты концертов и рассказы ведущей — в
+          сообществе школы во ВКонтакте.
         </p>
+        <div class="mt-6">
+          <Button href={links.vk} variant="primary">Смотреть во ВКонтакте</Button>
+        </div>
       </div>
     </div>
   </section>
@@ -101,7 +103,7 @@ const values = [
               {String(i + 1).padStart(2, "0")}
             </span>
             <h3 class="mt-3 text-xl">{value.title}</h3>
-            <p class="mt-2.5 text-[15px] leading-relaxed text-ink-soft">{value.text}</p>
+            <p class="mt-2.5 text-[16px] leading-relaxed text-ink-soft">{value.text}</p>
           </div>
         ))
       }

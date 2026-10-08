@@ -2,7 +2,6 @@
 import LkLayout from "../../layouts/LkLayout.astro";
 import Field from "../../components/lk/Field.astro";
 import Button from "../../components/ui/Button.astro";
-import { demoProfile } from "../../data/demoAccount";
 ---
 
 <LkLayout title="Профиль" active="profile">
@@ -15,21 +14,20 @@ import { demoProfile } from "../../data/demoAccount";
 
       <form
         class="mt-7 space-y-5"
-        data-demo-form
+        data-api-form
         data-endpoint="/api/profile.php"
         data-success="Личные данные сохранены."
-        data-demo-message="Сохранение данных заработает после запуска сайта на хостинге."
       >
-        <Field label="Имя" name="name" value={demoProfile.name} autocomplete="name" required />
+        <Field label="Имя" name="name" value="" autocomplete="name" required />
         <Field
           label="Электронная почта"
           name="email"
           type="email"
-          value={demoProfile.email}
+          value=""
           autocomplete="email"
           required
         />
-        <Field label="Город" name="city" value={demoProfile.city} placeholder="Не указан" />
+        <Field label="Город" name="city" value="" placeholder="Не указан" />
         <Button type="submit" variant="mustard">Сохранить изменения</Button>
       </form>
     </article>
@@ -42,10 +40,9 @@ import { demoProfile } from "../../data/demoAccount";
 
       <form
         class="mt-7 space-y-5"
-        data-demo-form
+        data-api-form
         data-endpoint="/api/change-password.php"
         data-success="Пароль обновлён. На других устройствах вход завершён."
-        data-demo-message="Смена пароля заработает после запуска сайта на хостинге."
       >
         <Field
           label="Текущий пароль"
@@ -78,12 +75,7 @@ import { demoProfile } from "../../data/demoAccount";
           <p class="font-medium">Выйти из аккаунта</p>
           <p class="text-ink-mute mt-0.5 text-sm">Завершит текущую сессию</p>
         </div>
-        <Button
-          variant="ghost"
-          data-logout
-          data-demo
-          data-demo-message="Выход станет доступен после запуска сайта на хостинге."
-        >
+        <Button variant="ghost" data-logout>
           Выйти
         </Button>
       </div>

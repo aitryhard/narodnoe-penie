@@ -61,7 +61,6 @@ const showTabs = active !== "auth";
           <button
             type="button"
             data-logout
-            data-demo-message="Выход станет доступен после запуска сайта на хостинге."
             class="border-ink/15 text-ink-soft hover:border-ink/30 hover:text-ink inline-flex items-center gap-2 rounded-full border bg-surface px-5 py-2.5 text-sm font-medium transition-colors"
           >
             <svg
@@ -179,7 +178,7 @@ const showTabs = active !== "auth";
       slot.closest("[data-dev-wrap]")?.classList.remove("hidden");
     };
 
-    document.querySelectorAll<HTMLFormElement>("[data-demo-form]").forEach((form) => {
+    document.querySelectorAll<HTMLFormElement>("[data-api-form]").forEach((form) => {
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
         clearErrors(form);
@@ -256,14 +255,5 @@ const showTabs = active !== "auth";
         window.location.href = withBase("/lk/login");
       });
     });
-
-    document
-      .querySelectorAll<HTMLElement>("[data-demo]:not([data-logout])")
-      .forEach((element) => {
-        element.addEventListener("click", (event) => {
-          event.preventDefault();
-          show(element.dataset.demoMessage || DEMO_HINT);
-        });
-      });
   </script>
 </BaseLayout>

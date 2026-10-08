@@ -2,8 +2,6 @@
 import LkLayout from "../../../layouts/LkLayout.astro";
 import Button from "../../../components/ui/Button.astro";
 import { withBase } from "../../../utils/base";
-import { courses } from "../../../data/products";
-import { demoAccess, hasAccess } from "../../../data/demoAccount";
 ---
 
 <LkLayout title="Мои курсы" active="courses">
@@ -12,58 +10,25 @@ import { demoAccess, hasAccess } from "../../../data/demoAccount";
     остаются доступными без ограничения по времени.
   </p>
 
-  <div class="mt-7 grid gap-5 sm:grid-cols-2">
-    {
-      courses.map((course) => {
-        const owned = hasAccess(course.slug);
-        return (
-          <article
-            class:list={[
-              "card flex flex-col p-7",
-              owned ? "bg-surface" : "bg-surface/60 border-dashed",
-            ]}
-          >
-            <div class="flex items-start justify-between gap-3">
-              <span
-                class:list={[
-                  "inline-block rounded-full px-3 py-1 text-xs font-medium",
-                  owned ? "bg-primary/15 text-primary-deep" : "bg-ink/5 text-ink-mute",
-                ]}
-              >
-                {course.format}
-              </span>
-              <span
-                class:list={[
-                  "rounded-full px-3 py-1 text-xs font-medium",
-                  owned ? "bg-primary/15 text-primary-deep" : "bg-mustard/40 text-mustard-deep",
-                ]}
-              >
-                {owned ? "Куплен" : "Не куплен"}
-              </span>
-            </div>
-
-            <h2 class="mt-4 text-xl">{course.title}</h2>
-            <p class="prose-body mt-2 flex-1 text-pretty">{course.lead}</p>
-
-            <div class="mt-6 flex flex-wrap gap-2.5">
-              {owned ? (
-                <Button href={withBase(`/lk/courses/${course.slug}`)} variant="mustard" size="sm">
-                  Открыть материалы
-                </Button>
-              ) : (
-                <Button href={withBase(`/kursy/${course.slug}`)} variant="ghost" size="sm">
-                  Перейти к курсу
-                </Button>
-              )}
-            </div>
-          </article>
-        );
-      })
-    }
+  <div class="card bg-surface mt-7 p-9 text-center">
+    <p class="prose-body">Купленных курсов пока нет.</p>
+    <Button href={withBase("/info-produkty")} variant="mustard" class="mt-5">
+      Посмотреть курсы
+    </Button>
   </div>
 
-  <p class="text-ink-mute mt-6 text-xs leading-relaxed">
-    Отмечено «Куплен»: {demoAccess.length} из {courses.length} — это демонстрационные
-    данные. Реальные покупки появятся после подключения оплаты.
-  </p>
+  <script>
+    import { API_ENABLED, API_BASE } from "../../../config/api";
+    import { withBase } from "../../../utils/base";
+
+    if (API_ENABLED) {
+      fetch(API_BASE + "/api/me.php", { credentials: "include" })
+        .then((response) => {
+          if (!response.ok) throw new Error("unauthorized");
+        })
+        .catch(() => {
+          window.location.href = withBase("/lk/login");
+        });
+    }
+  </script>
 </LkLayout>

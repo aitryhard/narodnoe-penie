@@ -3,7 +3,6 @@ import LkLayout from "../../../layouts/LkLayout.astro";
 import Button from "../../../components/ui/Button.astro";
 import { withBase } from "../../../utils/base";
 import { courses, type Course } from "../../../data/products";
-import { hasAccess, demoMaterials } from "../../../data/demoAccount";
 
 export function getStaticPaths() {
   return courses.map((course) => ({
@@ -13,8 +12,6 @@ export function getStaticPaths() {
 }
 
 const { course } = Astro.props as { course: Course };
-const owned = hasAccess(course.slug);
-const materials = demoMaterials[course.slug] ?? [];
 ---
 
 <LkLayout title={course.title} active="courses">
@@ -34,92 +31,47 @@ const materials = demoMaterials[course.slug] ?? [];
           {course.duration}
         </span>
         <span
-          class:list={[
-            "inline-block rounded-full px-3 py-1 text-xs font-medium",
-            owned ? "bg-primary/15 text-primary-deep" : "bg-mustard/40 text-mustard-deep",
-          ]}
+          class="bg-mustard/40 text-mustard-deep inline-block rounded-full px-3 py-1 text-xs font-medium"
         >
-          {owned ? "Доступ открыт" : "Доступ закрыт"}
+          Доступ закрыт
         </span>
       </div>
 
       <h2 class="mt-5 text-2xl sm:text-3xl">{course.title}</h2>
       <p class="prose-body mt-3 text-pretty">{course.description}</p>
 
-      {
-        owned ? (
-          <div class="mt-9">
-            <h3 class="text-xl">Материалы курса</h3>
-            <ol class="mt-5 divide-y divide-ink/10 overflow-hidden rounded-2xl border border-ink/10">
-              {materials.map((material, index) => (
-                <li class="flex items-center gap-4 bg-surface px-5 py-4">
-                  <span class="text-ink-mute w-6 shrink-0 text-sm font-medium tabular-nums">
-                    {index + 1}
-                  </span>
-                  <span class="min-w-0 flex-1">
-                    <span class="block font-medium">{material.title}</span>
-                    <span class="text-ink-mute text-sm">{material.kind}</span>
-                  </span>
-                  <button
-                    type="button"
-                    data-demo
-                    data-demo-message="Материалы откроются на хостинге: сейчас на демо их не с кого отдавать."
-                    class="text-primary-deep hover:bg-primary/10 inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors"
-                  >
-                    Открыть
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.75"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="h-4 w-4"
-                      aria-hidden="true"
-                    >
-                      <path d="M5 12h14" />
-                      <path d="m12 5 7 7-7 7" />
-                    </svg>
-                  </button>
-                </li>
-              ))}
-            </ol>
-          </div>
-        ) : (
-          <div class="border-primary/20 bg-primary/5 mt-9 rounded-2xl border p-6">
-            <div class="flex items-start gap-3">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.75"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="text-primary-deep mt-0.5 h-5 w-5 shrink-0"
-                aria-hidden="true"
-              >
-                <rect x="3" y="11" width="18" height="11" rx="2" />
-                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-              </svg>
-              <div>
-                <p class="font-medium">Материалы закрыты</p>
-                <p class="prose-body mt-1.5 text-pretty">
-                  Купите курс, чтобы открыть тексты, аудио и видеоразборы. Доступ
-                  остаётся навсегда.
-                </p>
-                <div class="mt-5 flex flex-wrap gap-2.5">
-                  <Button href={withBase(`/kursy/${course.slug}`)} variant="mustard" size="sm">
-                    Купить курс
-                  </Button>
-                  <Button href={withBase("/lk/courses")} variant="ghost" size="sm">
-                    Мои курсы
-                  </Button>
-                </div>
-              </div>
+      <div class="border-primary/20 bg-primary/5 mt-9 rounded-2xl border p-6">
+        <div class="flex items-start gap-3">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.75"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="text-primary-deep mt-0.5 h-5 w-5 shrink-0"
+            aria-hidden="true"
+          >
+            <rect x="3" y="11" width="18" height="11" rx="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+          <div>
+            <p class="font-medium">Материалы закрыты</p>
+            <p class="prose-body mt-1.5 text-pretty">
+              Купите курс, чтобы открыть тексты, аудио и видеоразборы. Доступ
+              остаётся навсегда.
+            </p>
+            <div class="mt-5 flex flex-wrap gap-2.5">
+              <Button href={withBase(`/kursy/${course.slug}`)} variant="mustard" size="sm">
+                Купить курс
+              </Button>
+              <Button href={withBase("/lk/courses")} variant="ghost" size="sm">
+                Мои курсы
+              </Button>
             </div>
           </div>
-        )
-      }
+        </div>
+      </div>
     </article>
 
     <aside class="card bg-sand-50 p-7">
@@ -127,15 +79,15 @@ const materials = demoMaterials[course.slug] ?? [];
       <dl class="mt-5 space-y-4 text-sm">
         <div>
           <dt class="text-ink-mute">Формат</dt>
-          <dd class="text-ink mt-0.5 text-[15px] font-medium">{course.format}</dd>
+          <dd class="text-ink mt-0.5 text-[16px] font-medium">{course.format}</dd>
         </div>
         <div>
           <dt class="text-ink-mute">Длительность</dt>
-          <dd class="text-ink mt-0.5 text-[15px] font-medium">{course.duration}</dd>
+          <dd class="text-ink mt-0.5 text-[16px] font-medium">{course.duration}</dd>
         </div>
         <div>
           <dt class="text-ink-mute">Стоимость</dt>
-          <dd class="text-ink mt-0.5 text-[15px] font-medium">{course.price}</dd>
+          <dd class="text-ink mt-0.5 text-[16px] font-medium">{course.price}</dd>
         </div>
         <div>
           <dt class="text-ink-mute">Что внутри</dt>
@@ -143,7 +95,7 @@ const materials = demoMaterials[course.slug] ?? [];
             <ul class="space-y-1.5">
               {
                 course.highlights.map((item) => (
-                  <li class="text-ink-soft flex items-start gap-2 text-[15px]">
+                  <li class="text-ink-soft flex items-start gap-2 text-[16px]">
                     <span class="bg-primary/40 mt-2 h-1.5 w-1.5 shrink-0 rounded-full" />
                     {item}
                   </li>

@@ -5,6 +5,13 @@ import { links } from "../../config/links";
 import { lessons, courses } from "../../data/products";
 import { reviews } from "../../data/reviews";
 import { withBase } from "../../utils/base";
+
+const toneClass = {
+  green: "bg-primary/15 text-primary-deep",
+  rose: "bg-rose-100 text-rose-accent",
+  sand: "bg-sand-200 text-ink",
+  mustard: "bg-mustard/30 text-mustard-deep",
+};
 ---
 
 <section class="wrap pt-8 sm:pt-12">
@@ -41,7 +48,7 @@ import { withBase } from "../../utils/base";
 
         <dl class="mt-10 grid max-w-lg grid-cols-3 gap-6 border-t border-ink/10 pt-7">
           <div>
-            <dt class="font-display text-2xl font-semibold text-primary-deep">3</dt>
+            <dt class="font-display text-2xl font-semibold text-primary-deep">4</dt>
             <dd class="mt-1 text-sm leading-snug text-ink-soft">формата занятий</dd>
           </div>
           <div>
@@ -56,12 +63,7 @@ import { withBase } from "../../utils/base";
       </div>
 
       <div class="relative">
-        <PhotoFrame
-          class="shadow-lift"
-          ratio="aspect-[4/5]"
-          label="Фото ведущей"
-          hint="заглушка — заменить на фото из ВК"
-        />
+        <PhotoFrame class="shadow-lift" ratio="aspect-[4/5]" />
 
         <div
           class="absolute -bottom-5 -left-5 hidden rounded-2xl border border-ink/5 bg-surface px-5 py-4 shadow-lift sm:block"
@@ -82,13 +84,13 @@ import { withBase } from "../../utils/base";
     </div>
     <a
       href={withBase("/info-produkty")}
-      class="link-underline shrink-0 self-start inline-flex min-h-8 items-center text-[15px] text-ink-soft hover:text-ink sm:self-auto"
+      class="link-underline shrink-0 self-start inline-flex min-h-8 items-center text-[16px] text-ink-soft hover:text-ink sm:self-auto"
     >
       Все инфо-продукты
     </a>
   </div>
 
-  <div class="mt-8 grid gap-5 md:grid-cols-2 md:[&>*:last-child:nth-child(odd)]:col-span-2 md:[&>*:last-child:nth-child(odd)]:justify-self-center md:[&>*:last-child:nth-child(odd)]:w-[calc(50%-10px)]">
+  <div class="mt-8 grid gap-5 md:grid-cols-2">
     {
       lessons.map((lesson) => (
         <a
@@ -98,9 +100,7 @@ import { withBase } from "../../utils/base";
           <span
             class:list={[
               "w-fit rounded-full px-3 py-1 text-xs font-medium",
-              lesson.tone === "green"
-                ? "bg-primary/15 text-primary-deep"
-                : "bg-rose-100 text-rose-accent",
+              toneClass[lesson.tone],
             ]}
           >
             {lesson.format}
@@ -193,7 +193,7 @@ import { withBase } from "../../utils/base";
       </p>
       <a
         href={withBase("/o-shkole")}
-        class="link-underline mt-6 inline-flex min-h-8 items-center gap-2 text-[15px] font-medium text-primary-deep"
+        class="link-underline mt-6 inline-flex min-h-8 items-center gap-2 text-[16px] font-medium text-primary-deep"
       >
         Подробнее о школе
       </a>
@@ -207,7 +207,7 @@ import { withBase } from "../../utils/base";
       </p>
       <a
         href={withBase("/o-veduschej")}
-        class="link-underline mt-6 inline-flex min-h-8 items-center gap-2 text-[15px] font-medium text-primary-deep"
+        class="link-underline mt-6 inline-flex min-h-8 items-center gap-2 text-[16px] font-medium text-primary-deep"
       >
         Прочитать историю
       </a>
@@ -223,7 +223,7 @@ import { withBase } from "../../utils/base";
     </div>
     <a
       href={withBase("/otzyvy")}
-      class="link-underline shrink-0 self-start inline-flex min-h-8 items-center text-[15px] text-ink-soft hover:text-ink sm:self-auto"
+      class="link-underline shrink-0 self-start inline-flex min-h-8 items-center text-[16px] text-ink-soft hover:text-ink sm:self-auto"
     >
       Все отзывы
     </a>
@@ -243,7 +243,7 @@ import { withBase } from "../../utils/base";
               d="M9.6 5C6.5 6.3 4.8 8.8 4.8 12c0 3.6 2 6.2 5.2 6.2 2.2 0 3.9-1.5 3.9-3.6 0-2-1.4-3.4-3.3-3.4-.4 0-.8 0-1 .1.3-1.6 1.6-3.2 3.4-4.2L9.6 5Zm9.2 0c-3.1 1.3-4.8 3.8-4.8 7 0 3.6 2 6.2 5.2 6.2 2.2 0 3.9-1.5 3.9-3.6 0-2-1.4-3.4-3.3-3.4-.4 0-.8 0-1 .1.3-1.6 1.6-3.2 3.4-4.2L18.8 5Z"
             ></path>
           </svg>
-          <blockquote class="mt-4 flex-1 text-[15px] leading-relaxed text-ink-soft text-pretty">
+          <blockquote class="mt-4 flex-1 text-[16px] leading-relaxed text-ink-soft text-pretty">
             {review.text}
           </blockquote>
           <figcaption class="mt-5 flex items-center gap-3 border-t border-ink/5 pt-4">
@@ -301,7 +301,7 @@ import { withBase } from "../../utils/base";
     </div>
     <div class="relative">
       <h2 class="text-balance text-2xl sm:text-3xl">Начните с одной песни</h2>
-      <p class="mx-auto mt-4 max-w-xl text-pretty text-[17px] leading-relaxed text-sand-200">
+      <p class="mx-auto mt-4 max-w-xl text-pretty text-[18px] leading-relaxed text-sand-200">
         Посмотрите инфо-продукты и выберите формат — живые занятия в Петербурге,
         онлайн-группу или отдельный обучающий проект.
       </p>

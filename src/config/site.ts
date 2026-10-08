@@ -1,6 +1,7 @@
 export const siteConfig = {
   name: "Женская школа народного пения",
-  shortName: "Народное пение",
+  shortName: "Женская школа",
+  subName: "народного пения",
   domain: "www.narodnoe-penie.ru",
   tagline: "Живое звучание, бережная традиция",
   description:

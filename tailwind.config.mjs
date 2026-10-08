@@ -35,7 +35,7 @@ export default {
         surface: "rgb(var(--c-surface) / <alpha-value>)",
       },
       fontFamily: {
-        display: ['"Playfair Display"', "Georgia", "serif"],
+        display: ['"Lora"', "Georgia", "serif"],
         sans: [
           "-apple-system",
           "BlinkMacSystemFont",

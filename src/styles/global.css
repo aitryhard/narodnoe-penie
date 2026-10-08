@@ -44,6 +44,11 @@
 
   body {
     background-color: rgb(var(--c-sand-100));
+    background-image: url("/img/site-bg.jpg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
     color: rgb(var(--c-ink));
     font-family: theme("fontFamily.sans");
     line-height: 1.65;

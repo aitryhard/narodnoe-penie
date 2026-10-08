@@ -58,7 +58,7 @@ const isActive = (href: string) =>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
   </head>
@@ -79,10 +79,19 @@ const isActive = (href: string) =>
           <span
             class="bg-primary/15 text-primary-deep ring-primary/20 group-hover:bg-primary/20 grid h-11 w-11 shrink-0 place-items-center rounded-2xl ring-1 transition-colors"
           >
-            <svg viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5" aria-hidden="true">
-              <path
-                d="M12 3v10.55A3.5 3.5 0 1 0 13.5 16V7h4.5V3H12Z"
-              ></path>
+            <svg viewBox="0 0 24 24" fill="none" class="h-6 w-6" aria-hidden="true">
+              <circle cx="12" cy="12" r="2.6" fill="currentColor"></circle>
+              <g fill="currentColor">
+                <ellipse cx="12" cy="6.2" rx="2" ry="3.4"></ellipse>
+                <ellipse cx="12" cy="17.8" rx="2" ry="3.4"></ellipse>
+                <ellipse cx="6.2" cy="12" rx="3.4" ry="2"></ellipse>
+                <ellipse cx="17.8" cy="12" rx="3.4" ry="2"></ellipse>
+                <ellipse cx="7.9" cy="7.9" rx="3.2" ry="1.9" transform="rotate(-45 7.9 7.9)"></ellipse>
+                <ellipse cx="16.1" cy="7.9" rx="3.2" ry="1.9" transform="rotate(45 16.1 7.9)"></ellipse>
+                <ellipse cx="7.9" cy="16.1" rx="3.2" ry="1.9" transform="rotate(45 7.9 16.1)"></ellipse>
+                <ellipse cx="16.1" cy="16.1" rx="3.2" ry="1.9" transform="rotate(-45 16.1 16.1)"></ellipse>
+              </g>
+              <circle cx="12" cy="12" r="2.2" fill="#decd95"></circle>
             </svg>
           </span>
           <span class="leading-tight">
@@ -90,7 +99,7 @@ const isActive = (href: string) =>
               {siteConfig.shortName}
             </span>
             <span class="text-ink-mute block text-xs uppercase tracking-[0.14em]">
-              женская школа
+              {siteConfig.subName}
             </span>
           </span>
         </a>

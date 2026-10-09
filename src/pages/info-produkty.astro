@@ -48,7 +48,7 @@ const lessonCards = lessons.map((lesson) => {
     <p class="text-xs font-semibold uppercase tracking-[0.14em] text-mustard-deep">
       Продаются онлайн
     </p>
-    <h2 class="text-balance mt-2 text-2xl sm:text-3xl">Обучающие проекты по песенному фольклору</h2>
+    <h2 class="text-balance mt-2 text-3xl sm:text-4xl">Обучающие проекты по песенному фольклору</h2>
     <p class="prose-body mt-3 max-w-2xl">
       Короткие курсы с конкретной темой: банные обряды, переходы, невестина баня,
       календарные песни. Каждый — с разбором и итоговым исполнением.
@@ -62,16 +62,11 @@ const lessonCards = lessons.map((lesson) => {
 
     <div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
       {
-        courses.map((course, i) => (
+        courses.map((course) => (
           <article class="card flex flex-col bg-surface p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-lift sm:p-7">
-            <div class="flex items-center justify-between gap-3">
-              <span class:list={["rounded-full px-3 py-1 text-xs font-medium", toneClass[course.tone]]}>
-                {course.format}
-              </span>
-              <span class="font-display text-sm font-semibold text-mustard-deep">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-            </div>
+            <span class:list={["w-fit rounded-full px-3 py-1 text-xs font-medium", toneClass[course.tone]]}>
+              {course.format}
+            </span>
 
             <h3 class="mt-5 text-xl">{course.title}</h3>
             <p class="mt-2.5 flex-1 text-[16px] leading-relaxed text-ink-soft text-pretty">
@@ -111,23 +106,18 @@ const lessonCards = lessons.map((lesson) => {
   </section>
 
   <section class="wrap pb-16 sm:pb-20">
-    <h2 class="text-balance text-2xl sm:text-3xl">Форматы участия</h2>
+    <h2 class="text-balance text-xl text-ink-soft sm:text-2xl">Форматы участия</h2>
 
     <div class="mt-8 grid gap-5 md:grid-cols-2">
       {
-        lessonCards.map((lesson, i) => (
+        lessonCards.map((lesson) => (
           <article
             id={lesson.anchor}
             class="card flex flex-col scroll-mt-28 bg-surface p-7 sm:p-9"
           >
-            <div class="flex items-center justify-between gap-4">
-              <span class:list={["rounded-full px-3 py-1 text-xs font-medium", toneClass[lesson.tone]]}>
-                {lesson.format}
-              </span>
-              <span class="font-display text-sm font-semibold text-ink-mute">
-                0{i + 1}
-              </span>
-            </div>
+            <span class:list={["w-fit rounded-full px-3 py-1 text-xs font-medium", toneClass[lesson.tone]]}>
+              {lesson.format}
+            </span>
 
             <h3 class="mt-5 text-xl sm:text-2xl">{lesson.title}</h3>
             <p class="prose-body mt-3 text-pretty sm:min-h-[4.875em]">

@@ -77,22 +77,15 @@ const isActive = (href: string) =>
       <div class="wrap flex items-center justify-between gap-4 py-4">
         <a href={withBase("/")} class="group flex items-center gap-3">
           <span
-            class="bg-primary/15 text-primary-deep ring-primary/20 group-hover:bg-primary/20 grid h-11 w-11 shrink-0 place-items-center rounded-2xl ring-1 transition-colors"
+            class="ring-primary/20 group-hover:ring-primary/30 h-11 w-11 shrink-0 overflow-hidden rounded-2xl ring-1 transition-all"
           >
-            <svg viewBox="0 0 24 24" fill="none" class="h-6 w-6" aria-hidden="true">
-              <circle cx="12" cy="12" r="2.6" fill="currentColor"></circle>
-              <g fill="currentColor">
-                <ellipse cx="12" cy="6.2" rx="2" ry="3.4"></ellipse>
-                <ellipse cx="12" cy="17.8" rx="2" ry="3.4"></ellipse>
-                <ellipse cx="6.2" cy="12" rx="3.4" ry="2"></ellipse>
-                <ellipse cx="17.8" cy="12" rx="3.4" ry="2"></ellipse>
-                <ellipse cx="7.9" cy="7.9" rx="3.2" ry="1.9" transform="rotate(-45 7.9 7.9)"></ellipse>
-                <ellipse cx="16.1" cy="7.9" rx="3.2" ry="1.9" transform="rotate(45 16.1 7.9)"></ellipse>
-                <ellipse cx="7.9" cy="16.1" rx="3.2" ry="1.9" transform="rotate(45 7.9 16.1)"></ellipse>
-                <ellipse cx="16.1" cy="16.1" rx="3.2" ry="1.9" transform="rotate(-45 16.1 16.1)"></ellipse>
-              </g>
-              <circle cx="12" cy="12" r="2.2" fill="#decd95"></circle>
-            </svg>
+            <img
+              src={withBase("/img/logo.jpg")}
+              alt=""
+              width="44"
+              height="44"
+              class="h-full w-full object-cover"
+            />
           </span>
           <span class="leading-tight">
             <span class="block font-display text-[18px] font-semibold tracking-tight">

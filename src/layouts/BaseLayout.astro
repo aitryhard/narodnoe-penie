@@ -244,7 +244,7 @@ const isActive = (href: string) =>
               </a>
               <a
                 href={links.max}
-                class="text-ink-soft hover:border-ink/25 hover:text-ink inline-flex h-10 items-center gap-2 rounded-full border border-ink/10 bg-surface px-4 text-sm transition-colors"
+                aria-label="Макс" class="text-ink-soft hover:border-ink/25 hover:text-ink grid h-10 w-10 place-items-center rounded-full border border-ink/10 bg-surface transition-colors"
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -260,7 +260,6 @@ const isActive = (href: string) =>
                     d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.4-.7L3 21l1.9-5.1A8.4 8.4 0 1 1 21 11.5Z"
                   ></path>
                 </svg>
-                Макс
               </a>
               <a
                 href={links.telegram}
@@ -296,7 +295,7 @@ const isActive = (href: string) =>
           </div>
 
           <div class="lg:col-span-3">
-            <p class="text-ink-mute text-xs font-medium uppercase tracking-[0.14em]">Разделы</p>
+            <p class="font-display text-base font-semibold text-ink">Разделы</p>
             <ul class="mt-4 space-y-2.5">
               {
                 navLinks.map((link) => (
@@ -314,7 +313,7 @@ const isActive = (href: string) =>
           </div>
 
           <div class="lg:col-span-3">
-            <p class="text-ink-mute text-xs font-medium uppercase tracking-[0.14em]">Обучение</p>
+            <p class="font-display text-base font-semibold text-ink">Обучение</p>
             <ul class="mt-4 space-y-2.5">
               <li>
                 <a
@@ -344,7 +343,7 @@ const isActive = (href: string) =>
           </div>
 
           <div class="lg:col-span-2">
-            <p class="text-ink-mute text-xs font-medium uppercase tracking-[0.14em]">Контакты</p>
+            <p class="font-display text-base font-semibold text-ink">Контакты</p>
             <ul class="text-ink-soft mt-4 space-y-2.5 text-[16px]">
               <li>
                 <a href={links.vk} class="hover:text-ink inline-flex min-h-8 items-center transition-colors">ВКонтакте</a>
@@ -365,7 +364,7 @@ const isActive = (href: string) =>
         <div
           class="text-ink-mute mt-12 flex flex-col gap-2 border-t border-ink/5 pt-6 text-xs sm:flex-row sm:items-center sm:justify-between"
         >
-          <p>© {year} {siteConfig.name}</p>
+          <p class="flex items-center gap-2"><span>© {year}</span><span aria-hidden="true" class="text-ink-mute/60">·</span><span>{siteConfig.name}</span></p>
           <p>{siteConfig.domain}</p>
         </div>
       </div>

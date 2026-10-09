@@ -77,7 +77,71 @@ const toneClass = {
 
   <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
-      <h2 class="text-balance text-2xl sm:text-3xl">Выберите, как вам ближе</h2>
+      <p class="text-xs font-semibold uppercase tracking-[0.14em] text-mustard-deep">
+        Продаются онлайн
+      </p>
+      <h2 class="text-balance mt-2 text-2xl sm:text-3xl">Курсы по песенному фольклору</h2>
+    </div>
+    <a
+      href={withBase("/info-produkty#proekty")}
+      class="link-underline shrink-0 self-start inline-flex min-h-8 items-center text-[16px] text-ink-soft hover:text-ink sm:self-auto"
+    >
+      Все курсы
+    </a>
+  </div>
+
+  <div class="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+    {
+      courses.map((course) => (
+        <a
+          href={withBase(`/kursy/${course.slug}`)}
+          class="card group flex flex-col bg-surface p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-lift sm:p-7"
+        >
+          <span
+            class:list={[
+              "w-fit rounded-full px-3 py-1 text-xs font-medium",
+              toneClass[course.tone],
+            ]}
+          >
+            {course.format}
+          </span>
+
+          <h3 class="mt-4 text-xl">{course.title}</h3>
+          <p class="mt-2 flex-1 text-sm leading-relaxed text-ink-soft text-pretty">
+            {course.lead}
+          </p>
+
+          <div class="mt-5 flex items-end justify-between gap-3 border-t border-ink/5 pt-4">
+            <div>
+              <p class="text-[13px] text-ink-mute">{course.duration}</p>
+              <p class="mt-1 inline-block border-b-[3px] border-mustard pb-0.5 font-display text-xl font-semibold">
+                {course.price}
+              </p>
+            </div>
+            <span class="inline-flex items-center gap-1.5 text-sm font-medium text-primary-deep">
+              Подробнее
+              <svg
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                class="h-4 w-4 transition-transform group-hover:translate-x-1"
+                aria-hidden="true"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M3 10a.75.75 0 0 1 .75-.75h12.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 10Zm4.22-4.72a.75.75 0 0 1 1.06 0l4.72 4.72-4.72 4.72a.75.75 0 1 1-1.06-1.06L11.44 10 7.28 5.78a.75.75 0 0 1 0-1.06Z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
+            </span>
+          </div>
+        </a>
+      ))
+    }
+  </div>
+
+  <div class="mt-14 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <h2 class="text-balance text-2xl sm:text-3xl">Форматы участия</h2>
     </div>
     <a
       href={withBase("/info-produkty")}
@@ -128,38 +192,6 @@ const toneClass = {
 
           <span class="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary-deep">
             Узнать подробнее
-            <svg
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              class="h-4 w-4 transition-transform group-hover:translate-x-1"
-              aria-hidden="true"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M3 10a.75.75 0 0 1 .75-.75h12.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 10Zm4.22-4.72a.75.75 0 0 1 1.06 0l4.72 4.72-4.72 4.72a.75.75 0 1 1-1.06-1.06L11.44 10 7.28 5.78a.75.75 0 0 1 0-1.06Z"
-                clip-rule="evenodd"
-              ></path>
-            </svg>
-          </span>
-        </a>
-      ))
-    }
-  </div>
-
-  <div class="mt-5 grid gap-5 sm:grid-cols-2 sm:[&>*:last-child:nth-child(odd)]:col-span-2 sm:[&>*:last-child:nth-child(odd)]:justify-self-center sm:[&>*:last-child:nth-child(odd)]:w-[calc(50%-10px)] lg:grid-cols-3 lg:[&>*:last-child:nth-child(odd)]:col-span-1 lg:[&>*:last-child:nth-child(odd)]:w-auto lg:[&>*:last-child:nth-child(odd)]:justify-self-auto">
-    {
-      courses.slice(0, 3).map((course, i) => (
-        <a
-          href={withBase(`/kursy/${course.slug}`)}
-          class="card group flex flex-col bg-sand-50 p-6 transition-all duration-200 hover:-translate-y-1 hover:bg-surface hover:shadow-lift"
-        >
-          <span class="font-display text-sm font-semibold text-mustard-deep">
-            {String(i + 1).padStart(2, "0")}
-          </span>
-          <h3 class="mt-3 text-xl">{course.title}</h3>
-          <p class="mt-2 flex-1 text-sm leading-relaxed text-ink-soft">{course.lead}</p>
-          <span class="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary-deep">
-            Подробнее
             <svg
               viewBox="0 0 20 20"
               fill="currentColor"

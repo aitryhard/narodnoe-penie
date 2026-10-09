@@ -95,7 +95,7 @@ const toneClass = {
       courses.map((course) => (
         <a
           href={withBase(`/kursy/${course.slug}`)}
-          class="card group flex flex-col bg-surface p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-lift sm:p-7"
+          class="card group flex flex-col border-primary/20 bg-surface p-6 transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lift sm:p-7"
         >
           <span
             class:list={[
@@ -141,7 +141,7 @@ const toneClass = {
 
   <div class="mt-14 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
-      <h2 class="text-balance text-2xl sm:text-3xl">Форматы участия</h2>
+      <h2 class="text-balance text-xl text-ink-soft sm:text-2xl">Форматы участия</h2>
     </div>
     <a
       href={withBase("/info-produkty")}

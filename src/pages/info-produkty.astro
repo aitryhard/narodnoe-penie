@@ -43,65 +43,67 @@ const lessonCards = lessons.map((lesson) => {
   />
 
   <section id="proekty" class="wrap scroll-mt-28 pt-14 pb-16 sm:pt-16 sm:pb-20">
-    <Ornament class="mb-10" />
+    <div class="card bg-surface/85 p-6 backdrop-blur sm:p-9 lg:p-12">
+      <Ornament class="mb-10" />
 
-    <p class="text-xs font-semibold uppercase tracking-[0.14em] text-mustard-deep">
-      Продаются онлайн
-    </p>
-    <h2 class="text-balance mt-2 text-3xl sm:text-4xl">Обучающие проекты по песенному фольклору</h2>
-    <p class="prose-body mt-3 max-w-2xl">
-      Короткие курсы с конкретной темой: банные обряды, переходы, невестина баня,
-      календарные песни. Каждый — с разбором и итоговым исполнением.
-    </p>
+      <p class="text-xs font-semibold uppercase tracking-[0.14em] text-mustard-deep">
+        Продаются онлайн
+      </p>
+      <h2 class="text-balance mt-2 text-3xl sm:text-4xl">Обучающие проекты по песенному фольклору</h2>
+      <p class="prose-body mt-3 max-w-2xl">
+        Короткие курсы с конкретной темой: банные обряды, переходы, невестина баня,
+        календарные песни. Каждый — с разбором и итоговым исполнением.
+      </p>
 
-    <div class="mt-7 grid gap-5 sm:grid-cols-3">
-      <PhotoFrame tone="rose" ratio="aspect-[4/3]" />
-      <PhotoFrame tone="sand" ratio="aspect-[4/3]" />
-      <PhotoFrame tone="green" ratio="aspect-[4/3]" />
-    </div>
+      <div class="mt-7 grid gap-5 sm:grid-cols-3">
+        <PhotoFrame tone="rose" ratio="aspect-[4/3]" />
+        <PhotoFrame tone="sand" ratio="aspect-[4/3]" />
+        <PhotoFrame tone="green" ratio="aspect-[4/3]" />
+      </div>
 
-    <div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-      {
-        courses.map((course) => (
-          <article class="card flex flex-col bg-surface p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-lift sm:p-7">
-            <span class:list={["w-fit rounded-full px-3 py-1 text-xs font-medium", toneClass[course.tone]]}>
-              {course.format}
-            </span>
+      <div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        {
+          courses.map((course) => (
+            <article class="group flex flex-col rounded-3xl border border-primary/15 bg-sand-50 p-6 transition-all duration-200 hover:-translate-y-1 hover:border-primary/30 hover:bg-surface hover:shadow-lift sm:p-7">
+              <span class:list={["w-fit rounded-full px-3 py-1 text-xs font-medium", toneClass[course.tone]]}>
+                {course.format}
+              </span>
 
-            <h3 class="mt-5 text-xl">{course.title}</h3>
-            <p class="mt-2.5 flex-1 text-[16px] leading-relaxed text-ink-soft text-pretty">
-              {course.lead}
-            </p>
+              <h3 class="mt-5 text-xl">{course.title}</h3>
+              <p class="mt-2.5 flex-1 text-[16px] leading-relaxed text-ink-soft text-pretty">
+                {course.lead}
+              </p>
 
-            <dl class="mt-5 flex gap-5 border-t border-ink/5 pt-4 text-xs">
-              <div>
-                <dt class="text-ink-mute">Длительность</dt>
-                <dd class="mt-0.5 font-medium text-ink-soft">{course.duration}</dd>
-              </div>
-              <div>
-                <dt class="text-ink-mute">Стоимость</dt>
-                <dd class="mt-1 font-display text-lg font-semibold text-ink">
-                  {course.price}
-                </dd>
-              </div>
-            </dl>
+              <dl class="mt-5 flex gap-5 border-t border-ink/10 pt-4 text-xs">
+                <div>
+                  <dt class="text-ink-mute">Длительность</dt>
+                  <dd class="mt-0.5 font-medium text-ink-soft">{course.duration}</dd>
+                </div>
+                <div>
+                  <dt class="text-ink-mute">Стоимость</dt>
+                  <dd class="mt-1 inline-block border-b-[3px] border-mustard pb-0.5 font-display text-xl font-semibold text-ink">
+                    {course.price}
+                  </dd>
+                </div>
+              </dl>
 
-            <a
-              href={withBase(`/kursy/${course.slug}`)}
-              class="mt-6 inline-flex h-[52px] items-center justify-center gap-2 rounded-full bg-ink px-6 text-[16px] font-medium text-sand-50 transition-all duration-200 hover:bg-ink/90 active:scale-[0.98]"
-            >
-              Узнать подробнее
-              <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
-                <path
-                  fill-rule="evenodd"
-                  d="M3 10a.75.75 0 0 1 .75-.75h12.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 10Zm4.22-4.72a.75.75 0 0 1 1.06 0l4.72 4.72-4.72 4.72a.75.75 0 1 1-1.06-1.06L11.44 10 7.28 5.78a.75.75 0 0 1 0-1.06Z"
-                  clip-rule="evenodd"
-                ></path>
-              </svg>
-            </a>
-          </article>
-        ))
-      }
+              <a
+                href={withBase(`/kursy/${course.slug}`)}
+                class="mt-6 inline-flex h-[52px] items-center justify-center gap-2 rounded-full bg-primary px-6 text-[16px] font-medium text-surface transition-all duration-200 hover:bg-primary-hover active:scale-[0.98]"
+              >
+                Узнать подробнее
+                <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
+                  <path
+                    fill-rule="evenodd"
+                    d="M3 10a.75.75 0 0 1 .75-.75h12.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 10Zm4.22-4.72a.75.75 0 0 1 1.06 0l4.72 4.72-4.72 4.72a.75.75 0 1 1-1.06-1.06L11.44 10 7.28 5.78a.75.75 0 0 1 0-1.06Z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+              </a>
+            </article>
+          ))
+        }
+      </div>
     </div>
   </section>
 

@@ -21,7 +21,7 @@ const { course } = Astro.props as { course: Course };
     <span class="text-ink-soft">{course.title}</span>
   </nav>
 
-  <div class="mt-6 grid gap-5 lg:grid-cols-3">
+  <div class="mt-6 grid gap-5 lg:grid-cols-3" data-course={course.slug}>
     <article class="card bg-surface p-7 lg:col-span-2 sm:p-9">
       <div class="flex flex-wrap items-center gap-2.5">
         <span class="bg-primary/10 text-primary-deep inline-block rounded-full px-3 py-1 text-xs font-medium">
@@ -31,6 +31,7 @@ const { course } = Astro.props as { course: Course };
           {course.duration}
         </span>
         <span
+          data-access-badge
           class="bg-mustard/40 text-mustard-deep inline-block rounded-full px-3 py-1 text-xs font-medium"
         >
           Доступ закрыт
@@ -40,7 +41,7 @@ const { course } = Astro.props as { course: Course };
       <h2 class="mt-5 text-2xl sm:text-3xl">{course.title}</h2>
       <p class="prose-body mt-3 text-pretty">{course.description}</p>
 
-      <div class="border-primary/20 bg-primary/5 mt-9 rounded-2xl border p-6">
+      <div data-lock class="border-primary/20 bg-primary/5 mt-9 rounded-2xl border p-6">
         <div class="flex items-start gap-3">
           <svg
             viewBox="0 0 24 24"
@@ -107,4 +108,121 @@ const { course } = Astro.props as { course: Course };
       </dl>
     </aside>
   </div>
+
+  <script>
+    import { API_ENABLED, API_BASE } from "../../../config/api";
+    import { withBase } from "../../../utils/base";
+
+    type Block = { type?: string; text?: string; src?: string; title?: string; alt?: string };
+    type CourseData = { access?: boolean; content?: { blocks?: Block[] } | null };
+
+    if (API_ENABLED) {
+      const root = document.querySelector<HTMLElement>("[data-course]");
+      const slug = root?.dataset.course ?? "";
+
+      if (slug) {
+        fetch(`${API_BASE}/api/course.php?slug=${encodeURIComponent(slug)}`, { credentials: "include" })
+          .then(async (response) => {
+            if (response.status === 401) {
+              window.location.href = withBase("/lk/login");
+              return null;
+            }
+            const json = (await response.json().catch(() => null)) as
+              | { ok?: boolean; data?: CourseData }
+              | null;
+            if (!response.ok || !json?.ok) return null;
+            return json.data ?? null;
+          })
+          .then((data) => {
+            if (!data?.access) return;
+
+            const badge = document.querySelector<HTMLElement>("[data-access-badge]");
+            if (badge) {
+              badge.textContent = "Доступ открыт";
+              badge.classList.remove("bg-mustard/40", "text-mustard-deep");
+              badge.classList.add("bg-primary/15", "text-primary-deep");
+            }
+
+            const lock = document.querySelector<HTMLElement>("[data-lock]");
+            if (!lock) return;
+
+            const box = document.createElement("div");
+            box.className = "border-primary/20 bg-primary/5 mt-9 rounded-2xl border p-6 sm:p-7";
+
+            const blocks = data.content?.blocks ?? [];
+
+            if (blocks.length === 0) {
+              const ok = document.createElement("p");
+              ok.className = "font-medium";
+              ok.textContent = "Доступ открыт";
+              const soon = document.createElement("p");
+              soon.className = "prose-body mt-1.5 text-pretty";
+              soon.textContent = "Материалы курса скоро появятся - мы их готовим.";
+              box.append(ok, soon);
+            } else {
+              const resolve = (src: string) =>
+                /^(https?:)?\/\//.test(src) || src.startsWith("/")
+                  ? src
+                  : `${API_BASE}/api/content/courses/${slug}/${src}`;
+
+              for (const block of blocks) {
+                const type = block.type ?? "";
+                if (type === "heading" && block.text) {
+                  const el = document.createElement("h3");
+                  el.className = "font-display mt-7 first:mt-0 text-xl font-semibold";
+                  el.textContent = block.text;
+                  box.append(el);
+                } else if (type === "text" && block.text) {
+                  const el = document.createElement("p");
+                  el.className = "prose-body mt-3 text-pretty";
+                  el.textContent = block.text;
+                  box.append(el);
+                } else if (type === "audio" && block.src) {
+                  const wrap = document.createElement("div");
+                  wrap.className = "mt-4";
+                  if (block.title) {
+                    const t = document.createElement("p");
+                    t.className = "mb-1.5 text-sm font-medium";
+                    t.textContent = block.title;
+                    wrap.append(t);
+                  }
+                  const audio = document.createElement("audio");
+                  audio.controls = true;
+                  audio.src = resolve(block.src);
+                  audio.className = "w-full";
+                  wrap.append(audio);
+                  box.append(wrap);
+                } else if (type === "video" && block.src) {
+                  const wrap = document.createElement("div");
+                  wrap.className = "mt-5";
+                  if (block.title) {
+                    const t = document.createElement("p");
+                    t.className = "mb-2 text-sm font-medium";
+                    t.textContent = block.title;
+                    wrap.append(t);
+                  }
+                  const video = document.createElement("video");
+                  video.controls = true;
+                  video.src = resolve(block.src);
+                  video.className = "w-full rounded-xl";
+                  video.preload = "metadata";
+                  wrap.append(video);
+                  box.append(wrap);
+                } else if (type === "image" && block.src) {
+                  const img = document.createElement("img");
+                  img.src = resolve(block.src);
+                  img.alt = block.alt ?? "";
+                  img.className = "mt-4 w-full rounded-xl";
+                  img.loading = "lazy";
+                  box.append(img);
+                }
+              }
+            }
+
+            lock.replaceWith(box);
+          })
+          .catch(() => {});
+      }
+    }
+  </script>
 </LkLayout>

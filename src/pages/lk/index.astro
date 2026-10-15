@@ -27,12 +27,13 @@ import { withBase } from "../../utils/base";
 
   <section class="mt-10">
     <h2 class="text-2xl">Мои курсы</h2>
-    <div class="card bg-surface mt-5 p-9 text-center">
+    <div data-my-empty class="card bg-surface mt-5 p-9 text-center">
       <p class="prose-body">Купленных курсов пока нет.</p>
       <Button href={withBase("/info-produkty")} variant="mustard" class="mt-5">
         Посмотреть курсы
       </Button>
     </div>
+    <div data-my-list class="mt-5 hidden space-y-3"></div>
   </section>
 
   <script>
@@ -55,6 +56,42 @@ import { withBase } from "../../utils/base";
         .catch(() => {
           window.location.href = withBase("/lk/login");
         });
+
+      fetch(API_BASE + "/api/courses.php", { credentials: "include" })
+        .then((response) => response.json())
+        .then((json) => {
+          const list = document.querySelector<HTMLElement>("[data-my-list]");
+          if (!list) return;
+          const courses = (json?.data?.courses ?? []) as {
+            slug: string;
+            title: string;
+            access: boolean;
+          }[];
+          const open = courses.filter((course) => course.access);
+          if (open.length === 0) return;
+
+          document.querySelector<HTMLElement>("[data-my-empty]")?.classList.add("hidden");
+          list.classList.remove("hidden");
+
+          for (const course of open) {
+            const link = document.createElement("a");
+            link.href = withBase("/lk/courses/" + course.slug);
+            link.className =
+              "card bg-surface group flex items-center justify-between gap-4 p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lift sm:p-6";
+
+            const title = document.createElement("span");
+            title.className = "font-display text-lg font-semibold";
+            title.textContent = course.title;
+
+            const action = document.createElement("span");
+            action.className = "text-primary-deep inline-flex shrink-0 items-center gap-1.5 text-sm font-medium";
+            action.textContent = "Открыть курс";
+
+            link.append(title, action);
+            list.append(link);
+          }
+        })
+        .catch(() => {});
     }
   </script>
 </LkLayout>

@@ -45,7 +45,7 @@ function api_site_host(): string
 }
 
 /**
- * Адрес сайта. Задаётся в config.php/config.local.php, а если не задан —
+ * Адрес сайта. Задаётся в config.php/config.local.php, а если не задан -
  * берётся из запроса, чтобы ссылки в письмах работали на любом домене.
  */
 function api_site_url(): string
@@ -59,7 +59,7 @@ function api_site_url(): string
     return (api_is_https() ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
 }
 
-/** Отправитель письма. По умолчанию — no-reply@домен-сайта. */
+/** Отправитель письма. По умолчанию - no-reply@домен-сайта. */
 function api_mail_from(): string
 {
     $configured = api_config()['mail_from'] ?? null;

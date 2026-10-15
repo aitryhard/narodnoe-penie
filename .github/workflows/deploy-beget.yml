@@ -46,7 +46,7 @@ jobs:
             "
             echo "api/tg.config.php written"
           else
-            echo "TG secrets not set — bot config skipped"
+            echo "TG secrets not set - bot config skipped"
           fi
 
       - name: Copy API into dist

@@ -50,7 +50,7 @@ db_write(
 $data = [];
 
 if ($emailChanged) {
-    // Новый адрес нужно подтвердить заново — иначе письма уйдут не туда.
+    // Новый адрес нужно подтвердить заново - иначе письма уйдут не туда.
     $fresh = find_user_by_id((int) $user['id']);
     $code = create_confirm_code(
         (int) $fresh['id'],
@@ -58,7 +58,7 @@ if ($emailChanged) {
     );
 
     if (!send_confirm_email($fresh, $code)) {
-        // Письмо не ушло — возвращаем прежнюю почту, иначе вход закроется
+        // Письмо не ушло - возвращаем прежнюю почту, иначе вход закроется
         // навсегда: подтвердить новый адрес будет нечем.
         db_write(
             'UPDATE users SET email = ?, email_verified_at = ?, updated_at = ? WHERE id = ?',

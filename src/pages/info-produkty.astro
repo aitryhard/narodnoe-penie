@@ -23,7 +23,7 @@ const photoTone = {
 } as const;
 
 // «2 100 ₽ · абонемент на 4 занятия» → цена отдельно, пояснение отдельно.
-// В данных тире-делитель окружено неразрывными пробелами — режем по «·» и обрезаем.
+// В данных тире-делитель окружено неразрывными пробелами - режем по «·» и обрезаем.
 const lessonCards = lessons.map((lesson) => {
   const parts = lesson.price.split("·").map((part) => part.trim());
   return {
@@ -38,7 +38,7 @@ const lessonCards = lessons.map((lesson) => {
   <PageHero
     label="Инфо-продукты"
     title="Что можно выбрать"
-    intro="Обучающие проекты по песенному фольклору и четыре формата участия: живые занятия в центре Петербурга, онлайн по средам и ансамбль «Реченька». Цены и детали — в карточках."
+    intro="Обучающие проекты по песенному фольклору и четыре формата участия: живые занятия в центре Петербурга, онлайн по средам и ансамбль «Реченька». Цены и детали - в карточках."
     tone="sand"
   />
 
@@ -51,7 +51,7 @@ const lessonCards = lessons.map((lesson) => {
       <h2 class="text-balance mt-2 text-3xl sm:text-4xl">Обучающие проекты по песенному фольклору</h2>
       <p class="prose-body mt-3 max-w-2xl">
         Короткие курсы с конкретной темой: банные обряды, переходы, невестина баня,
-        календарные песни. Каждый — с разбором и итоговым исполнением.
+        календарные песни. Каждый - с разбором и итоговым исполнением.
       </p>
 
       <div class="mt-7 grid gap-5 sm:grid-cols-3">
@@ -179,7 +179,7 @@ const lessonCards = lessons.map((lesson) => {
     <div class="card bg-rose-100 p-8 text-center sm:p-12">
       <h2 class="text-balance text-2xl sm:text-3xl">Не знаете, что выбрать?</h2>
       <p class="mx-auto mt-4 max-w-xl text-pretty text-[18px] leading-relaxed text-ink-soft">
-        Напишите нам — подберём формат под ваш уровень и задачу.
+        Напишите нам - подберём формат под ваш уровень и задачу.
       </p>
       <div class="mt-8 flex flex-wrap justify-center gap-3">
         <Button href={links.email} variant="mustard" size="lg">Написать на почту</Button>

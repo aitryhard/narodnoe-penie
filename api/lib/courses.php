@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Курсы — синхронизировать с src/data/products.ts (слаги и названия).
+ * Курсы - синхронизировать с src/data/products.ts (слаги и названия).
  */
 return [
     ['slug' => 'pesni-bannyh-obryadov', 'title' => 'Песни банных обрядов'],

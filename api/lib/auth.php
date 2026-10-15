@@ -8,7 +8,7 @@ function current_user_id(): ?int
 }
 
 /**
- * Отпечаток пароля в сессии. Если пароль сменили — отпечаток в старых
+ * Отпечаток пароля в сессии. Если пароль сменили - отпечаток в старых
  * сессиях разойдётся, и они закроются на следующем обращении.
  */
 function password_epoch(string $passwordHash): string
@@ -23,7 +23,7 @@ function session_login(array $user): void
     $_SESSION['pw_epoch'] = password_epoch($user['password_hash']);
 }
 
-/** Переводит текущую сессию на новый пароль — сама она не разлогинивается. */
+/** Переводит текущую сессию на новый пароль - сама она не разлогинивается. */
 function session_refresh_password(string $passwordHash): void
 {
     $_SESSION['pw_epoch'] = password_epoch($passwordHash);
@@ -66,7 +66,7 @@ function public_user(array $user): array
 }
 
 /**
- * Пользователь, сделавший запрос. Если его нет — отвечает 401 и завершает.
+ * Пользователь, сделавший запрос. Если его нет - отвечает 401 и завершает.
  */
 function require_user(): array
 {
@@ -152,7 +152,7 @@ function drop_tokens(int $userId, string $purpose): void
 /* Коды подтверждения почты                                            */
 /* ------------------------------------------------------------------ */
 
-/** Хеш кода привязан к пользователю — одинаковые коды у разных не конфликтуют. */
+/** Хеш кода привязан к пользователю - одинаковые коды у разных не конфликтуют. */
 function confirm_code_hash(int $userId, string $code): string
 {
     return hash('sha256', $userId . ':' . $code);

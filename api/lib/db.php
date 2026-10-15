@@ -51,7 +51,7 @@ function db(): PDO
 }
 
 /**
- * Создаёт таблицы, если их ещё нет. Повторные обращения ничего не делают —
+ * Создаёт таблицы, если их ещё нет. Повторные обращения ничего не делают -
  * лишний запрос к information_schema выполняется один раз за запрос к API.
  */
 function db_ensure_schema(PDO $pdo, string $dialect): void
@@ -95,7 +95,7 @@ function db_table_exists(PDO $pdo, string $table): bool
 
 /**
  * Добавляет колонки, появившиеся после создания таблиц на живых базах.
- * Ошибок «колонка уже есть» не бывает — перед exec стоит проверка.
+ * Ошибок «колонка уже есть» не бывает - перед exec стоит проверка.
  */
 function db_ensure_columns(PDO $pdo, string $dialect): void
 {
@@ -163,7 +163,7 @@ function db_write(string $sql, array $params = []): int
     return $stmt->rowCount();
 }
 
-/** Момент времени в UTC, ISO-8601 — одинаково сравнивается в SQLite и MySQL. */
+/** Момент времени в UTC, ISO-8601 - одинаково сравнивается в SQLite и MySQL. */
 function now_iso(): string
 {
     return gmdate('Y-m-d\TH:i:s\Z');

@@ -11,7 +11,7 @@ export interface Props {
 
 const { title, description = siteConfig.description } = Astro.props;
 
-const pageTitle = title ? `${title} — ${siteConfig.shortName}` : siteConfig.name;
+const pageTitle = title ? `${title} - ${siteConfig.shortName}` : siteConfig.name;
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site) : undefined;
 const year = new Date().getFullYear();
 
@@ -227,7 +227,7 @@ const isActive = (href: string) =>
           <div class="lg:col-span-4">
             <p class="font-display text-xl font-semibold">{siteConfig.name}</p>
             <p class="mt-3 max-w-sm text-sm leading-relaxed text-ink-soft">
-              {siteConfig.tagline}. Бережно передаём песенный фольклор живым звучанием —
+              {siteConfig.tagline}. Бережно передаём песенный фольклор живым звучанием -
               офлайн в Петербурге и онлайн из любой точки.
             </p>
             <div class="mt-5 flex items-center gap-2">

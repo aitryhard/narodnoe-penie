@@ -27,5 +27,5 @@ $tables = $dialect === 'sqlite'
 echo 'Подключение: ' . ($dialect === 'sqlite' ? 'SQLite' : 'MySQL') . "\n";
 echo 'База: ' . $dsn . "\n";
 echo 'Таблицы: ' . count($tables) . " из 2 (users, auth_tokens)\n";
-echo count($tables) === 2 ? "Готово.\n" : "Таблицы не созданы — смотрите лог ошибок PHP.\n";
+echo count($tables) === 2 ? "Готово.\n" : "Таблицы не созданы - смотрите лог ошибок PHP.\n";
 exit(count($tables) === 2 ? 0 : 1);

@@ -96,7 +96,7 @@ import { withBase } from "../../utils/base";
 
         <h2 class="mt-6 text-2xl">Почта подтверждена</h2>
         <p class="prose-body mt-3 text-pretty">
-          Спасибо! Теперь можно войти в личный кабинет — там уже лежат ваши курсы и
+          Спасибо! Теперь можно войти в личный кабинет - там уже лежат ваши курсы и
           материалы.
         </p>
 
@@ -149,7 +149,7 @@ import { withBase } from "../../utils/base";
       box.addEventListener("input", () => {
         const digits = box.value.replace(/\D/g, "");
         if (digits.length > 1) {
-          // Вставка или автозаполнение из письма — раскладываем по квадратикам.
+          // Вставка или автозаполнение из письма - раскладываем по квадратикам.
           box.value = "";
           distribute(i, digits);
           return;

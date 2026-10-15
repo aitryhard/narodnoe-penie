@@ -4,7 +4,7 @@ import BaseLayout from "./BaseLayout.astro";
 export interface Props {
   title: string;
   description?: string;
-  /** Страницы авторизации — без кнопки «Выйти». */
+  /** Страницы авторизации - без кнопки «Выйти». */
   auth?: boolean;
   /** Заголовок по центру (страницы авторизации). */
   titleCentered?: boolean;
@@ -194,10 +194,10 @@ const { title, description, auth = false, titleCentered = false } = Astro.props;
             return;
           }
 
-          // Смена почты в профиле — новый адрес подтверждается кодом.
+          // Смена почты в профиле - новый адрес подтверждается кодом.
           if (data.emailChanged) {
             const email = String(new FormData(form).get("email") ?? "");
-            flashTo("Подтвердите новый адрес — мы отправили на него код.");
+            flashTo("Подтвердите новый адрес - мы отправили на него код.");
             window.location.href = withBase("/lk/confirm/") + "?email=" + encodeURIComponent(email);
             return;
           }
@@ -223,7 +223,7 @@ const { title, description, auth = false, titleCentered = false } = Astro.props;
           if (apiError.needsConfirm) {
             const email = String(new FormData(form).get("email") ?? "");
             call("/api/resend.php", { email }).then(showDevLink).catch(() => {});
-            flashTo("Мы отправили код на почту — введите его для подтверждения.");
+            flashTo("Мы отправили код на почту - введите его для подтверждения.");
             window.location.href = withBase("/lk/confirm/") + "?email=" + encodeURIComponent(email);
             return;
           }

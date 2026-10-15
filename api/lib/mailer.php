@@ -4,7 +4,7 @@ declare(strict_types=1);
 /**
  * Отправка писем.
  *
- * В режиме dev письмо не уходит, а пишется в var/mail.log — так можно
+ * В режиме dev письмо не уходит, а пишется в var/mail.log - так можно
  * проверить код подтверждения без настроенного SMTP.
  * На хостинге (dev = false) используется стандартная mail() с почтой Beget.
  */
@@ -85,11 +85,11 @@ function send_confirm_email(array $user, string $code): bool
         . "Код подтверждения: {$code}\n\n"
         . "Введите его на странице:\n{$confirmUrl}\n\n"
         . "Код действует {$minutes} минут.\n"
-        . "Если это были не вы — просто проигнорируйте письмо.\n";
+        . "Если это были не вы - просто проигнорируйте письмо.\n";
 
     $html = confirm_email_html($name, $code, $confirmUrl, $minutes);
 
-    return send_mail($user['email'], 'Код подтверждения — Школа народного пения', $plain, $html);
+    return send_mail($user['email'], 'Код подтверждения - Школа народного пения', $plain, $html);
 }
 
 function send_reset_email(array $user, string $rawToken): bool
@@ -101,13 +101,13 @@ function send_reset_email(array $user, string $rawToken): bool
         . "Кто-то запросил сброс пароля для {$user['email']}.\n"
         . "Задайте новый пароль по ссылке:\n\n{$link}\n\n"
         . "Ссылка действует 2 часа.\n"
-        . "Если это были не вы — ничего делать не нужно.\n";
+        . "Если это были не вы - ничего делать не нужно.\n";
 
-    return send_mail($user['email'], 'Сброс пароля — Школа народного пения', $body);
+    return send_mail($user['email'], 'Сброс пароля - Школа народного пения', $body);
 }
 
 /**
- * HTML-письмо с кодом — в оформлении карточки регистрации:
+ * HTML-письмо с кодом - в оформлении карточки регистрации:
  * бежевый фон, белая карточка с большим скруглением, горчичный код.
  * Только инлайн-стили и таблицы: почтовые клиенты не читают внешние CSS.
  */
@@ -146,7 +146,7 @@ function confirm_email_html(string $name, string $code, string $confirmUrl, int 
                 Здравствуйте, {$safeName}!
               </h1>
               <p style="margin:14px 0 0; font-size:16px; line-height:1.65; color:#4e4c44;">
-                Вы зарегистрировались в Женской школе народного пения. Введите код из письма на странице подтверждения — и всё готово.
+                Вы зарегистрировались в Женской школе народного пения. Введите код из письма на странице подтверждения - и всё готово.
               </p>
 
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:26px 0 0;">
@@ -163,7 +163,7 @@ function confirm_email_html(string $name, string $code, string $confirmUrl, int 
               </table>
 
               <p style="margin:24px 0 0; font-size:16px; line-height:1.65; color:#4e4c44;">
-                Страница подтверждения уже открыта у вас в браузере — либо откройте её по кнопке:
+                Страница подтверждения уже открыта у вас в браузере - либо откройте её по кнопке:
               </p>
 
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:14px 0 0;">
@@ -177,7 +177,7 @@ function confirm_email_html(string $name, string $code, string $confirmUrl, int 
               </table>
 
               <p style="margin:26px 0 0; font-size:13px; line-height:1.6; color:#4a473b;">
-                Если это были не вы — просто проигнорируйте это письмо, ничего делать не нужно.
+                Если это были не вы - просто проигнорируйте это письмо, ничего делать не нужно.
               </p>
             </td>
           </tr>

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 /**
  * Telegram-бот админ-панель (webhook).
- * Только inline-кнопки, доступ — только для администраторов.
+ * Только inline-кнопки, доступ - только для администраторов.
  * Регистрация: setWebhook с secret_token; запросы без него отклоняются.
  */
 
@@ -106,7 +106,7 @@ function tg_show_menu(int $chatId, int $messageId): void
     tg_edit($chatId, $messageId, tg_menu_text(), tg_menu_kb());
 }
 
-/** Список курсов кнопками. $next — куда вести после выбора: 'g' или 'gu:<uid>' */
+/** Список курсов кнопками. $next - куда вести после выбора: 'g' или 'gu:<uid>' */
 function tg_show_courses(int $chatId, int $messageId, string $next, string $title): void
 {
     $rows = [];
@@ -138,14 +138,14 @@ function tg_user_card(int $chatId, int $messageId, int $userId): void
         '👤 Пользователь',
         '',
         'Email: ' . $user['email'],
-        'Имя: ' . (($user['name'] !== '') ? $user['name'] : '—'),
+        'Имя: ' . (($user['name'] !== '') ? $user['name'] : '-'),
         'Роль: ' . $user['role'],
         'Регистрация: ' . substr((string) $user['created_at'], 0, 10),
         '',
         'Курсы (' . count($purchased) . '):',
     ];
     if ($purchased === []) {
-        $lines[] = '— нет доступов —';
+        $lines[] = '- нет доступов -';
     } else {
         foreach ($purchased as $slug) {
             $lines[] = '✅ ' . course_title($slug);
@@ -176,7 +176,7 @@ function tg_show_users(int $chatId, int $messageId, int $offset): void
         $rows[] = [tg_btn($label, 'u:' . $user['id'])];
     }
     if ($users === []) {
-        $lines[] = '— пусто —';
+        $lines[] = '- пусто -';
     }
 
     $nav = [];
@@ -447,10 +447,10 @@ function tg_handle_message(int $chatId, string $text): void
                 return;
             }
             $purchased = access_list((int) $user['id']);
-            $list = $purchased === [] ? '— нет доступов —' : implode("\n", array_map(fn($s) => '✅ ' . course_title($s), $purchased));
+            $list = $purchased === [] ? '- нет доступов -' : implode("\n", array_map(fn($s) => '✅ ' . course_title($s), $purchased));
             tg_send(
                 $chatId,
-                "👤 {$user['email']}\nИмя: " . (($user['name'] !== '') ? $user['name'] : '—') . "\nРоль: {$user['role']}\n\nКурсы:\n{$list}",
+                "👤 {$user['email']}\nИмя: " . (($user['name'] !== '') ? $user['name'] : '-') . "\nРоль: {$user['role']}\n\nКурсы:\n{$list}",
                 [[tg_btn('🗂 Открыть карточку', 'u:' . $user['id']), tg_btn('🧹 В меню', 'm')]]
             );
             return;

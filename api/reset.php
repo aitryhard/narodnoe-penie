@@ -42,7 +42,7 @@ db_write(
     'UPDATE users SET password_hash = ?, email_verified_at = ?, updated_at = ? WHERE id = ?',
     [
         password_hash($password, PASSWORD_DEFAULT),
-        // Письмо со ссылкой пришло на этот адрес — значит, почта подтверждена.
+        // Письмо со ссылкой пришло на этот адрес - значит, почта подтверждена.
         $now,
         $now,
         (int) $user['id'],

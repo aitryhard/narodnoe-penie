@@ -2,7 +2,6 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PageHero from "../components/PageHero.astro";
 import Button from "../components/ui/Button.astro";
-import PhotoFrame from "../components/ui/PhotoFrame.astro";
 import VideoFrame from "../components/ui/VideoFrame.astro";
 import Ornament from "../components/Ornament.astro";
 import { links } from "../config/links";
@@ -65,11 +64,16 @@ const values = [
         </div>
       </div>
 
-      <PhotoFrame
-        class="shadow-card lg:aspect-auto lg:min-h-full"
-        ratio="aspect-[3/4]"
-        tone="green"
-      />
+      <div class="shadow-card aspect-[3/4] overflow-hidden rounded-3xl lg:aspect-auto lg:min-h-full">
+        <img
+          src={withBase("/img/o-shkole.jpg")}
+          alt="Занятие школы - ведущая с ученицами поют вместе"
+          width={634}
+          height={952}
+          class="h-full w-full object-cover"
+          loading="lazy"
+        />
+      </div>
     </div>
   </section>
 

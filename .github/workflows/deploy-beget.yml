@@ -32,6 +32,23 @@ jobs:
           PUBLIC_SITE_URL: https://narodnoe-penie.ru
           PUBLIC_API_ENABLED: "1"
 
+      - name: Prepare Telegram bot config
+        env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_SECRET: ${{ secrets.TG_SECRET }}
+        run: |
+          if [ -n "$TG_TOKEN" ] && [ -n "$TG_SECRET" ]; then
+            node -e "
+              const fs = require('fs');
+              const q = (s) => \"'\" + String(s).replace(/\\\\/g, '\\\\\\\\').replace(/'/g, \"\\\\'\") + \"'\";
+              const php = '<?php\\nreturn [\\'token\\' => ' + q(process.env.TG_TOKEN) + ', \\'secret\\' => ' + q(process.env.TG_SECRET) + ', \\'admin_ids\\' => []];\\n';
+              fs.writeFileSync('api/tg.config.php', php);
+            "
+            echo "api/tg.config.php written"
+          else
+            echo "TG secrets not set — bot config skipped"
+          fi
+
       - name: Copy API into dist
         run: cp -R api dist/api
 

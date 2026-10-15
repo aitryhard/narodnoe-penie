@@ -36,6 +36,24 @@ return [
         )',
         'CREATE UNIQUE INDEX IF NOT EXISTS ux_auth_tokens_hash ON auth_tokens (token_hash)',
         'CREATE INDEX IF NOT EXISTS ix_auth_tokens_user ON auth_tokens (user_id, purpose)',
+        'CREATE TABLE IF NOT EXISTS purchases (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id INTEGER NOT NULL,
+          course_slug TEXT NOT NULL,
+          created_at TEXT NOT NULL,
+          CONSTRAINT fk_purchases_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+        )',
+        'CREATE UNIQUE INDEX IF NOT EXISTS ux_purchases ON purchases (user_id, course_slug)',
+        'CREATE TABLE IF NOT EXISTS tg_state (
+          chat_id INTEGER PRIMARY KEY,
+          step TEXT NOT NULL,
+          payload TEXT NOT NULL DEFAULT "{}",
+          updated_at TEXT NOT NULL
+        )',
+        'CREATE TABLE IF NOT EXISTS settings (
+          key TEXT PRIMARY KEY,
+          value TEXT NOT NULL
+        )',
     ],
 
     'mysql' => [
@@ -63,6 +81,27 @@ return [
           UNIQUE KEY `ux_auth_tokens_hash` (`token_hash`),
           KEY `ix_auth_tokens_user` (`user_id`, `purpose`),
           CONSTRAINT `fk_auth_tokens_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci',
+        'CREATE TABLE IF NOT EXISTS `purchases` (
+          `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+          `user_id` BIGINT UNSIGNED NOT NULL,
+          `course_slug` VARCHAR(64) NOT NULL,
+          `created_at` VARCHAR(32) NOT NULL,
+          PRIMARY KEY (`id`),
+          UNIQUE KEY `ux_purchases` (`user_id`, `course_slug`),
+          CONSTRAINT `fk_purchases_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci',
+        'CREATE TABLE IF NOT EXISTS `tg_state` (
+          `chat_id` BIGINT UNSIGNED NOT NULL,
+          `step` VARCHAR(32) NOT NULL,
+          `payload` TEXT NOT NULL,
+          `updated_at` VARCHAR(32) NOT NULL,
+          PRIMARY KEY (`chat_id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci',
+        'CREATE TABLE IF NOT EXISTS `settings` (
+          `key` VARCHAR(64) NOT NULL,
+          `value` TEXT NOT NULL,
+          PRIMARY KEY (`key`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci',
     ],
 ];

@@ -56,13 +56,16 @@ function db(): PDO
  */
 function db_ensure_schema(PDO $pdo, string $dialect): void
 {
-    $exists = $dialect === 'sqlite'
-        ? $pdo->query("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'users'")->fetch()
-        : $pdo->query(
-            "SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'users' LIMIT 1"
-        )->fetch();
+    $required = ['users', 'auth_tokens', 'purchases', 'tg_state', 'settings'];
+    $allExist = true;
+    foreach ($required as $table) {
+        if (!db_table_exists($pdo, $table)) {
+            $allExist = false;
+            break;
+        }
+    }
 
-    if ($exists === false) {
+    if (!$allExist) {
         $statements = require __DIR__ . '/schema.php';
         $statements = $statements[$dialect] ?? [];
 
@@ -72,6 +75,22 @@ function db_ensure_schema(PDO $pdo, string $dialect): void
     }
 
     db_ensure_columns($pdo, $dialect);
+}
+
+function db_table_exists(PDO $pdo, string $table): bool
+{
+    if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
+        $stmt = $pdo->prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?");
+        $stmt->execute([$table]);
+        return $stmt->fetch() !== false;
+    }
+
+    $stmt = $pdo->prepare(
+        'SELECT 1 FROM information_schema.tables
+         WHERE table_schema = DATABASE() AND table_name = ? LIMIT 1'
+    );
+    $stmt->execute([$table]);
+    return $stmt->fetch() !== false;
 }
 
 /**
@@ -85,6 +104,11 @@ function db_ensure_columns(PDO $pdo, string $dialect): void
             'attempts' => $dialect === 'sqlite'
                 ? 'ALTER TABLE auth_tokens ADD COLUMN attempts INTEGER NOT NULL DEFAULT 0'
                 : 'ALTER TABLE auth_tokens ADD COLUMN attempts INT NOT NULL DEFAULT 0',
+        ],
+        'users' => [
+            'role' => $dialect === 'sqlite'
+                ? 'ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT "user"'
+                : 'ALTER TABLE users ADD COLUMN role VARCHAR(16) NOT NULL DEFAULT \'user\'',
         ],
     ];
 
@@ -143,6 +167,31 @@ function db_write(string $sql, array $params = []): int
 function now_iso(): string
 {
     return gmdate('Y-m-d\TH:i:s\Z');
+}
+
+/* ------------------------------------------------------------------ */
+/* Настройки (ключ-значение)                                          */
+/* ------------------------------------------------------------------ */
+
+function settings_get(string $key, mixed $default = null): mixed
+{
+    $row = db_one('SELECT value FROM settings WHERE `key` = ?', [$key]);
+    if ($row === null) {
+        return $default;
+    }
+    $decoded = json_decode((string) $row['value'], true);
+    return $decoded === null && $row['value'] !== 'null' ? $row['value'] : $decoded;
+}
+
+function settings_set(string $key, mixed $value): void
+{
+    $json = json_encode($value, JSON_UNESCAPED_UNICODE);
+    $existing = db_one('SELECT `key` FROM settings WHERE `key` = ?', [$key]);
+    if ($existing === null) {
+        db_write('INSERT INTO settings (`key`, `value`) VALUES (?, ?)', [$key, $json]);
+    } else {
+        db_write('UPDATE settings SET value = ? WHERE `key` = ?', [$json, $key]);
+    }
 }
 
 function iso_plus_hours(int $hours): string

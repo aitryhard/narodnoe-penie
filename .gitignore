@@ -31,6 +31,7 @@ yarn-error.log*
 # api
 /var
 /api/config.local.php
+/api/tg.config.php
 
 # сборки под хостинг
 /*.zip

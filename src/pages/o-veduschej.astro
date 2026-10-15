@@ -34,17 +34,16 @@ const steps = [
 
     <div class="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
       <div
-        class="placeholder-frame aspect-[3/4] shadow-card lg:aspect-auto lg:sticky lg:top-28 lg:self-start"
+        class="aspect-[4/5] overflow-hidden rounded-3xl shadow-card lg:aspect-auto lg:sticky lg:top-28 lg:self-start"
       >
-        <span
-          class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-surface text-primary-deep shadow-soft"
-        >
-          <svg viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6" aria-hidden="true">
-            <path
-              d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 2c-4.2 0-7.5 2.7-7.5 6v1.5a.75.75 0 0 0 .75.75h13.5a.75.75 0 0 0 .75-.75V20c0-3.3-3.3-6-7.5-6Z"
-            ></path>
-          </svg>
-        </span>
+        <img
+          src={withBase("/img/o-vedushej.jpg")}
+          alt="Мария - ведущая школы народного пения"
+          width={1400}
+          height={1750}
+          class="h-full w-full object-cover"
+          loading="lazy"
+        />
       </div>
 
       <div>

@@ -1,6 +1,5 @@
 ﻿---
 import Button from "../ui/Button.astro";
-import PhotoFrame from "../ui/PhotoFrame.astro";
 import Ornament from "../Ornament.astro";
 import { links } from "../../config/links";
 import { lessons, courses } from "../../data/products";
@@ -59,7 +58,14 @@ const toneClass = {
       </div>
 
       <div class="relative">
-        <PhotoFrame class="shadow-lift" ratio="aspect-[4/5]" />
+        <img
+          src={withBase("/img/zastavka.jpg")}
+          alt="Ведущая школы на фоне поля на закате"
+          width={1440}
+          height={1092}
+          fetchpriority="high"
+          class="border-ink/10 shadow-lift aspect-[4/5] w-full rounded-3xl border object-cover"
+        />
 
         <div
           class="absolute -bottom-5 -left-5 hidden rounded-2xl border border-ink/5 bg-surface px-5 py-4 shadow-lift sm:block"

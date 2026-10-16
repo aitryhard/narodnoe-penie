@@ -38,7 +38,7 @@ const toneClass = {
       <div class="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {
           courses.map((course) => (
-            <article class="group flex flex-col rounded-3xl border border-primary/15 bg-sand-50 p-6 transition-all duration-200 hover:-translate-y-1 hover:border-primary/30 hover:bg-surface hover:shadow-lift sm:p-7">
+            <article class="flex flex-col rounded-3xl border border-primary/15 bg-sand-50 p-6 shadow-card transition-all duration-200 hover:-translate-y-1 hover:border-primary/30 hover:bg-surface hover:shadow-lift sm:p-7">
               <span class:list={["w-fit rounded-full px-3 py-1 text-xs font-medium", toneClass[course.tone]]}>
                 {course.format}
               </span>
@@ -83,53 +83,34 @@ const toneClass = {
   <section class="wrap pb-16 sm:pb-20">
     <h2 class="text-balance text-xl text-ink-soft sm:text-2xl">Форматы участия</h2>
 
-    <div class="mt-8 grid gap-5 md:grid-cols-2">
+    <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
       {
         lessonCards.map((lesson) => (
           <article
             id={lesson.anchor}
-            class="card flex flex-col scroll-mt-28 bg-surface p-7 sm:p-8"
+            class="flex flex-col scroll-mt-28 rounded-3xl border border-ink/10 bg-surface p-6"
           >
             <span class:list={["w-fit rounded-full px-3 py-1 text-xs font-medium", toneClass[lesson.tone]]}>
               {lesson.format}
             </span>
 
-            <h3 class="mt-5 text-xl">{lesson.title}</h3>
-            <p class="prose-body mt-3 text-pretty">
+            <h3 class="mt-4 text-lg">{lesson.title}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-ink-soft text-pretty">
               {lesson.description}
             </p>
+            <p class="mt-3 mb-5 text-xs text-ink-mute">{lesson.bullets[0]}</p>
 
-            <ul class="mb-5 mt-4 space-y-2">
-              {lesson.bullets.map((bullet) => (
-                <li class="flex items-start gap-2.5 text-sm text-ink-soft">
-                  <svg
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    class="mt-0.5 h-4 w-4 shrink-0 text-primary"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M16.7 5.3a1 1 0 0 1 0 1.4l-7.5 7.5a1 1 0 0 1-1.4 0l-3.5-3.5a1 1 0 1 1 1.4-1.4l2.8 2.79 6.8-6.8a1 1 0 0 1 1.4 0Z"
-                      clip-rule="evenodd"
-                    ></path>
-                  </svg>
-                  {bullet}
-                </li>
-              ))}
-            </ul>
-
-            <div class="mt-auto flex flex-wrap items-end justify-between gap-4 border-t border-ink/10 pt-4">
+            <div class="mt-auto flex flex-wrap items-end justify-between gap-3 border-t border-ink/10 pt-4">
               <div>
                 <p class="text-xs text-ink-mute">Стоимость</p>
                 <p
-                  class="mt-1 inline-block border-b-[3px] border-mustard pb-0.5 font-display text-xl font-semibold"
+                  class="mt-1 inline-block border-b-[3px] border-mustard pb-0.5 font-display text-lg font-semibold"
                 >
                   {lesson.priceMain}
                 </p>
-                <p class="mt-1 min-h-[1.25rem] text-xs text-ink-mute">{lesson.priceNote}</p>
+                <p class="mt-1 min-h-[1.125rem] text-xs text-ink-mute">{lesson.priceNote}</p>
               </div>
-              <Button href={lesson.href ?? links.buy} variant="primary">
+              <Button href={lesson.href ?? links.buy} variant="primary" size="sm">
                 {lesson.cta ?? "Купить курс"}
               </Button>
             </div>

@@ -90,10 +90,6 @@
     margin-top: 1.15em;
   }
 
-  .placeholder-frame {
-    @apply flex items-center justify-center rounded-3xl border border-dashed border-ink/15 bg-sand-50;
-  }
-
   /* Кнопка меню: три полоски <-> крестик */
   .burger-icon {
     transform-box: view-box;

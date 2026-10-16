@@ -3,7 +3,6 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import PageHero from "../components/PageHero.astro";
 import Button from "../components/ui/Button.astro";
 import Photo from "../components/ui/Photo.astro";
-import VideoFrame from "../components/ui/VideoFrame.astro";
 import Ornament from "../components/Ornament.astro";
 import { links } from "../config/links";
 import { withBase } from "../utils/base";
@@ -76,19 +75,14 @@ const values = [
   </section>
 
   <section class="wrap pb-16 sm:pb-20">
-    <h2 class="text-balance text-2xl sm:text-3xl">Как проходят занятия</h2>
-
-    <div class="mt-6 grid gap-5 lg:grid-cols-[1.4fr_1fr]">
-      <VideoFrame />
-      <div class="card flex flex-col justify-center bg-rose-100 p-7 text-center sm:p-10">
-        <h3 class="text-balance text-2xl sm:text-3xl">Как это звучит вживую</h3>
-        <p class="mx-auto mt-3 max-w-xl text-pretty text-[16px] leading-relaxed text-ink-soft">
-          Записи открытых занятий, фрагменты концертов и рассказы ведущей - в
-          сообществе школы во ВКонтакте.
-        </p>
-        <div class="mt-6 flex flex-wrap justify-center gap-3">
-          <Button href={links.vk} variant="primary">Смотреть во ВКонтакте</Button>
-        </div>
+    <div class="card bg-rose-100 p-7 text-center sm:p-10">
+      <h2 class="text-balance text-2xl sm:text-3xl">Как это звучит вживую</h2>
+      <p class="mx-auto mt-3 max-w-xl text-pretty text-[16px] leading-relaxed text-ink-soft">
+        Записи открытых занятий, фрагменты концертов и рассказы ведущей - в
+        сообществе школы во ВКонтакте.
+      </p>
+      <div class="mt-6 flex flex-wrap justify-center gap-3">
+        <Button href={links.vk} variant="primary">Смотреть во ВКонтакте</Button>
       </div>
     </div>
   </section>

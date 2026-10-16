@@ -64,13 +64,15 @@ const values = [
         </div>
       </div>
 
-      <Photo
-        src={withBase("/img/o-shkole.jpg")}
-        alt="Занятие школы - ведущая с ученицами поют вместе"
-        width={634}
-        height={952}
-        class="aspect-[3/4] lg:aspect-auto lg:min-h-full"
-      />
+      <div class="lg:relative">
+        <Photo
+          src={withBase("/img/o-shkole.jpg")}
+          alt="Занятие школы - ведущая с ученицами поют вместе"
+          width={634}
+          height={952}
+          class="aspect-[3/4] lg:absolute lg:inset-0"
+        />
+      </div>
     </div>
   </section>
 

@@ -422,7 +422,7 @@ const isActive = (href: string) =>
         const parent = element.parentElement;
         const index = order.get(parent) ?? 0;
         order.set(parent, index + 1);
-        element.style.setProperty("--reveal-delay", `${Math.min(index, 5) * 70}ms`);
+        element.style.setProperty("--reveal-delay", `${Math.min(index, 5) * 40}ms`);
         element.classList.add("reveal");
       });
 

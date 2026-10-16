@@ -276,7 +276,7 @@ const toneClass = {
   </div>
 
   <div
-    class="mt-8 flex snap-x snap-mandatory gap-5 overflow-x-auto overflow-y-hidden overscroll-x-contain pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    class="mt-8 flex snap-x snap-mandatory gap-5 overflow-x-auto overflow-y-hidden overscroll-x-contain pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     id="home-reviews"
     role="region"
     aria-label="Отзывы учениц"
@@ -365,14 +365,13 @@ const toneClass = {
       var prev = controls.querySelector("[data-carousel-prev]");
       var next = controls.querySelector("[data-carousel-next]");
       var reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+      var desktop = window.matchMedia("(min-width: 640px)");
 
       function update() {
         var max = track.scrollWidth - track.clientWidth;
-        if (max <= 4) {
-          controls.classList.add("hidden");
-          return;
-        }
-        controls.classList.remove("hidden");
+        var show = desktop.matches && max > 4;
+        controls.style.display = show ? "flex" : "none";
+        if (!show) return;
         prev.disabled = track.scrollLeft <= 2;
         next.disabled = track.scrollLeft >= max - 2;
       }
@@ -396,6 +395,7 @@ const toneClass = {
       });
       track.addEventListener("scroll", update, { passive: true });
       window.addEventListener("resize", update);
+      if (desktop.addEventListener) desktop.addEventListener("change", update);
       update();
     })();
   </script>

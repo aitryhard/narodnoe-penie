@@ -7,17 +7,11 @@ export interface Props {
   label?: string;
   title: string;
   intro?: string;
+  /** Устарело: цвет не применяется, проп оставлен для совместимости. */
   tone?: "green" | "rose" | "sand" | "mustard";
 }
 
-const { title, intro, tone = "sand" } = Astro.props;
-
-const toneText = {
-  green: "text-primary-deep",
-  rose: "text-rose-accent",
-  sand: "text-ink",
-  mustard: "text-mustard-deep",
-};
+const { title, intro } = Astro.props;
 
 const path = normalizePath(stripBase(Astro.url.pathname));
 const section = navLinks.find((link) => normalizePath(link.href) === path);
@@ -43,7 +37,7 @@ crumbs.push(section ? { label: section.label } : { label: title });
               {crumb.label}
             </a>
           ) : (
-            <span class={`font-medium ${toneText[tone]}`}>{crumb.label}</span>
+            <span class="font-medium text-ink-soft">{crumb.label}</span>
           )}
         </>
       ))

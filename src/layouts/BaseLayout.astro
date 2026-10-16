@@ -1,4 +1,4 @@
-﻿---
+---
 import "../styles/global.css";
 import { siteConfig, navLinks } from "../config/site";
 import { links } from "../config/links";
@@ -45,15 +45,6 @@ const isActive = (href: string) =>
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={siteConfig.name} />
     <meta name="twitter:card" content="summary_large_image" />
-
-    <noscript>
-      <style>
-        .reveal {
-          opacity: 1 !important;
-          translate: none !important;
-        }
-      </style>
-    </noscript>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -447,7 +438,9 @@ const isActive = (href: string) =>
           const onScreen = rect.top < window.innerHeight * 0.94 && rect.bottom > 0;
 
           if (onScreen) {
-            element.classList.add("is-visible");
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => element.classList.add("is-visible"));
+            });
           } else {
             observer.observe(element);
           }

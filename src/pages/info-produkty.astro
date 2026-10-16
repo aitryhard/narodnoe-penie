@@ -2,10 +2,9 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PageHero from "../components/PageHero.astro";
 import Button from "../components/ui/Button.astro";
-import PhotoFrame from "../components/ui/PhotoFrame.astro";
 import Ornament from "../components/Ornament.astro";
 import { links } from "../config/links";
-import { lessons, courses } from "../data/products";
+import { courses, lessonCards } from "../data/products";
 import { withBase } from "../utils/base";
 
 const toneClass = {
@@ -14,24 +13,6 @@ const toneClass = {
   sand: "bg-sand-200 text-ink",
   mustard: "bg-mustard/30 text-mustard-deep",
 };
-
-const photoTone = {
-  green: "green",
-  rose: "rose",
-  sand: "sand",
-  mustard: "sand",
-} as const;
-
-// «2 100 ₽ · абонемент на 4 занятия» → цена отдельно, пояснение отдельно.
-// В данных тире-делитель окружено неразрывными пробелами - режем по «·» и обрезаем.
-const lessonCards = lessons.map((lesson) => {
-  const parts = lesson.price.split("·").map((part) => part.trim());
-  return {
-    ...lesson,
-    priceMain: parts[0],
-    priceNote: parts.length > 1 ? parts.slice(1).join("·") : null,
-  };
-});
 ---
 
 <BaseLayout title="Инфо-продукты">
@@ -48,19 +29,13 @@ const lessonCards = lessons.map((lesson) => {
     <p class="text-xs font-semibold uppercase tracking-[0.14em] text-mustard-deep">
       Продаются онлайн
     </p>
-      <h2 class="text-balance mt-2 text-3xl sm:text-4xl">Обучающие проекты по песенному фольклору</h2>
+      <h2 class="text-balance mt-2 text-2xl sm:text-3xl">Обучающие проекты по песенному фольклору</h2>
       <p class="prose-body mt-3 max-w-2xl">
         Короткие курсы с конкретной темой: банные обряды, переходы, невестина баня,
         календарные песни. Каждый - с разбором и итоговым исполнением.
       </p>
 
-      <div class="mt-7 grid gap-5 sm:grid-cols-3">
-        <PhotoFrame tone="rose" ratio="aspect-[4/3]" />
-        <PhotoFrame tone="sand" ratio="aspect-[4/3]" />
-        <PhotoFrame tone="green" ratio="aspect-[4/3]" />
-      </div>
-
-      <div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      <div class="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {
           courses.map((course) => (
             <article class="group flex flex-col rounded-3xl border border-primary/15 bg-sand-50 p-6 transition-all duration-200 hover:-translate-y-1 hover:border-primary/30 hover:bg-surface hover:shadow-lift sm:p-7">
@@ -113,23 +88,18 @@ const lessonCards = lessons.map((lesson) => {
         lessonCards.map((lesson) => (
           <article
             id={lesson.anchor}
-            class="card flex flex-col scroll-mt-28 bg-surface p-7 sm:p-9"
+            class="card flex flex-col scroll-mt-28 bg-surface p-7 sm:p-8"
           >
             <span class:list={["w-fit rounded-full px-3 py-1 text-xs font-medium", toneClass[lesson.tone]]}>
               {lesson.format}
             </span>
 
-            <h3 class="mt-5 text-xl sm:text-2xl">{lesson.title}</h3>
-            <p class="prose-body mt-3 text-pretty sm:min-h-[4.875em]">
+            <h3 class="mt-5 text-xl">{lesson.title}</h3>
+            <p class="prose-body mt-3 text-pretty">
               {lesson.description}
             </p>
 
-            <PhotoFrame
-              class="mt-5"
-              tone={photoTone[lesson.tone]}
-            />
-
-            <ul class="mt-6 grid gap-2 border-y border-ink/5 py-5 sm:grid-cols-2">
+            <ul class="mb-5 mt-4 space-y-2">
               {lesson.bullets.map((bullet) => (
                 <li class="flex items-start gap-2.5 text-sm text-ink-soft">
                   <svg
@@ -149,25 +119,19 @@ const lessonCards = lessons.map((lesson) => {
               ))}
             </ul>
 
-            <div class="mt-auto flex flex-wrap items-center justify-between gap-4 pt-6">
+            <div class="mt-auto flex flex-wrap items-end justify-between gap-4 border-t border-ink/10 pt-4">
               <div>
-                <p class="text-xs uppercase tracking-[0.14em] text-ink-mute">
-                  Стоимость
-                </p>
+                <p class="text-xs text-ink-mute">Стоимость</p>
                 <p
-                  class="mt-1.5 inline-block border-b-[3px] border-mustard pb-1 font-display text-2xl font-semibold"
+                  class="mt-1 inline-block border-b-[3px] border-mustard pb-0.5 font-display text-xl font-semibold"
                 >
                   {lesson.priceMain}
                 </p>
-                <p class="mt-1.5 min-h-[1.25rem] text-xs text-ink-mute">
-                  {lesson.priceNote}
-                </p>
+                <p class="mt-1 min-h-[1.25rem] text-xs text-ink-mute">{lesson.priceNote}</p>
               </div>
-              <div class="flex flex-wrap gap-2.5">
-                <Button href={lesson.href ?? links.buy} variant="primary">
-                  {lesson.cta ?? "Купить курс"}
-                </Button>
-              </div>
+              <Button href={lesson.href ?? links.buy} variant="primary">
+                {lesson.cta ?? "Купить курс"}
+              </Button>
             </div>
           </article>
         ))
@@ -176,14 +140,15 @@ const lessonCards = lessons.map((lesson) => {
   </section>
 
   <section class="wrap pb-16 sm:pb-20">
-    <div class="card bg-rose-100 p-8 text-center sm:p-12">
+    <div class="card bg-rose-100 p-7 text-center sm:p-10">
       <h2 class="text-balance text-2xl sm:text-3xl">Не знаете, что выбрать?</h2>
-      <p class="mx-auto mt-4 max-w-xl text-pretty text-[18px] leading-relaxed text-ink-soft">
-        Напишите нам - подберём формат под ваш уровень и задачу.
+      <p class="mx-auto mt-3 max-w-xl text-pretty text-[16px] leading-relaxed text-ink-soft">
+        Напишите нам - подберём формат под ваш уровень и задачи.
       </p>
-      <div class="mt-8 flex flex-wrap justify-center gap-3">
-        <Button href={links.email} variant="mustard" size="lg">Написать на почту</Button>
+      <div class="mt-6 flex flex-wrap justify-center gap-3">
+        <Button href={links.email} variant="primary">Написать на почту</Button>
       </div>
+    </div>
     </div>
   </section>
 </BaseLayout>

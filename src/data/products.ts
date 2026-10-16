@@ -138,3 +138,13 @@ export const lessons: Lesson[] = [
     tone: "mustard",
   },
 ];
+
+/** Цена формата: «2 100 ₽ · абонемент на 4 занятия» → отдельно сумма, отдельно пояснение. */
+export const lessonCards = lessons.map((lesson) => {
+  const parts = lesson.price.split("·").map((part) => part.trim());
+  return {
+    ...lesson,
+    priceMain: parts[0],
+    priceNote: parts.length > 1 ? parts.slice(1).join("·") : null,
+  };
+});

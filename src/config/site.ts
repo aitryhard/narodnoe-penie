@@ -6,7 +6,6 @@ export const siteConfig = {
   tagline: "Живое звучание, бережная традиция",
   description:
     "Женская школа народного пения: живые занятия в Петербурге, онлайн-занятия и обучающие проекты по песенному фольклору.",
-  address: "Санкт-Петербург",
 };
 
 export type NavLink = { label: string; href: string };

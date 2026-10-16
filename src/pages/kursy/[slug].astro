@@ -20,7 +20,6 @@ const { course } = Astro.props as { course: Course };
   <PageHero
     title={course.title}
     intro={course.lead}
-    tone={course.tone}
   />
 
   <section class="wrap pt-14 pb-16 sm:pt-16 sm:pb-20">
@@ -59,14 +58,6 @@ const { course } = Astro.props as { course: Course };
               ))
             }
           </ul>
-
-          <div class="mt-8 rounded-2xl bg-sand-50 p-6">
-            <p class="text-sm font-medium">Занятия ведёт</p>
-            <p class="mt-1 text-[16px] leading-relaxed text-ink-soft">
-              Ведущая школы - фольклорист и певица. Все вопросы по программе можно
-              задать до записи.
-            </p>
-          </div>
         </div>
       </div>
 
@@ -87,15 +78,6 @@ const { course } = Astro.props as { course: Course };
               Купить курс
             </Button>
           </div>
-        </div>
-
-        <div class="card mt-5 bg-sand-50 p-7">
-          <p class="text-sm font-medium">Что важно знать</p>
-          <ul class="mt-4 space-y-3 text-sm leading-relaxed text-ink-soft">
-            <li>Группы небольшие, чтобы слышать каждый голос.</li>
-            <li>Материал согласовывается с ведущей до старта.</li>
-            <li>Записи остаются у вас после окончания.</li>
-          </ul>
         </div>
       </aside>
     </div>

@@ -275,10 +275,18 @@ const toneClass = {
     </a>
   </div>
 
-  <div class="mt-8 grid gap-5 md:grid-cols-3 md:[&>*:last-child:nth-child(3n+1)]:col-start-2" id="home-reviews">
+  <div
+    class="mt-8 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    id="home-reviews"
+    role="region"
+    aria-label="Отзывы учениц"
+    tabindex="0"
+  >
     {
       reviews.map((review) => (
-        <figure class="card flex flex-col bg-surface p-6">
+        <figure
+          class={`card flex w-[85%] shrink-0 snap-start flex-col p-6 sm:w-[calc((100%-1.25rem)/2)] sm:p-7 lg:w-[calc((100%-2.5rem)/3)] ${review.tone}`}
+        >
           <svg
             viewBox="0 0 24 24"
             fill="currentColor"
@@ -317,21 +325,78 @@ const toneClass = {
     }
   </div>
 
+  <div class="mt-5 hidden items-center justify-end gap-3" data-carousel-controls>
+    <button
+      type="button"
+      data-carousel-prev
+      aria-label="Предыдущий отзыв"
+      class="grid h-11 w-11 place-items-center rounded-full border border-ink/10 bg-surface text-ink-soft shadow-soft transition-all hover:border-ink/20 hover:bg-sand-50 hover:text-ink disabled:pointer-events-none disabled:opacity-40"
+    >
+      <svg viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5" aria-hidden="true">
+        <path
+          fill-rule="evenodd"
+          d="M12.79 5.23a.75.75 0 0 1-.02 1.06L8.832 10l3.938 3.71a.75.75 0 1 1-1.04 1.08l-4.5-4.25a.75.75 0 0 1 0-1.08l4.5-4.25a.75.75 0 0 1 1.06.02Z"
+          clip-rule="evenodd"
+        ></path>
+      </svg>
+    </button>
+    <button
+      type="button"
+      data-carousel-next
+      aria-label="Следующий отзыв"
+      class="grid h-11 w-11 place-items-center rounded-full border border-ink/10 bg-surface text-ink-soft shadow-soft transition-all hover:border-ink/20 hover:bg-sand-50 hover:text-ink disabled:pointer-events-none disabled:opacity-40"
+    >
+      <svg viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5" aria-hidden="true">
+        <path
+          fill-rule="evenodd"
+          d="M7.21 14.77a.75.75 0 0 1 .02-1.06L11.168 10 7.23 6.29a.75.75 0 1 1 1.04-1.08l4.5 4.25a.75.75 0 0 1 0 1.08l-4.5 4.25a.75.75 0 0 1-1.06-.02Z"
+          clip-rule="evenodd"
+        ></path>
+      </svg>
+    </button>
+  </div>
+
   <script is:inline>
     (function () {
-      var root = document.getElementById("home-reviews");
-      if (!root) return;
-      var cards = Array.prototype.slice.call(root.children);
-      for (var i = cards.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var tmp = cards[i];
-        cards[i] = cards[j];
-        cards[j] = tmp;
+      var track = document.getElementById("home-reviews");
+      var controls = document.querySelector("[data-carousel-controls]");
+      if (!track || !controls) return;
+
+      var prev = controls.querySelector("[data-carousel-prev]");
+      var next = controls.querySelector("[data-carousel-next]");
+      var reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+      function update() {
+        var max = track.scrollWidth - track.clientWidth;
+        if (max <= 4) {
+          controls.classList.add("hidden");
+          return;
+        }
+        controls.classList.remove("hidden");
+        prev.disabled = track.scrollLeft <= 2;
+        next.disabled = track.scrollLeft >= max - 2;
       }
-      cards.forEach(function (card, index) {
-        card.style.display = index < 3 ? "" : "none";
-        root.appendChild(card);
+
+      function go(direction) {
+        var card = track.querySelector("figure");
+        if (!card) return;
+        var styles = window.getComputedStyle(track);
+        var gap = parseFloat(styles.columnGap || styles.gap) || 20;
+        track.scrollBy({
+          left: direction * (card.getBoundingClientRect().width + gap),
+          behavior: reduced.matches ? "auto" : "smooth",
+        });
+      }
+
+      prev.addEventListener("click", function () {
+        go(-1);
       });
+      next.addEventListener("click", function () {
+        go(1);
+      });
+      track.addEventListener("scroll", update, { passive: true });
+      window.addEventListener("resize", update);
+      update();
     })();
   </script>
 </section>

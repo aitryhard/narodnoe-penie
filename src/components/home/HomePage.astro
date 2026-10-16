@@ -104,26 +104,17 @@ const toneClass = {
         <article
           class="flex flex-col rounded-3xl border border-primary/15 bg-sand-50 p-6 shadow-card transition-all duration-200 hover:-translate-y-1 hover:border-primary/30 hover:bg-surface hover:shadow-lift sm:p-7"
         >
-          <span
-            class:list={[
-              "w-fit rounded-full px-3 py-1 text-xs font-medium",
-              toneClass[course.tone],
-            ]}
-          >
-            {course.format}
-          </span>
-
-          <h3 class="mt-5 text-xl">{course.title}</h3>
+          <h3 class="text-xl">{course.title}</h3>
           <p class="mt-2.5 flex-1 text-[16px] leading-relaxed text-ink-soft text-pretty">
             {course.lead}
           </p>
 
-          <dl class="mt-5 flex gap-5 border-t border-ink/10 pt-4 text-xs">
+          <dl class="mt-5 flex justify-between gap-5 border-t border-ink/10 pt-4 text-xs">
             <div>
               <dt class="text-ink-mute">Длительность</dt>
               <dd class="mt-0.5 font-medium text-ink-soft">{course.duration}</dd>
             </div>
-            <div>
+            <div class="text-right">
               <dt class="text-ink-mute">Стоимость</dt>
               <dd
                 class="mt-1 inline-block border-b-[3px] border-mustard pb-0.5 font-display text-xl font-semibold text-ink"
@@ -267,12 +258,44 @@ const toneClass = {
     <div>
       <h2 class="text-balance text-2xl sm:text-3xl">Что говорят после занятий</h2>
     </div>
-    <a
-      href={withBase("/otzyvy")}
-      class="link-underline shrink-0 self-start inline-flex min-h-8 items-center text-[16px] text-ink-soft hover:text-ink sm:self-auto"
-    >
-      Все отзывы
-    </a>
+    <div class="flex items-center gap-4">
+      <a
+        href={withBase("/otzyvy")}
+        class="link-underline inline-flex min-h-8 items-center text-[16px] text-ink-soft hover:text-ink"
+      >
+        Все отзывы
+      </a>
+      <div class="hidden items-center gap-2.5" data-carousel-controls>
+        <button
+          type="button"
+          data-carousel-prev
+          aria-label="Предыдущий отзыв"
+          class="grid h-10 w-10 place-items-center rounded-full border border-ink/10 bg-surface text-ink-soft shadow-soft transition-all hover:border-ink/20 hover:bg-sand-50 hover:text-ink disabled:pointer-events-none disabled:opacity-40"
+        >
+          <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
+            <path
+              fill-rule="evenodd"
+              d="M12.79 5.23a.75.75 0 0 1-.02 1.06L8.832 10l3.938 3.71a.75.75 0 1 1-1.04 1.08l-4.5-4.25a.75.75 0 0 1 0-1.08l4.5-4.25a.75.75 0 0 1 1.06.02Z"
+              clip-rule="evenodd"
+            ></path>
+          </svg>
+        </button>
+        <button
+          type="button"
+          data-carousel-next
+          aria-label="Следующий отзыв"
+          class="grid h-10 w-10 place-items-center rounded-full border border-ink/10 bg-surface text-ink-soft shadow-soft transition-all hover:border-ink/20 hover:bg-sand-50 hover:text-ink disabled:pointer-events-none disabled:opacity-40"
+        >
+          <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
+            <path
+              fill-rule="evenodd"
+              d="M7.21 14.77a.75.75 0 0 1 .02-1.06L11.168 10 7.23 6.29a.75.75 0 1 1 1.04-1.08l4.5 4.25a.75.75 0 0 1 0 1.08l-4.5 4.25a.75.75 0 0 1-1.06-.02Z"
+              clip-rule="evenodd"
+            ></path>
+          </svg>
+        </button>
+      </div>
+    </div>
   </div>
 
   <div
@@ -325,37 +348,6 @@ const toneClass = {
     }
   </div>
 
-  <div class="mt-5 hidden items-center justify-end gap-3" data-carousel-controls>
-    <button
-      type="button"
-      data-carousel-prev
-      aria-label="Предыдущий отзыв"
-      class="grid h-11 w-11 place-items-center rounded-full border border-ink/10 bg-surface text-ink-soft shadow-soft transition-all hover:border-ink/20 hover:bg-sand-50 hover:text-ink disabled:pointer-events-none disabled:opacity-40"
-    >
-      <svg viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5" aria-hidden="true">
-        <path
-          fill-rule="evenodd"
-          d="M12.79 5.23a.75.75 0 0 1-.02 1.06L8.832 10l3.938 3.71a.75.75 0 1 1-1.04 1.08l-4.5-4.25a.75.75 0 0 1 0-1.08l4.5-4.25a.75.75 0 0 1 1.06.02Z"
-          clip-rule="evenodd"
-        ></path>
-      </svg>
-    </button>
-    <button
-      type="button"
-      data-carousel-next
-      aria-label="Следующий отзыв"
-      class="grid h-11 w-11 place-items-center rounded-full border border-ink/10 bg-surface text-ink-soft shadow-soft transition-all hover:border-ink/20 hover:bg-sand-50 hover:text-ink disabled:pointer-events-none disabled:opacity-40"
-    >
-      <svg viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5" aria-hidden="true">
-        <path
-          fill-rule="evenodd"
-          d="M7.21 14.77a.75.75 0 0 1 .02-1.06L11.168 10 7.23 6.29a.75.75 0 1 1 1.04-1.08l4.5 4.25a.75.75 0 0 1 0 1.08l-4.5 4.25a.75.75 0 0 1-1.06-.02Z"
-          clip-rule="evenodd"
-        ></path>
-      </svg>
-    </button>
-  </div>
-
   <script is:inline>
     (function () {
       var track = document.getElementById("home-reviews");
@@ -396,7 +388,13 @@ const toneClass = {
       track.addEventListener("scroll", update, { passive: true });
       window.addEventListener("resize", update);
       if (desktop.addEventListener) desktop.addEventListener("change", update);
+      window.addEventListener("load", update);
       update();
+      if (window.requestAnimationFrame) {
+        requestAnimationFrame(function () {
+          requestAnimationFrame(update);
+        });
+      }
     })();
   </script>
 </section>

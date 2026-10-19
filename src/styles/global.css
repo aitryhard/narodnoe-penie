@@ -84,7 +84,8 @@
 
   body {
     background-color: rgb(var(--c-sand-100));
-    background-image: url("/img/zastavka2.jpg");
+    background-image: linear-gradient(rgba(208, 197, 147, 0.75), rgba(208, 197, 147, 0.75)),
+      url("/img/zastavka2.jpg");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;

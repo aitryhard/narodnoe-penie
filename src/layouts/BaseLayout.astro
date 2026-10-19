@@ -48,6 +48,17 @@ const isActive = (href: string) =>
   </head>
 
   <body class="flex min-h-screen flex-col">
+    <div class="fixed inset-0 -z-10" aria-hidden="true">
+      <img
+        src={withBase("/img/zastavka2.jpg")}
+        alt=""
+        width={768}
+        height={960}
+        class="h-full w-full object-cover"
+      />
+      <div class="absolute inset-0 bg-white/70"></div>
+    </div>
+
     <a
       href="#main"
       class="focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-ink focus:px-5 focus:py-2.5 focus:text-sand-50 sr-only"

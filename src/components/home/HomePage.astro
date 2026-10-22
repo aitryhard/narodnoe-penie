@@ -316,20 +316,31 @@ const toneClass = {
             {review.text}
           </blockquote>
           <figcaption class="mt-5 flex items-center gap-3 border-t border-ink/5 pt-4">
-            <span
-              class:list={[
-                "grid h-10 w-10 shrink-0 place-items-center rounded-full font-display text-[13px] font-semibold uppercase tracking-wide text-primary-deep ring-1 ring-ink/5",
-                review.avatarTone,
-              ]}
-            >
-              {
-                review.name
-                  .split(/\s+/)
-                  .slice(0, 2)
-                  .map((word) => word[0])
-                  .join("")
-              }
-            </span>
+            {
+              review.avatar ? (
+                <img
+                  src={withBase(review.avatar)}
+                  alt=""
+                  width="40"
+                  height="40"
+                  loading="lazy"
+                  class="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-ink/5"
+                />
+              ) : (
+                <span
+                  class:list={[
+                    "grid h-10 w-10 shrink-0 place-items-center rounded-full font-display text-[13px] font-semibold uppercase tracking-wide text-primary-deep ring-1 ring-ink/5",
+                    review.avatarTone,
+                  ]}
+                >
+                  {review.name
+                    .split(/\s+/)
+                    .slice(0, 2)
+                    .map((word) => word[0])
+                    .join("")}
+                </span>
+              )
+            }
             <span class="text-sm">
               <span class="block font-medium text-ink">{review.name}</span>
               <span class="block text-sm text-ink-mute">{review.meta}</span>

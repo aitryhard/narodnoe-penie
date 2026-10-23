@@ -167,7 +167,7 @@ const { course } = Astro.props as { course: Course };
                   box.append(el);
                 } else if (type === "text" && block.text) {
                   const el = document.createElement("p");
-                  el.className = "prose-body mt-3 text-pretty";
+                  el.className = "prose-body mt-3 whitespace-pre-line text-pretty";
                   el.textContent = block.text;
                   box.append(el);
                 } else if (type === "audio" && block.src) {
@@ -208,6 +208,19 @@ const { course } = Astro.props as { course: Course };
                   img.className = "mt-4 w-full rounded-xl";
                   img.loading = "lazy";
                   box.append(img);
+                } else if (type === "link" && block.src) {
+                  const a = document.createElement("a");
+                  a.href = block.src;
+                  a.target = "_blank";
+                  a.rel = "noopener noreferrer";
+                  a.className =
+                    "link-underline text-primary-deep mt-2.5 flex items-start gap-2 text-[16px]";
+                  const dot = document.createElement("span");
+                  dot.className = "bg-primary/40 mt-2 h-1.5 w-1.5 shrink-0 rounded-full";
+                  const label = document.createElement("span");
+                  label.textContent = block.text ?? block.src;
+                  a.append(dot, label);
+                  box.append(a);
                 }
               }
             }

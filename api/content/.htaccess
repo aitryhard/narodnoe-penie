@@ -1,0 +1,4 @@
+# Контент курсов: тексты и структура (JSON) отдаются только через API.
+<FilesMatch "\.json$">
+    Require all denied
+</FilesMatch>

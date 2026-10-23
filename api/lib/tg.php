@@ -37,6 +37,7 @@ function tg_api(string $method, array $params = []): array
 
     // Режим без сети: локальные тесты (флаг есть только в api/tg.config.php на разработке).
     if (!empty(tg_config()['dry'])) {
+        $GLOBALS['tg_dry_calls'][] = ['method' => $method, 'params' => $params];
         return ['ok' => true, 'result' => ['message_id' => 1]];
     }
 
@@ -86,10 +87,17 @@ function tg_api(string $method, array $params = []): array
     return $decoded;
 }
 
-/** Ряды кнопок: [['текст' => ..., 'callback_data' => ...], ...] */
+/** Вызовы Bot API, сделанные в dry-режиме, - чтобы тесты могли их прочитать. */
+function tg_dry_calls(): array
+{
+    return $GLOBALS['tg_dry_calls'] ?? [];
+}
+
+/** Ряды кнопок: [['текст' => ..., 'callback_data' => ...], ...]
+ *  null - клавиатуру не трогать, [] - снять кнопки с сообщения. */
 function tg_kb(?array $rows): ?array
 {
-    if ($rows === null || $rows === []) {
+    if ($rows === null) {
         return null;
     }
     return ['inline_keyboard' => $rows];
@@ -150,46 +158,6 @@ function tg_set_webhook(string $url, string $secret): array
         'allowed_updates' => ['message', 'callback_query'],
         'drop_pending_updates' => true,
     ]);
-}
-
-/* ------------------------------------------------------------------ */
-/* Состояние диалога (FSM)                                            */
-/* ------------------------------------------------------------------ */
-
-function tg_state_get(int $chatId): array
-{
-    $row = db_one('SELECT step, payload FROM tg_state WHERE chat_id = ?', [$chatId]);
-    if ($row === null) {
-        return ['step' => '', 'payload' => []];
-    }
-    $payload = json_decode((string) $row['payload'], true);
-
-    return [
-        'step' => (string) $row['step'],
-        'payload' => is_array($payload) ? $payload : [],
-    ];
-}
-
-function tg_state_set(int $chatId, string $step, array $payload = []): void
-{
-    $json = json_encode($payload, JSON_UNESCAPED_UNICODE);
-    $existing = db_one('SELECT chat_id FROM tg_state WHERE chat_id = ?', [$chatId]);
-    if ($existing === null) {
-        db_write(
-            'INSERT INTO tg_state (chat_id, step, payload, updated_at) VALUES (?, ?, ?, ?)',
-            [$chatId, $step, $json, now_iso()]
-        );
-    } else {
-        db_write(
-            'UPDATE tg_state SET step = ?, payload = ?, updated_at = ? WHERE chat_id = ?',
-            [$step, $json, now_iso(), $chatId]
-        );
-    }
-}
-
-function tg_state_clear(int $chatId): void
-{
-    db_write('DELETE FROM tg_state WHERE chat_id = ?', [$chatId]);
 }
 
 /* ------------------------------------------------------------------ */

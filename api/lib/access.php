@@ -59,6 +59,28 @@ function access_list(int $userId): array
     );
 }
 
+/** Поиск по подстроке email (регистронезависимый). $limit - сколько строк максимум. */
+function users_search(string $query, int $limit = 11): array
+{
+    $q = mb_strtolower(trim($query));
+    if ($q === '') {
+        return [];
+    }
+
+    return db_all(
+        'SELECT id, email, name FROM users WHERE INSTR(LOWER(email), ?) > 0 ORDER BY LENGTH(email), email LIMIT ' . max(1, $limit),
+        [$q]
+    );
+}
+
+/** Удаление аккаунта со всеми связанными данными (доступы, токены входа). */
+function user_delete(int $userId): void
+{
+    db_write('DELETE FROM purchases WHERE user_id = ?', [$userId]);
+    db_write('DELETE FROM auth_tokens WHERE user_id = ?', [$userId]);
+    db_write('DELETE FROM users WHERE id = ?', [$userId]);
+}
+
 function user_set_role(int $userId, string $role): void
 {
     db_write('UPDATE users SET role = ?, updated_at = ? WHERE id = ?', [$role, now_iso(), $userId]);

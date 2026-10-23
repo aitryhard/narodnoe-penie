@@ -2,9 +2,16 @@
 declare(strict_types=1);
 
 /**
- * Telegram-бот админ-панель (webhook).
- * Только inline-кнопки, доступ - только для администраторов.
- * Регистрация: setWebhook с secret_token; запросы без него отклоняются.
+ * Telegram-бот: админ-панель доступа к курсам (webhook).
+ *
+ * Вся работа строится вокруг одного экрана - карточки пользователя:
+ *   1. Любое сообщение = поиск по email (точный, затем по подстроке).
+ *   2. Карточка: кнопка у каждого курса выдаёт/отзывает доступ, внизу - удаление аккаунта.
+ *   3. Меню (/start) - только приглашение ввести email.
+ *
+ * Состояние диалога не хранится: любое действие адресуется id пользователя
+ * прямо в callback_data, поэтому FSM-таблица боту больше не нужна.
+ * Доступ только у администраторов; запросы без secret_token отклоняются.
  */
 
 require __DIR__ . '/bootstrap.php';
@@ -37,8 +44,7 @@ if ($cb !== null) {
     $chatId = (int) ($cb['message']['chat']['id'] ?? $cb['from']['id'] ?? 0);
 } else {
     $chatId = (int) ($message['chat']['id'] ?? 0);
-    $chatType = (string) ($message['chat']['type'] ?? '');
-    if ($chatType !== 'private') {
+    if (($message['chat']['type'] ?? '') !== 'private') {
         http_response_code(200);
         exit;
     }
@@ -56,8 +62,7 @@ if ($chatId <= 0) {
 if (!tg_is_admin($chatId)) {
     if (tg_admin_ids() === []) {
         tg_add_admin($chatId);
-        tg_send($chatId, "✅ Вы назначены администратором бота.\n\nПанель управления доступом к курсам:", tg_menu_kb());
-        tg_state_clear($chatId);
+        tg_send($chatId, "✅ Вы назначены администратором бота.\n\n" . tg_menu_text());
         http_response_code(200);
         exit;
     }
@@ -83,160 +88,187 @@ if ($cb !== null) {
 http_response_code(200);
 
 /* ================================================================== */
-/* Меню и экраны                                                      */
+/* Экраны                                                             */
 /* ================================================================== */
-
-function tg_menu_kb(): array
-{
-    return [
-        [tg_btn('🎓 Выдать доступ', 'g'), tg_btn('🚫 Отозвать доступ', 'r')],
-        [tg_btn('🔍 Найти пользователя', 'f'), tg_btn('👥 Пользователи', 'us:0')],
-        [tg_btn('👤 Мои курсы', 'my')],
-    ];
-}
 
 function tg_menu_text(): string
 {
-    return '🧹 Админ-панель курсов';
+    return "🧹 Админ-панель курсов\n\n📧 Введите email пользователя — открою его карточку.\nВ карточке: выдать или отозвать курс, удалить аккаунт.";
 }
 
 function tg_show_menu(int $chatId, int $messageId): void
 {
-    tg_state_clear($chatId);
-    tg_edit($chatId, $messageId, tg_menu_text(), tg_menu_kb());
+    tg_render($chatId, $messageId, tg_menu_text(), []);
 }
 
-/** Список курсов кнопками. $next - куда вести после выбора: 'g' или 'gu:<uid>' */
-function tg_show_courses(int $chatId, int $messageId, string $next, string $title): void
-{
-    $rows = [];
-    foreach (courses_list() as $course) {
-        $rows[] = [tg_btn($course['title'], $next . ':' . $course['slug'])];
-    }
-    $rows[] = [tg_btn('⬅️ Назад', 'm')];
-    tg_edit($chatId, $messageId, $title, $rows);
-}
-
-function tg_prompt_email(int $chatId, int $messageId, string $step, array $payload, string $title): void
-{
-    tg_state_set($chatId, $step, $payload);
-    tg_edit($chatId, $messageId, $title . "\n\n📧 Отправьте email пользователя:", [
-        [tg_btn('⬅️ Назад', 'm')],
-    ]);
-}
-
-function tg_user_card(int $chatId, int $messageId, int $userId): void
+/** [$text, $kb] карточки пользователя или null, если его нет. */
+function tg_card_parts(int $userId): ?array
 {
     $user = db_one('SELECT id, email, name, role, created_at FROM users WHERE id = ?', [$userId]);
     if ($user === null) {
-        tg_edit($chatId, $messageId, '❌ Пользователь не найден.', [[tg_btn('⬅️ Назад', 'us:0')]]);
-        return;
+        return null;
     }
 
-    $purchased = access_list($userId);
+    $owned = access_list($userId);
+    $all = courses_list();
+
     $lines = [
-        '👤 Пользователь',
+        '👤 ' . $user['email'],
         '',
-        'Email: ' . $user['email'],
         'Имя: ' . (($user['name'] !== '') ? $user['name'] : '-'),
         'Роль: ' . $user['role'],
         'Регистрация: ' . substr((string) $user['created_at'], 0, 10),
+        'ID: ' . $userId,
         '',
-        'Курсы (' . count($purchased) . '):',
+        'Курсы: ' . count($owned) . ' из ' . count($all),
+        '',
     ];
-    if ($purchased === []) {
-        $lines[] = '- нет доступов -';
-    } else {
-        foreach ($purchased as $slug) {
-            $lines[] = '✅ ' . course_title($slug);
-        }
-    }
 
     $rows = [];
-    foreach ($purchased as $slug) {
-        $rows[] = [tg_btn('✗ Отозвать: ' . course_title($slug), 'rq:' . $userId . ':' . $slug)];
-    }
-    $rows[] = [tg_btn('🎓 Выдать курс', 'gu:' . $userId)];
-    $rows[] = [tg_btn('🔄 Обновить', 'u:' . $userId), tg_btn('⬅️ Назад', 'us:0')];
-
-    tg_edit($chatId, $messageId, implode("\n", $lines), $rows);
-}
-
-function tg_show_users(int $chatId, int $messageId, int $offset): void
-{
-    $per = 8;
-    $total = (int) (db_one('SELECT COUNT(*) AS c FROM users')['c'] ?? 0);
-    $users = db_all('SELECT id, email, name FROM users ORDER BY id DESC LIMIT ' . $per . ' OFFSET ' . $offset);
-
-    $lines = ['👥 Пользователи: ' . $total, ''];
-    $rows = [];
-    foreach ($users as $user) {
-        $label = $user['email'] . (($user['name'] !== '') ? ' · ' . $user['name'] : '');
-        $lines[] = '• ' . $label;
-        $rows[] = [tg_btn($label, 'u:' . $user['id'])];
-    }
-    if ($users === []) {
-        $lines[] = '- пусто -';
-    }
-
-    $nav = [];
-    if ($offset > 0) {
-        $nav[] = tg_btn('⬅️', 'us:' . max(0, $offset - $per));
-    }
-    if ($offset + $per < $total) {
-        $nav[] = tg_btn('➡️', 'us:' . ($offset + $per));
-    }
-    if ($nav !== []) {
-        $rows[] = $nav;
-    }
-    $rows[] = [tg_btn('⬅️ Назад', 'm')];
-
-    tg_edit($chatId, $messageId, implode("\n", $lines), $rows);
-}
-
-function tg_my_email(): ?string
-{
-    $email = settings_get('tg_admin_email', '');
-    return is_string($email) && $email !== '' ? $email : null;
-}
-
-function tg_show_my(int $chatId, int $messageId): void
-{
-    $email = tg_my_email();
-    if ($email === null) {
-        tg_state_set($chatId, 'm_email', []);
-        tg_edit($chatId, $messageId, "👤 Мои курсы\n\n📧 Отправьте ваш email на сайте:", [
-            [tg_btn('⬅️ Назад', 'm')],
-        ]);
-        return;
-    }
-
-    $user = user_by_email($email);
-    if ($user === null) {
-        tg_edit($chatId, $messageId, "❌ Пользователь {$email} не найден.", [
-            [tg_btn('🔁 Указать другой email', 'mym')],
-            [tg_btn('⬅️ Назад', 'm')],
-        ]);
-        return;
-    }
-
-    $owned = access_list((int) $user['id']);
-    $isAdminRole = ($user['role'] ?? 'user') === 'admin';
-    $lines = ['👤 Мои курсы', '', 'Email: ' . $email, ''];
-
-    $rows = [];
-    foreach (courses_list() as $course) {
+    foreach ($all as $course) {
         $has = in_array($course['slug'], $owned, true);
         $lines[] = ($has ? '✅ ' : '⬜️ ') . $course['title'];
-        $rows[] = [tg_btn(($has ? '✓ ' : '＋ ') . $course['title'], 'myc:' . $course['slug'])];
+        $rows[] = [tg_btn(
+            ($has ? '✗ Отозвать · ' : '＋ Выдать · ') . $course['title'],
+            't:' . $userId . ':' . $course['slug']
+        )];
     }
-    $lines[] = '';
-    $lines[] = 'Роль admin (все курсы): ' . ($isAdminRole ? '✅' : '⬜️');
+    $rows[] = [tg_btn('🗑 Удалить аккаунт', 'd:' . $userId)];
+    $rows[] = [tg_btn('🔍 Новый поиск', 'm')];
 
-    $rows[] = [tg_btn(($isAdminRole ? '✓' : '＋') . ' Роль admin', 'myr')];
-    $rows[] = [tg_btn('🔁 Другой email', 'mym'), tg_btn('⬅️ Назад', 'm')];
+    return ['text' => implode("\n", $lines), 'kb' => $rows];
+}
 
-    tg_edit($chatId, $messageId, implode("\n", $lines), $rows);
+function tg_show_card(int $chatId, int $messageId, int $userId): void
+{
+    $parts = tg_card_parts($userId);
+    if ($parts === null) {
+        tg_show_not_found($chatId, $messageId, '#' . $userId);
+        return;
+    }
+    tg_render($chatId, $messageId, $parts['text'], $parts['kb']);
+}
+
+function tg_show_not_found(int $chatId, int $messageId, string $query): void
+{
+    tg_render(
+        $chatId,
+        $messageId,
+        "❌ Пользователь не найден: {$query}\n\nПроверьте адрес или введите другую часть email.",
+        []
+    );
+}
+
+/** [$text, $kb] экрана подтверждения удаления или null. */
+function tg_delete_parts(int $userId): ?array
+{
+    $user = db_one('SELECT id, email, name, role FROM users WHERE id = ?', [$userId]);
+    if ($user === null) {
+        return null;
+    }
+
+    $text = "🗑 Удалить аккаунт?\n\n"
+        . $user['email'] . "\n"
+        . 'Имя: ' . (($user['name'] !== '') ? $user['name'] : '-') . "\n"
+        . 'Роль: ' . $user['role'] . ' · Курсы: ' . count(access_list($userId)) . "\n\n"
+        . 'Аккаунт, доступы к курсам и токены входа удаляются безвозвратно.';
+
+    return [
+        'text' => $text,
+        'kb' => [
+            [tg_btn('🗑 Да, удалить', 'x:' . $userId)],
+            [tg_btn('⬅️ Отмена', 'u:' . $userId)],
+        ],
+    ];
+}
+
+function tg_show_delete_confirm(int $chatId, int $messageId, int $userId): void
+{
+    $parts = tg_delete_parts($userId);
+    if ($parts === null) {
+        tg_show_not_found($chatId, $messageId, '#' . $userId);
+        return;
+    }
+    tg_render($chatId, $messageId, $parts['text'], $parts['kb']);
+}
+
+function tg_delete_user(int $chatId, int $messageId, int $userId): void
+{
+    $user = db_one('SELECT id, email, name, role FROM users WHERE id = ?', [$userId]);
+    if ($user === null) {
+        tg_show_not_found($chatId, $messageId, '#' . $userId);
+        return;
+    }
+
+    $courses = count(access_list($userId));
+    user_delete($userId);
+
+    tg_render(
+        $chatId,
+        $messageId,
+        "🗑 Аккаунт удалён\n\n{$user['email']}\nКурсы: {$courses} · Роль: {$user['role']}",
+        [[tg_btn('🔍 Новый поиск', 'm')]]
+    );
+}
+
+/** Сообщение/редактирование: $messageId = 0 - отправить новое. */
+function tg_render(int $chatId, int $messageId, string $text, array $kb): void
+{
+    if ($messageId > 0) {
+        tg_edit($chatId, $messageId, $text, $kb);
+    } else {
+        tg_send($chatId, $text, $kb);
+    }
+}
+
+/* ================================================================== */
+/* Поиск по email                                                     */
+/* ================================================================== */
+
+function tg_search(int $chatId, string $query): void
+{
+    $q = trim($query);
+    if ($q === '') {
+        tg_send($chatId, tg_menu_text(), []);
+        return;
+    }
+
+    $user = user_by_email($q);
+    if ($user !== null) {
+        tg_show_card($chatId, 0, (int) $user['id']);
+        return;
+    }
+
+    $found = users_search($q, 11);
+    if ($found === []) {
+        tg_show_not_found($chatId, 0, $query);
+        return;
+    }
+    if (count($found) === 1) {
+        tg_show_card($chatId, 0, (int) $found[0]['id']);
+        return;
+    }
+
+    $more = count($found) > 10;
+    if ($more) {
+        $found = array_slice($found, 0, 10);
+    }
+
+    $lines = [
+        '🔍 Найдено: ' . count($found) . ($more ? '+' : ''),
+        '',
+        'Уточните email или откройте карточку кнопкой:',
+        '',
+    ];
+    $rows = [];
+    foreach ($found as $row) {
+        $label = $row['email'] . (($row['name'] !== '') ? ' · ' . $row['name'] : '');
+        $lines[] = '• ' . $label;
+        $rows[] = [tg_btn($label, 'u:' . $row['id'])];
+    }
+    $rows[] = [tg_btn('🔍 Новый поиск', 'm')];
+
+    tg_send($chatId, implode("\n", $lines), $rows);
 }
 
 /* ================================================================== */
@@ -246,168 +278,59 @@ function tg_show_my(int $chatId, int $messageId): void
 function tg_handle_callback(int $chatId, int $messageId, string $data, string $cbId): void
 {
     $parts = explode(':', $data);
-    $action = $parts[0] ?? '';
+    $userId = (int) ($parts[1] ?? 0);
 
-    switch ($action) {
+    switch ($parts[0] ?? '') {
         case 'm':
             tg_answer($cbId);
             tg_show_menu($chatId, $messageId);
             return;
 
-        case 'g':
-            tg_answer($cbId);
-            tg_show_courses($chatId, $messageId, 'gsel', '🎓 Выдать доступ\n\nВыберите курс:');
-            return;
-
-        case 'gsel':
-            $slug = (string) ($parts[1] ?? '');
-            tg_answer($cbId);
-            tg_prompt_email($chatId, $messageId, 'g_email', ['slug' => $slug], '🎓 Выдать: ' . course_title($slug));
-            return;
-
-        case 'r':
-            tg_answer($cbId);
-            tg_show_courses($chatId, $messageId, 'rsel', '🚫 Отозвать доступ\n\nВыберите курс:');
-            return;
-
-        case 'rsel':
-            $slug = (string) ($parts[1] ?? '');
-            tg_answer($cbId);
-            tg_prompt_email($chatId, $messageId, 'r_email', ['slug' => $slug], '🚫 Отозвать: ' . course_title($slug));
-            return;
-
-        case 'gu':
-            $uid = (int) ($parts[1] ?? 0);
-            tg_answer($cbId);
-            tg_show_courses($chatId, $messageId, 'gus:' . $uid, '🎓 Выдать курс пользователю #' . $uid . "\n\nВыберите курс:");
-            return;
-
-        case 'gus':
-            $uid = (int) ($parts[1] ?? 0);
-            $slug = (string) ($parts[2] ?? '');
-            tg_answer($cbId, access_grant($uid, $slug) ? '✅ Доступ выдан' : 'Уже был');
-            tg_user_card($chatId, $messageId, $uid);
-            return;
-
-        case 'rq':
-            $uid = (int) ($parts[1] ?? 0);
-            $slug = (string) ($parts[2] ?? '');
-            tg_answer($cbId, access_revoke($uid, $slug) ? '🚫 Доступ отозван' : 'Не было');
-            tg_user_card($chatId, $messageId, $uid);
-            return;
-
-        case 'gok':
-            tg_confirm_grant($chatId, $messageId, $cbId);
-            return;
-
-        case 'f':
-            tg_answer($cbId);
-            tg_state_set($chatId, 'f_email', []);
-            tg_edit($chatId, $messageId, "🔍 Найти пользователя\n\n📧 Отправьте email:", [
-                [tg_btn('⬅️ Назад', 'm')],
-            ]);
-            return;
-
-        case 'us':
-            $offset = max(0, (int) ($parts[1] ?? 0));
-            tg_answer($cbId);
-            tg_show_users($chatId, $messageId, $offset);
-            return;
-
         case 'u':
-            $uid = (int) ($parts[1] ?? 0);
             tg_answer($cbId);
-            tg_user_card($chatId, $messageId, $uid);
+            tg_show_card($chatId, $messageId, $userId);
             return;
 
-        case 'my':
-            tg_answer($cbId);
-            tg_show_my($chatId, $messageId);
+        case 't':
+            tg_answer($cbId, tg_toggle($userId, (string) ($parts[2] ?? '')));
+            tg_show_card($chatId, $messageId, $userId);
             return;
 
-        case 'mym':
+        case 'd':
             tg_answer($cbId);
-            tg_state_set($chatId, 'm_email', []);
-            tg_edit($chatId, $messageId, "👤 Мои курсы\n\n📧 Отправьте ваш email на сайте:", [
-                [tg_btn('⬅️ Назад', 'm')],
-            ]);
+            tg_show_delete_confirm($chatId, $messageId, $userId);
             return;
 
-        case 'myc':
-            $slug = (string) ($parts[1] ?? '');
-            tg_my_toggle($chatId, $messageId, $cbId, $slug);
-            return;
-
-        case 'myr':
-            tg_answer($cbId);
-            $email = tg_my_email();
-            $user = $email !== null ? user_by_email($email) : null;
-            if ($user === null) {
-                tg_answer($cbId, 'Email не задан', true);
-                return;
-            }
-            $newRole = (($user['role'] ?? 'user') === 'admin') ? 'user' : 'admin';
-            user_set_role((int) $user['id'], $newRole);
-            tg_answer($cbId, $newRole === 'admin' ? '✅ Роль admin выдана' : 'Роль снята');
-            tg_show_my($chatId, $messageId);
+        case 'x':
+            tg_answer($cbId, '🗑 Удаляю…');
+            tg_delete_user($chatId, $messageId, $userId);
             return;
     }
 
-    tg_answer($cbId, 'Неизвестная команда');
+    // Кнопка из старой версии бота или устаревшее сообщение.
+    tg_answer($cbId, 'Меню обновлено');
+    tg_show_menu($chatId, $messageId);
 }
 
-function tg_confirm_grant(int $chatId, int $messageId, string $cbId): void
+/** Выдача/отзыв одного курса. Возвращает текст для всплывающего уведомления. */
+function tg_toggle(int $userId, string $slug): string
 {
-    $state = tg_state_get($chatId);
-    $slug = (string) ($state['payload']['slug'] ?? '');
-    $email = (string) ($state['payload']['email'] ?? '');
-
-    if ($state['step'] !== 'g_confirm' || $slug === '' || $email === '') {
-        tg_answer($cbId, 'Сессия устарела', true);
-        tg_show_menu($chatId, $messageId);
-        return;
+    if ($userId <= 0 || $slug === '') {
+        return '❌ Ошибка';
+    }
+    if (!in_array($slug, array_column(courses_list(), 'slug'), true)) {
+        return '❌ Неизвестный курс';
     }
 
-    $user = user_by_email($email);
-    if ($user === null) {
-        tg_answer($cbId, 'Пользователь не найден', true);
-        tg_show_menu($chatId, $messageId);
-        return;
+    if (access_has($userId, $slug)) {
+        return access_revoke($userId, $slug) ? '🚫 Доступ отозван' : 'ℹ️ Доступа не было';
     }
 
-    $created = access_grant((int) $user['id'], $slug);
-    tg_answer($cbId, $created ? '✅ Доступ выдан' : 'Уже был');
-    tg_state_clear($chatId);
-    tg_edit(
-        $chatId,
-        $messageId,
-        ($created ? '✅ Доступ выдан' : 'ℹ️ Доступ уже был') . "\n\n" . $email . ' → ' . course_title($slug),
-        [[tg_btn('🎓 Выдать ещё', 'g'), tg_btn('🧹 В меню', 'm')]]
-    );
-}
-
-function tg_my_toggle(int $chatId, int $messageId, string $cbId, string $slug): void
-{
-    $email = tg_my_email();
-    $user = $email !== null ? user_by_email($email) : null;
-    if ($user === null) {
-        tg_answer($cbId, 'Email не задан', true);
-        return;
-    }
-
-    $uid = (int) $user['id'];
-    if (access_has($uid, $slug)) {
-        access_revoke($uid, $slug);
-        tg_answer($cbId, '🚫 Доступ отозван');
-    } else {
-        access_grant($uid, $slug);
-        tg_answer($cbId, '✅ Доступ выдан');
-    }
-    tg_show_my($chatId, $messageId);
+    return access_grant($userId, $slug) ? '✅ Доступ выдан' : 'ℹ️ Доступ уже был';
 }
 
 /* ================================================================== */
-/* Текстовые сообщения (ввод email, /start)                           */
+/* Текстовые сообщения                                                */
 /* ================================================================== */
 
 function tg_handle_message(int $chatId, string $text): void
@@ -415,108 +338,9 @@ function tg_handle_message(int $chatId, string $text): void
     $text = trim($text);
 
     if ($text === '/start' || $text === '/menu') {
-        tg_state_clear($chatId);
-        tg_send($chatId, tg_menu_text(), tg_menu_kb());
+        tg_send($chatId, tg_menu_text(), []);
         return;
     }
 
-    $state = tg_state_get($chatId);
-    $step = $state['step'];
-
-    if ($step === '') {
-        tg_send($chatId, tg_menu_text(), tg_menu_kb());
-        return;
-    }
-
-    $email = mb_strtolower($text);
-
-    switch ($step) {
-        case 'g_email':
-            tg_email_for_grant($chatId, $email, $state);
-            return;
-
-        case 'r_email':
-            tg_email_for_revoke($chatId, $email, $state);
-            return;
-
-        case 'f_email':
-            tg_state_clear($chatId);
-            $user = user_by_email($email);
-            if ($user === null) {
-                tg_send($chatId, "❌ Пользователь {$email} не найден.", [[tg_btn('🔁 Ещё раз', 'f'), tg_btn('🧹 В меню', 'm')]]);
-                return;
-            }
-            $purchased = access_list((int) $user['id']);
-            $list = $purchased === [] ? '- нет доступов -' : implode("\n", array_map(fn($s) => '✅ ' . course_title($s), $purchased));
-            tg_send(
-                $chatId,
-                "👤 {$user['email']}\nИмя: " . (($user['name'] !== '') ? $user['name'] : '-') . "\nРоль: {$user['role']}\n\nКурсы:\n{$list}",
-                [[tg_btn('🗂 Открыть карточку', 'u:' . $user['id']), tg_btn('🧹 В меню', 'm')]]
-            );
-            return;
-
-        case 'm_email':
-            tg_state_clear($chatId);
-            $user = user_by_email($email);
-            if ($user === null) {
-                tg_send($chatId, "❌ Пользователь {$email} не найден.", [[tg_btn('🔁 Ещё раз', 'mym'), tg_btn('🧹 В меню', 'm')]]);
-                return;
-            }
-            settings_set('tg_admin_email', mb_strtolower($email));
-            tg_send($chatId, '✅ Сохранено.', [[tg_btn('👤 Мои курсы', 'my')]]);
-            return;
-    }
-
-    tg_state_clear($chatId);
-    tg_send($chatId, tg_menu_text(), tg_menu_kb());
-}
-
-function tg_email_for_grant(int $chatId, string $email, array $state): void
-{
-    $slug = (string) ($state['payload']['slug'] ?? '');
-    if ($slug === '') {
-        tg_state_clear($chatId);
-        tg_send($chatId, tg_menu_text(), tg_menu_kb());
-        return;
-    }
-
-    $user = user_by_email($email);
-    if ($user === null) {
-        tg_send(
-            $chatId,
-            "❌ Пользователь {$email} не найден.\nОтправьте другой email:",
-            [[tg_btn('⬅️ Отмена', 'm')]]
-        );
-        return;
-    }
-
-    tg_state_set($chatId, 'g_confirm', ['slug' => $slug, 'email' => $email]);
-    tg_send(
-        $chatId,
-        "🎓 Выдать доступ?\n\n{$email} → " . course_title($slug),
-        [[tg_btn('✅ Подтвердить', 'gok'), tg_btn('🚫 Отмена', 'm')]]
-    );
-}
-
-function tg_email_for_revoke(int $chatId, string $email, array $state): void
-{
-    $slug = (string) ($state['payload']['slug'] ?? '');
-    tg_state_clear($chatId);
-
-    $user = user_by_email($email);
-    if ($user === null) {
-        tg_send($chatId, "❌ Пользователь {$email} не найден.", [[tg_btn('🔁 Ещё раз', 'r'), tg_btn('🧹 В меню', 'm')]]);
-        return;
-    }
-    if ($slug === '') {
-        tg_send($chatId, tg_menu_text(), tg_menu_kb());
-        return;
-    }
-
-    $revoked = access_revoke((int) $user['id'], $slug);
-    tg_send(
-        $chatId,
-        ($revoked ? '🚫 Доступ отозван' : 'ℹ️ Доступа и не было') . "\n\n{$email} · " . course_title($slug),
-        [[tg_btn('🗂 Карточка', 'u:' . $user['id']), tg_btn('🧹 В меню', 'm')]]
-    );
+    tg_search($chatId, $text);
 }

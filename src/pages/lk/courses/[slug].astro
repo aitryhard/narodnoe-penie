@@ -16,13 +16,26 @@ const { course } = Astro.props as { course: Course };
 
 <LkLayout title={course.title}>
   <nav class="text-ink-mute flex items-center gap-2 text-sm" aria-label="Хлебные крошки">
-    <a href={withBase("/lk")} class="link-underline hover:text-ink-soft">Личный кабинет</a>
+    <a href={withBase("/lk")} class="link-underline hover:text-ink-soft">Мои курсы</a>
     <span aria-hidden="true">/</span>
     <span class="text-ink-soft">{course.title}</span>
   </nav>
 
-  <div class="mt-5" data-course={course.slug}>
-    <div data-lock class="border-primary/20 bg-surface rounded-2xl border p-6 sm:p-7">
+  <p class="prose-body mt-3 max-w-2xl text-pretty">{course.lead}</p>
+  <p class="mt-2">
+    <span class="bg-sand-50 border-ink/10 inline-block rounded-full border px-3 py-1 text-xs font-medium text-ink-soft">
+      {course.duration}
+    </span>
+  </p>
+
+  <div class="mt-7" data-course={course.slug}>
+    <!-- Состояние: загрузка -->
+    <div data-loading>
+      <p class="prose-body text-ink-mute">Загружаем материалы курса…</p>
+    </div>
+
+    <!-- Состояние: нет доступа -->
+    <div data-lock hidden class="border-primary/20 bg-surface rounded-2xl border p-6 sm:p-7">
       <div class="flex items-start gap-3">
         <svg
           viewBox="0 0 24 24"
@@ -48,14 +61,139 @@ const { course } = Astro.props as { course: Course };
               Купить курс
             </Button>
             <Button href={withBase("/lk")} variant="ghost" size="sm">
-              Личный кабинет
+              Мои курсы
             </Button>
           </div>
         </div>
       </div>
     </div>
 
-    <div data-content class="mx-auto hidden max-w-4xl"></div>
+    <!-- Состояние: ошибка загрузки -->
+    <div data-error hidden class="border-ink/10 bg-surface rounded-2xl border p-6 sm:p-7">
+      <p class="font-medium">Не удалось загрузить материалы</p>
+      <p class="prose-body mt-1.5 text-pretty">
+        Пожалуйста, обновите страницу или попробуйте позже.
+      </p>
+    </div>
+
+    <!-- Состояние: курс без материалов -->
+    <div data-empty hidden class="border-ink/10 bg-surface rounded-2xl border p-6 sm:p-7">
+      <p class="prose-body text-pretty">Материалы курса скоро появятся — мы их готовим.</p>
+    </div>
+
+    <!-- Рабочая область -->
+    <div data-workspace hidden class="lg:flex lg:items-start lg:gap-6">
+      <!-- Уроки: мобильный раскрывающийся блок -->
+      <details data-lessons-mobile class="border-ink/10 bg-surface mb-5 rounded-2xl border lg:hidden">
+        <summary
+          class="text-ink cursor-pointer px-4 py-3 text-sm font-medium"
+          data-lessons-summary
+        >
+          Уроки курса
+        </summary>
+        <div class="border-ink/10 border-t p-2" data-lessons-list></div>
+      </details>
+
+      <!-- Уроки: боковая панель на десктопе -->
+      <aside class="border-ink/10 sticky top-24 hidden w-56 shrink-0 lg:block">
+        <p class="text-ink-mute mb-2 text-[11px] font-semibold uppercase tracking-[0.16em]">
+          Уроки курса
+        </p>
+        <div data-lessons-list></div>
+      </aside>
+
+      <div class="min-w-0 flex-1">
+        <h2
+          data-lesson-title
+          class="border-ink/10 font-display mb-5 border-b pb-2.5 text-xl font-semibold sm:text-2xl"
+        >
+        </h2>
+
+        <div class="grid gap-6 lg:grid-cols-[auto_minmax(0,1fr)] lg:items-start lg:gap-7">
+          <!-- Видео -->
+          <div class="mx-auto w-fit lg:mx-0">
+            <div data-video-stack class="grid"></div>
+            <div data-video-switch class="mt-3 flex flex-wrap justify-center gap-1.5"></div>
+            <p data-video-error hidden class="border-ink/10 bg-surface mt-3 rounded-xl border px-3 py-2 text-sm">
+              Не удалось загрузить видео. Попробуйте обновить страницу.
+            </p>
+          </div>
+
+          <!-- Панель материалов -->
+          <div class="border-ink/10 bg-surface min-w-0 rounded-2xl border">
+            <div
+              class="border-ink/10 flex gap-1 overflow-x-auto border-b px-2 py-2"
+              role="tablist"
+              aria-label="Материалы урока"
+            >
+              <button
+                type="button"
+                role="tab"
+                data-tab="text"
+                aria-controls="lesson-panel"
+                aria-selected="true"
+                class="bg-primary/10 text-primary-deep rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 sm:px-4"
+              >
+                Текст
+              </button>
+              <button
+                type="button"
+                role="tab"
+                data-tab="audio"
+                aria-controls="lesson-panel"
+                aria-selected="false"
+                class="text-ink-soft hover:bg-sand-50 rounded-lg px-3.5 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 sm:px-4"
+              >
+                Аудио
+              </button>
+              <button
+                type="button"
+                role="tab"
+                data-tab="materials"
+                aria-controls="lesson-panel"
+                aria-selected="false"
+                class="text-ink-soft hover:bg-sand-50 rounded-lg px-3.5 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 sm:px-4"
+              >
+                Материалы
+              </button>
+            </div>
+            <div
+              id="lesson-panel"
+              data-tabpanel
+              role="tabpanel"
+              tabindex="0"
+              class="p-4 focus-visible:outline-none sm:p-5"
+            >
+            </div>
+          </div>
+        </div>
+
+        <!-- Нижняя навигация -->
+        <nav
+          class="mt-8 flex items-stretch justify-between gap-4"
+          aria-label="Переход между уроками"
+        >
+          <button
+            type="button"
+            data-prev
+            hidden
+            class="border-ink/15 bg-surface text-ink-soft hover:border-ink/30 hover:text-ink group flex max-w-[46%] flex-col items-start gap-0.5 rounded-2xl border px-4 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+          >
+            <span class="text-xs">← Предыдущий урок</span>
+            <span data-prev-title class="text-sm font-medium"></span>
+          </button>
+          <button
+            type="button"
+            data-next
+            hidden
+            class="bg-primary text-sand-50 hover:bg-primary-hover ml-auto flex max-w-[46%] flex-col items-end gap-0.5 rounded-2xl px-5 py-3 text-right transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
+          >
+            <span class="text-xs">Следующий урок →</span>
+            <span data-next-title class="text-sm font-medium"></span>
+          </button>
+        </nav>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -64,10 +202,24 @@ const { course } = Astro.props as { course: Course };
 
     type Block = { type?: string; text?: string; src?: string; title?: string; alt?: string };
     type CourseData = { access?: boolean; content?: { blocks?: Block[] } | null };
+    type Lesson = { title: string; blocks: Block[] };
+    type TabName = "text" | "audio" | "materials";
 
     if (API_ENABLED) {
       const root = document.querySelector<HTMLElement>("[data-course]");
       const slug = root?.dataset.course ?? "";
+
+      const $ = <T extends HTMLElement>(selector: string) =>
+        document.querySelector<T>(selector);
+
+      const show = (name: "loading" | "lock" | "error" | "empty" | "workspace") => {
+        (["loading", "lock", "error", "empty", "workspace"] as const).forEach((state) => {
+          const el = $(`[data-${state}]`);
+          if (!el) return;
+          if (state === name) el.removeAttribute("hidden");
+          else el.setAttribute("hidden", "");
+        });
+      };
 
       if (slug) {
         fetch(`${API_BASE}/api/course.php?slug=${encodeURIComponent(slug)}`, { credentials: "include" })
@@ -83,198 +235,141 @@ const { course } = Astro.props as { course: Course };
             return json.data ?? null;
           })
           .then((data) => {
-            if (!data?.access) return;
-
-            const lock = document.querySelector<HTMLElement>("[data-lock]");
-            const container = document.querySelector<HTMLElement>("[data-content]");
-            if (!container) return;
-            lock?.classList.add("hidden");
-            container.classList.remove("hidden");
-
-            const blocks = data.content?.blocks ?? [];
-
-            if (blocks.length === 0) {
-              const box = document.createElement("div");
-              box.className = "border-ink/10 bg-surface mx-auto max-w-2xl rounded-2xl border p-6";
-              const soon = document.createElement("p");
-              soon.className = "prose-body text-pretty";
-              soon.textContent = "Материалы курса скоро появятся — мы их готовим.";
-              box.append(soon);
-              container.append(box);
+            if (!data) {
+              show("error");
               return;
             }
+            if (!data.access) {
+              show("lock");
+              return;
+            }
+
+            const blocks = data.content?.blocks ?? [];
+            if (blocks.length === 0) {
+              show("empty");
+              return;
+            }
+
+            // --- Разбиение на уроки: каждый заголовок начинает новый урок ---
+            const lessons: Lesson[] = [];
+            for (const block of blocks) {
+              if (block.type === "heading" && block.text) {
+                lessons.push({ title: block.text, blocks: [] });
+              } else if (lessons.length > 0) {
+                lessons[lessons.length - 1].blocks.push(block);
+              } else {
+                lessons.push({ title: "Урок", blocks: [block] });
+              }
+            }
+
+            const lessonTitle = (index: number) =>
+              lessons[index]?.title ?? `Урок ${index + 1}`;
+
+            // --- Вспомогательные построители ---
+            const el = <K extends keyof HTMLElementTagNameMap>(
+              tag: K,
+              className: string,
+              text?: string,
+            ) => {
+              const node = document.createElement(tag);
+              node.className = className;
+              if (text !== undefined) node.textContent = text;
+              return node;
+            };
 
             const resolve = (src: string) =>
               /^(https?:)?\/\//.test(src) || src.startsWith("/")
                 ? src
                 : `${API_BASE}/api/content/courses/${slug}/${src}`;
 
-            const make = <K extends keyof HTMLElementTagNameMap>(
-              tag: K,
-              className: string,
-              text?: string,
-            ) => {
-              const el = document.createElement(tag);
-              el.className = className;
-              if (text !== undefined) el.textContent = text;
-              return el;
-            };
-
-            // Длительность в подписях не нужна - она видна на плеере.
+            // Длительность не дублируем в подписях - она видна на плеере.
             const cleanTitle = (title: string) =>
               title.replace(/\s*·\s*\d{1,2}:\d{2}(?::\d{2})?\s*$/, "");
 
-            // Каждая часть курса (блок с заголовком и всё после него) - отдельная страница.
-            const sections: Block[][] = [];
-            for (const block of blocks) {
-              if (block.type === "heading" && block.text) {
-                sections.push([block]);
-              } else if (sections.length > 0) {
-                sections[sections.length - 1].push(block);
-              } else {
-                sections.push([block]);
-              }
-            }
+            // --- Список уроков (две копии: десктоп и мобильный) ---
+            const lessonButtons: { button: HTMLButtonElement; lessonIndex: number }[] = [];
 
-            const sectionTitle = (index: number) =>
-              sections[index].find((block) => block.type === "heading")?.text ??
-              `Часть ${index + 1}`;
-
-            // Вертикальное видео - в натуральных пропорциях, без тёмной рамки и полос.
-            const createVideoEl = (block: Block, maxHeight: number) => {
-              const video = document.createElement("video");
-              video.controls = true;
-              video.preload = "metadata";
-              video.src = resolve(block.src ?? "");
-              video.setAttribute("playsinline", "");
-              video.className = "bg-ink mx-auto block h-auto w-auto max-w-full rounded-xl shadow-card";
-              video.style.maxHeight = `${maxHeight}px`;
-              video.style.aspectRatio = "9 / 16";
-              video.addEventListener("loadedmetadata", () => {
-                if (video.videoWidth && video.videoHeight) {
-                  video.style.aspectRatio = `${video.videoWidth} / ${video.videoHeight}`;
-                }
-              });
-              return video;
-            };
-
-            // Список видео: переключаем видимость готовых плееров - без мигания.
-            const createPlaylist = (videos: Block[], players: HTMLVideoElement[]) => {
-              const list = make(
-                "div",
-                "bg-surface border-ink/10 divide-ink/5 divide-y rounded-2xl border p-1.5 shadow-card",
-              );
-              const rows: { row: HTMLButtonElement; badge: HTMLElement }[] = [];
-
-              const apply = (activeIndex: number) => {
-                players.forEach((video, index) => {
-                  if (index === activeIndex) {
-                    video.classList.remove("hidden");
-                  } else {
-                    video.classList.add("hidden");
-                    if (!video.paused) video.pause();
-                  }
-                });
-                rows.forEach(({ row, badge }, index) => {
-                  const active = index === activeIndex;
-                  row.className = active
-                    ? "bg-primary/10 text-primary-deep flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-sm font-medium"
-                    : "text-ink-soft hover:bg-sand-50 flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-sm transition-colors";
-                  badge.className = active
-                    ? "bg-primary text-sand-50 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold"
-                    : "bg-ink/5 text-ink-mute flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold";
-                });
-              };
-
-              videos.forEach((block, index) => {
-                const row = document.createElement("button");
-                row.type = "button";
-                const badge = make("span", "", String(index + 1));
-                const label = make(
+            const buildLessonsList = (container: HTMLElement) => {
+              lessons.forEach((lesson, index) => {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className =
+                  "border-ink/10 text-ink-soft hover:border-primary/40 hover:text-ink mb-1.5 flex w-full items-start gap-2.5 rounded-xl border px-3 py-2.5 text-left text-sm leading-snug transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40";
+                const number = el(
                   "span",
-                  "min-w-0 flex-1 truncate",
-                  cleanTitle(block.title ?? `Видео ${index + 1}`),
+                  "font-display text-ink-mute w-5 shrink-0 text-[13px] tabular-nums",
+                  String(index + 1).padStart(2, "0"),
                 );
-                const icon = make("span", "text-ink-mute/50 text-[10px]", "▶");
-                row.append(badge, label, icon);
-                row.addEventListener("click", () => {
-                  apply(index);
-                  void players[index].play().catch(() => {});
+                const title = el("span", "min-w-0 break-words", lesson.title);
+                button.append(number, title);
+                button.addEventListener("click", () => {
+                  location.hash = `part-${index + 1}`;
+                  const details = container.closest("details");
+                  if (details) details.open = false;
                 });
-                rows.push({ row, badge });
-                list.append(row);
+                lessonButtons.push({ button, lessonIndex: index });
+                container.append(button);
               });
-
-              apply(0);
-              return list;
             };
 
-            // Подголоски: компактная карточка с плеерами.
-            const createAudioCard = (audios: Block[]) => {
-              const card = make("div", "bg-surface border-ink/10 rounded-2xl border p-3.5 shadow-card");
-              card.append(
-                make(
-                  "p",
-                  "text-ink-mute mb-2.5 text-[11px] font-semibold uppercase tracking-[0.14em]",
-                  "Подголоски",
-                ),
-              );
-              const stack = make("div", "space-y-3");
-              for (const block of audios) {
-                if (!block.src) continue;
-                const item = document.createElement("div");
-                const label = cleanTitle(block.title ?? "")
-                  .replace(/^Подголосок:\s*/i, "")
-                  .replace(/^./, (char) => char.toUpperCase());
-                if (label) item.append(make("p", "text-ink-soft mb-1 text-xs font-medium", label));
-                const audio = document.createElement("audio");
-                audio.controls = true;
-                audio.src = resolve(block.src);
-                audio.className = "block w-full";
-                item.append(audio);
-                stack.append(item);
-              }
-              card.append(stack);
-              return card;
+            document.querySelectorAll<HTMLElement>("[data-lessons-list]").forEach(
+              buildLessonsList,
+            );
+
+            // --- Вкладки ---
+            const tabButtons = Array.from(
+              document.querySelectorAll<HTMLButtonElement>('[role="tab"]'),
+            );
+            const tabPanel = $<HTMLElement>("[data-tabpanel]");
+            const activeTab: TabName = "text";
+
+            const setActiveTab = (name: TabName) => {
+              tabButtons.forEach((button) => {
+                const isActive = button.dataset.tab === name;
+                button.setAttribute("aria-selected", String(isActive));
+                button.className = isActive
+                  ? "bg-primary/10 text-primary-deep rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 sm:px-4"
+                  : "text-ink-soft hover:bg-sand-50 rounded-lg px-3.5 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 sm:px-4";
+              });
+              currentTab = name;
+              renderTab();
             };
 
-            // Плеер + список видео + подголоски.
-            const renderMedia = (videos: Block[], audios: Block[], parent: HTMLElement) => {
-              const widget = make("div", "flex flex-col gap-4 sm:flex-row sm:items-start");
+            tabButtons.forEach((button) => {
+              button.addEventListener("click", () => {
+                setActiveTab(button.dataset.tab as TabName);
+              });
+              button.addEventListener("keydown", (event) => {
+                const keys = ["ArrowLeft", "ArrowRight", "Home", "End"];
+                if (!keys.includes(event.key)) return;
+                event.preventDefault();
+                const index = tabButtons.indexOf(button);
+                let next = index;
+                if (event.key === "ArrowRight") next = (index + 1) % tabButtons.length;
+                else if (event.key === "ArrowLeft")
+                  next = (index - 1 + tabButtons.length) % tabButtons.length;
+                else if (event.key === "Home") next = 0;
+                else if (event.key === "End") next = tabButtons.length - 1;
+                tabButtons[next].focus();
+                setActiveTab(tabButtons[next].dataset.tab as TabName);
+              });
+            });
 
-              const stage = make("div", "mx-auto w-full max-w-[268px] shrink-0 sm:mx-0");
-              const players: HTMLVideoElement[] = [];
-              if (videos.length > 0) {
-                const stack = make("div", "grid");
-                videos.forEach((block, index) => {
-                  const video = createVideoEl(block, 440);
-                  video.style.gridArea = "1 / 1";
-                  if (index > 0) video.classList.add("hidden");
-                  players.push(video);
-                  stack.append(video);
-                });
-                stage.append(stack);
-              }
-              widget.append(stage);
-
-              const side = make("div", "flex min-w-0 flex-1 flex-col gap-3");
-              if (players.length > 1) side.append(createPlaylist(videos, players));
-              if (audios.length > 0) side.append(createAudioCard(audios));
-              if (side.childElementCount > 0) widget.append(side);
-
-              parent.append(widget);
+            // --- Рендер содержимого вкладок ---
+            const emptyMessage = (text: string) => {
+              const box = el("div", "border-ink/10 bg-sand-50 rounded-xl border px-4 py-5");
+              box.append(el("p", "prose-body text-pretty", text));
+              return box;
             };
 
-            // Текст песни: центрированные строфы в карточке с орнаментом,
-            // первая строка до пустой строки - источник записи.
             const renderLyrics = (text: string, parent: HTMLElement) => {
               const parts = text.split(/\n[ \t]*\n/);
               const source = parts.length > 1 ? parts[0].trim() : "";
               const body = (source ? parts.slice(1) : parts).join("\n\n");
 
-              const figure = make(
+              const figure = el(
                 "figure",
-                "bg-sand-50 border-primary/20 text-ink rounded-2xl border px-6 py-7 text-center shadow-card sm:px-8",
+                "border-primary/20 bg-sand-50 text-ink rounded-2xl border px-5 py-6 text-center sm:px-8",
               );
 
               const ornament = document.createElement("div");
@@ -286,19 +381,20 @@ const { course } = Astro.props as { course: Course };
                 '<path d="M59 10c3.4-3.8 10.6-3.8 14 0-3.4 3.8-10.6 3.8-14 0z" />' +
                 '<circle cx="66" cy="10" r="1.7" fill="currentColor" stroke="none" /></svg>';
 
-              const poem = make(
-                "p",
-                "font-display text-ink whitespace-pre-line text-[16px] leading-[1.95]",
-                body,
+              figure.append(
+                ornament,
+                el(
+                  "p",
+                  "font-display text-ink whitespace-pre-line text-[16px] leading-[1.95]",
+                  body,
+                ),
               );
-
-              figure.append(ornament, poem);
 
               if (source) {
                 figure.append(
-                  make(
+                  el(
                     "figcaption",
-                    "border-ink/10 text-ink-mute mt-5 border-t pt-3 text-xs italic",
+                    "border-ink/10 text-ink-mute mt-4 border-t pt-3 text-xs italic",
                     source,
                   ),
                 );
@@ -314,21 +410,21 @@ const { course } = Astro.props as { course: Course };
             };
 
             const renderList = (text: string, parent: HTMLElement) => {
-              const tray = make(
+              const tray = el(
                 "div",
-                "bg-surface border-ink/10 rounded-2xl border px-5 py-4 shadow-card sm:px-6 sm:py-5",
+                "border-ink/10 bg-sand-50 rounded-2xl border px-4 py-4 sm:px-5",
               );
               const ul = document.createElement("ul");
               ul.className = "space-y-2";
               for (const line of text.split("\n")) {
                 const item = line.trim().replace(/^[-–—]\s*/, "");
                 if (!item) continue;
-                const li = make(
+                const li = el(
                   "li",
                   "text-ink-soft flex items-start gap-2.5 text-[15px] leading-relaxed",
                 );
-                li.append(make("span", "bg-mustard mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full"));
-                li.append(make("span", "", item));
+                li.append(el("span", "bg-mustard mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full"));
+                li.append(el("span", "", item));
                 ul.append(li);
               }
               tray.append(ul);
@@ -337,225 +433,263 @@ const { course } = Astro.props as { course: Course };
 
             const renderNote = (text: string, parent: HTMLElement) => {
               parent.append(
-                make(
+                el(
                   "p",
-                  "bg-surface border-mustard/50 prose-body rounded-2xl border px-6 py-5 whitespace-pre-line shadow-card",
+                  "bg-mustard/40 prose-body rounded-xl px-4 py-4 whitespace-pre-line",
                   text,
                 ),
               );
             };
 
-            const createLink = (block: Block) => {
-              const a = document.createElement("a");
-              a.href = block.src ?? "#";
-              a.target = "_blank";
-              a.rel = "noopener noreferrer";
-              a.className =
-                "group bg-surface border-ink/10 text-ink hover:border-primary/40 flex items-center gap-2.5 rounded-xl border px-4 py-3 text-[15px] transition-colors";
-              a.append(make("span", "bg-mustard h-1.5 w-1.5 shrink-0 rounded-full"));
-              a.append(make("span", "min-w-0 flex-1", cleanTitle(block.text ?? block.src ?? "")));
-              a.append(make("span", "text-ink-mute group-hover:text-primary-deep shrink-0", "↗"));
-              return a;
-            };
+            let currentLesson = 0;
+            let currentTab: TabName = activeTab;
+            let lessonVideos: HTMLVideoElement[] = [];
 
-            const renderSection = (index: number) => {
-              container.replaceChildren();
-              const section = sections[index];
-              const heading = section.find((block) => block.type === "heading");
-              const rest = section.filter((block) => block !== heading);
+            const renderTab = () => {
+              if (!tabPanel) return;
+              tabPanel.replaceChildren();
+              const lesson = lessons[currentLesson];
+              if (!lesson) return;
 
-              if (heading?.text) {
-                container.append(
-                  make(
-                    "h2",
-                    "font-display border-ink/10 mb-5 border-b pb-2.5 text-2xl font-semibold",
-                    heading.text,
-                  ),
-                );
+              const texts = lesson.blocks.filter((block) => block.type === "text" && block.text);
+              const audios = lesson.blocks.filter((block) => block.type === "audio" && block.src);
+              const links = lesson.blocks.filter((block) => block.type === "link" && block.src);
+              const isSong = lesson.title.startsWith("Песня");
+
+              if (currentTab === "text") {
+                if (texts.length === 0) {
+                  tabPanel.append(emptyMessage("В этом уроке нет текстовых материалов."));
+                  return;
+                }
+                const stack = el("div", "space-y-3");
+                for (const block of texts) {
+                  const text = block.text ?? "";
+                  if (isSong) renderLyrics(text, stack);
+                  else if (isBulletList(text)) renderList(text, stack);
+                  else renderNote(text, stack);
+                }
+                tabPanel.append(stack);
+                return;
               }
 
-              const videos = rest.filter((block) => block.type === "video" && block.src);
-              const audios = rest.filter((block) => block.type === "audio" && block.src);
-              const texts = rest.filter((block) => block.type === "text" && block.text);
-              const links = rest.filter((block) => block.type === "link" && block.src);
-              const isSong = (heading?.text ?? "").startsWith("Песня");
-
-              if (isSong) {
-                // Песня: текст слева (прилипает), плеер со списком видео справа.
-                const grid = make(
-                  "div",
-                  "grid gap-6 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:items-start lg:gap-8",
-                );
-                const lyricsCol = make("div", "lg:sticky lg:top-24");
-                for (const block of texts) renderLyrics(block.text ?? "", lyricsCol);
-
-                const mediaCol = make("div", "min-w-0");
-                renderMedia(videos, audios, mediaCol);
-
-                grid.append(lyricsCol, mediaCol);
-                container.append(grid);
-              } else if (videos.length > 0 && texts.length > 0) {
-                // Беседа: видео рядом со списком тем.
-                const grid = make(
-                  "div",
-                  "mx-auto grid w-full max-w-3xl items-start gap-6 lg:grid-cols-[auto_minmax(0,1fr)]",
-                );
-                const stage = make("div", "");
-                stage.append(createVideoEl(videos[0], 420));
-                const textCol = make("div", "space-y-3");
-                for (const block of texts) {
-                  const text = block.text ?? "";
-                  if (isBulletList(text)) renderList(text, textCol);
-                  else renderNote(text, textCol);
+              if (currentTab === "audio") {
+                if (audios.length === 0) {
+                  tabPanel.append(emptyMessage("В этом уроке нет аудиозаписей."));
+                  return;
                 }
-                grid.append(stage, textCol);
-                container.append(grid);
-              } else {
-                // Вступление, завершение, приложения.
-                const flow = make("div", "mx-auto w-full max-w-2xl space-y-3");
-                for (const block of texts) {
-                  const text = block.text ?? "";
-                  if (isBulletList(text)) renderList(text, flow);
-                  else renderNote(text, flow);
-                }
-                if (videos.length > 0) {
-                  const stage = make("div", "mx-auto w-fit");
-                  stage.append(createVideoEl(videos[0], 460));
-                  flow.append(stage);
-                }
-                if (links.length > 0) {
-                  const gridLinks = make(
-                    "div",
-                    "mx-auto grid w-full max-w-3xl gap-2 pt-1 sm:grid-cols-2",
+                const list = el("div", "space-y-4");
+                for (const block of audios) {
+                  const item = el("div", "border-ink/10 rounded-xl border px-3.5 py-3");
+                  const header = el("div", "mb-2 flex items-center justify-between gap-3");
+                  const label = cleanTitle(block.title ?? "Аудиозапись").replace(
+                    /^Подголосок:\s*/i,
+                    "Подголосок: ",
                   );
-                  for (const block of links) gridLinks.append(createLink(block));
-                  container.append(flow);
-                  container.append(gridLinks);
-                } else {
-                  container.append(flow);
+                  header.append(el("p", "text-sm font-medium", label));
+                  const download = el("a", "link-underline text-primary-deep text-xs font-medium");
+                  download.href = resolve(block.src);
+                  download.setAttribute("download", "");
+                  download.textContent = "Скачать";
+                  header.append(download);
+                  item.append(header);
+                  const audio = document.createElement("audio");
+                  audio.controls = true;
+                  audio.preload = "metadata";
+                  audio.src = resolve(block.src);
+                  audio.className = "block w-full";
+                  audio.setAttribute("aria-label", label);
+                  const error = el("p", "text-ink-mute mt-1 hidden text-xs");
+                  error.textContent = "Не удалось загрузить запись.";
+                  audio.addEventListener("error", () => error.classList.remove("hidden"));
+                  item.append(audio, error);
+                  list.append(item);
                 }
+                tabPanel.append(list);
+                return;
+              }
+
+              // Материалы
+              if (links.length === 0) {
+                tabPanel.append(
+                  emptyMessage("Дополнительные материалы к этому уроку не предусмотрены."),
+                );
+                return;
+              }
+              const list = el("div", "space-y-2");
+              for (const block of links) {
+                const a = document.createElement("a");
+                a.href = block.src;
+                a.target = "_blank";
+                a.rel = "noopener noreferrer";
+                a.className =
+                  "border-ink/10 text-ink hover:border-primary/40 group flex items-center gap-2.5 rounded-xl border px-3.5 py-3 text-[15px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40";
+                a.append(el("span", "bg-mustard h-1.5 w-1.5 shrink-0 rounded-full"));
+                a.append(el("span", "min-w-0 flex-1", block.text ?? block.src));
+                a.append(
+                  el("span", "text-ink-mute group-hover:text-primary-deep shrink-0 text-sm", "↗"),
+                );
+                list.append(a);
+              }
+              tabPanel.append(list);
+            };
+
+            // --- Видео урока: всё заранее, переключение видимостью (без мигания) ---
+            const videoStack = $<HTMLElement>("[data-video-stack]");
+            const videoSwitch = $<HTMLElement>("[data-video-switch]");
+            const videoError = $<HTMLElement>("[data-video-error]");
+
+            const setVideo = (index: number) => {
+              lessonVideos.forEach((video, videoIndex) => {
+                if (videoIndex === index) video.removeAttribute("hidden");
+                else {
+                  video.setAttribute("hidden", "");
+                  if (!video.paused) video.pause();
+                }
+              });
+              if (videoSwitch) {
+                Array.from(videoSwitch.children).forEach((chip, chipIndex) => {
+                  const button = chip as HTMLButtonElement;
+                  const isActive = chipIndex === index;
+                  button.setAttribute("aria-pressed", String(isActive));
+                  button.className = isActive
+                    ? "bg-primary text-sand-50 rounded-lg border border-primary px-3 py-1.5 text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                    : "border-ink/10 bg-surface text-ink-soft hover:border-primary/40 rounded-lg border px-3 py-1.5 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40";
+                });
               }
             };
 
-            // --- Навигация по частям курса (внизу страницы) ---
+            const renderVideo = (lesson: Lesson) => {
+              if (!videoStack || !videoSwitch) return;
+              videoStack.replaceChildren();
+              videoSwitch.replaceChildren();
+              videoError?.setAttribute("hidden", "");
+              lessonVideos = [];
 
-            const pager = document.createElement("div");
-            pager.className = "mx-auto mt-10 flex max-w-4xl items-center justify-between gap-4";
-
-            const prev = document.createElement("button");
-            prev.type = "button";
-            prev.className =
-              "border-ink/15 bg-surface text-ink-soft hover:border-ink/30 hover:text-ink rounded-full border px-5 py-2.5 text-sm font-medium transition-colors";
-            prev.textContent = "← Назад";
-
-            const counter = document.createElement("span");
-            counter.className = "text-ink-mute text-center text-sm tabular-nums";
-
-            const next = document.createElement("button");
-            next.type = "button";
-            next.className =
-              "bg-primary text-sand-50 hover:bg-primary-hover rounded-full px-6 py-2.5 text-sm font-medium transition-colors";
-            next.textContent = "Далее →";
-
-            prev.addEventListener("click", () => {
-              location.hash = `part-${currentIndex()}`;
-            });
-            next.addEventListener("click", () => {
-              location.hash = `part-${currentIndex() + 2}`;
-            });
-
-            pager.append(prev, counter, next);
-
-            // Содержание курса: все части списком, текущая выделена.
-            const toc = make("nav", "mx-auto mt-8 max-w-4xl");
-            toc.setAttribute("aria-label", "Содержание курса");
-            toc.append(
-              make(
-                "p",
-                "text-ink-mute mb-3 text-[11px] font-semibold uppercase tracking-[0.16em]",
-                "Содержание курса",
-              ),
-            );
-
-            const tocGrid = make("div", "grid gap-1.5 sm:grid-cols-2");
-            toc.append(tocGrid);
-
-            const tocItems: { row: HTMLButtonElement; num: HTMLElement; arrow: HTMLElement }[] = [];
-            sections.forEach((_, index) => {
-              const row = document.createElement("button");
-              row.type = "button";
-              const num = make(
-                "span",
-                "font-display text-ink-mute/70 w-6 shrink-0 text-[13px] tabular-nums",
-                String(index + 1).padStart(2, "0"),
-              );
-              const title = make("span", "min-w-0 flex-1 text-left leading-snug", sectionTitle(index));
-              const arrow = make("span", "text-ink-mute/40 shrink-0 text-[13px]", "→");
-              row.append(num, title, arrow);
-              row.addEventListener("click", () => {
-                location.hash = `part-${index + 1}`;
+              const videos = lesson.blocks.filter((block) => block.type === "video" && block.src);
+              videos.forEach((block, index) => {
+                const video = document.createElement("video");
+                video.controls = true;
+                video.preload = index === 0 ? "auto" : "metadata";
+                video.src = resolve(block.src);
+                video.setAttribute("playsinline", "");
+                // 9/16 до загрузки метаданных, затем фактические пропорции - без обрезки и полос.
+                video.className = "bg-ink block h-auto w-auto max-w-full rounded-xl";
+                video.style.maxHeight = "min(72vh, 640px)";
+                video.style.aspectRatio = "9 / 16";
+                video.setAttribute("aria-label", cleanTitle(block.title ?? `Видео ${index + 1}`));
+                video.addEventListener("loadedmetadata", () => {
+                  if (video.videoWidth && video.videoHeight) {
+                    video.style.aspectRatio = `${video.videoWidth} / ${video.videoHeight}`;
+                  }
+                });
+                video.addEventListener("error", () => {
+                  videoError?.removeAttribute("hidden");
+                });
+                videoStack.append(video);
+                lessonVideos.push(video);
               });
-              tocItems.push({ row, num, arrow });
-              tocGrid.append(row);
+
+              if (videos.length > 1) {
+                videos.forEach((block, index) => {
+                  const chip = document.createElement("button");
+                  chip.type = "button";
+                  chip.textContent = cleanTitle(block.title ?? `Видео ${index + 1}`);
+                  chip.addEventListener("click", () => setVideo(index));
+                  videoSwitch.append(chip);
+                });
+              }
+              if (lessonVideos.length > 0) setVideo(0);
+            };
+
+            // --- Нижняя навигация ---
+            const prevButton = $<HTMLButtonElement>("[data-prev]");
+            const nextButton = $<HTMLButtonElement>("[data-next]");
+            const prevTitle = $<HTMLElement>("[data-prev-title]");
+            const nextTitle = $<HTMLElement>("[data-next-title]");
+
+            prevButton?.addEventListener("click", () => {
+              location.hash = `part-${currentLesson}`;
+            });
+            nextButton?.addEventListener("click", () => {
+              location.hash = `part-${currentLesson + 2}`;
             });
 
-            const nav = document.createElement("div");
-            nav.append(pager, toc);
-            container.parentElement?.insertBefore(nav, container.nextSibling);
+            const updatePager = () => {
+              const hasPrev = currentLesson > 0;
+              const hasNext = currentLesson < lessons.length - 1;
+              if (prevButton) {
+                prevButton.toggleAttribute("hidden", !hasPrev);
+                if (hasPrev && prevTitle) prevTitle.textContent = lessonTitle(currentLesson - 1);
+              }
+              if (nextButton) {
+                nextButton.toggleAttribute("hidden", !hasNext);
+                if (hasNext && nextTitle) nextTitle.textContent = lessonTitle(currentLesson + 1);
+              }
+            };
 
+            // --- Отрисовка урока ---
+            const titleEl = $<HTMLElement>("[data-lesson-title]");
+            const summary = $<HTMLElement>("[data-lessons-summary]");
+
+            const renderLesson = (index: number) => {
+              currentLesson = index;
+              const lesson = lessons[index];
+              if (!lesson) return;
+
+              if (titleEl) titleEl.textContent = lesson.title;
+              if (summary) {
+                summary.textContent = `Урок ${index + 1} из ${lessons.length}: ${lesson.title}`;
+              }
+
+              lessonButtons.forEach(({ button, lessonIndex }) => {
+                const isActive = lessonIndex === index;
+                button.setAttribute("aria-current", isActive ? "true" : "false");
+                button.className = isActive
+                  ? "border-primary/30 bg-primary/10 text-primary-deep mb-1.5 flex w-full items-start gap-2.5 rounded-xl border px-3 py-2.5 text-left text-sm font-medium leading-snug focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                  : "border-ink/10 text-ink-soft hover:border-primary/40 hover:text-ink mb-1.5 flex w-full items-start gap-2.5 rounded-xl border px-3 py-2.5 text-left text-sm leading-snug transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40";
+              });
+
+              renderVideo(lesson);
+
+              // Вкладка по умолчанию: первая с содержимым.
+              const hasText = lesson.blocks.some((block) => block.type === "text");
+              const hasAudio = lesson.blocks.some((block) => block.type === "audio");
+              const hasLinks = lesson.blocks.some((block) => block.type === "link");
+              const defaultTab: TabName = hasText ? "text" : hasAudio ? "audio" : hasLinks ? "materials" : "text";
+              setActiveTab(defaultTab);
+
+              updatePager();
+            };
+
+            // --- Навигация по урокам (hash #part-N) ---
             const currentIndex = () => {
               const match = location.hash.match(/^#part-(\d+)$/);
               const value = match ? Number(match[1]) : 1;
-              return Math.min(Math.max(value, 1), sections.length) - 1;
-            };
-
-            const render = () => {
-              const index = currentIndex();
-              renderSection(index);
-
-              tocItems.forEach(({ row, num, arrow }, itemIndex) => {
-                const active = itemIndex === index;
-                row.className = active
-                  ? "border-primary/30 bg-primary/10 text-primary-deep flex items-center gap-3 rounded-xl border px-3.5 py-2.5 text-sm font-medium"
-                  : "border-ink/10 bg-surface text-ink-soft hover:border-primary/40 hover:text-ink flex items-center gap-3 rounded-xl border px-3.5 py-2.5 text-sm transition-colors";
-                num.className = active
-                  ? "font-display text-primary-deep w-6 shrink-0 text-[13px] tabular-nums"
-                  : "font-display text-ink-mute/70 w-6 shrink-0 text-[13px] tabular-nums";
-                arrow.className = active
-                  ? "text-primary-deep shrink-0 text-[13px]"
-                  : "text-ink-mute/40 shrink-0 text-[13px]";
-                row.setAttribute("aria-current", active ? "step" : "false");
-              });
-
-              counter.textContent = `Часть ${index + 1} из ${sections.length}`;
-
-              const atStart = index === 0;
-              const atEnd = index === sections.length - 1;
-              prev.toggleAttribute("disabled", atStart);
-              next.toggleAttribute("disabled", atEnd);
-              prev.classList.toggle("pointer-events-none", atStart);
-              prev.classList.toggle("opacity-40", atStart);
-              next.classList.toggle("pointer-events-none", atEnd);
-              next.classList.toggle("opacity-40", atEnd);
+              return Math.min(Math.max(value, 1), lessons.length) - 1;
             };
 
             window.addEventListener("hashchange", () => {
-              render();
+              renderLesson(currentIndex());
               window.scrollTo({ top: 0, behavior: "smooth" });
             });
 
             document.addEventListener("keydown", (event) => {
               if (event.target !== document.body) return;
-              if (event.key === "ArrowRight" && currentIndex() < sections.length - 1) {
-                location.hash = `part-${currentIndex() + 2}`;
-              } else if (event.key === "ArrowLeft" && currentIndex() > 0) {
-                location.hash = `part-${currentIndex()}`;
+              if (event.key === "ArrowRight" && currentLesson < lessons.length - 1) {
+                location.hash = `part-${currentLesson + 2}`;
+              } else if (event.key === "ArrowLeft" && currentLesson > 0) {
+                location.hash = `part-${currentLesson}`;
               }
             });
 
-            render();
+            show("workspace");
+            renderLesson(currentIndex());
           })
-          .catch(() => {});
+          .catch(() => {
+            show("error");
+          });
+      } else {
+        show("error");
       }
     }
   </script>

@@ -22,13 +22,6 @@ const { course } = Astro.props as { course: Course };
   </nav>
 
   <div class="mt-5" data-course={course.slug}>
-    <span
-      data-access-badge
-      class="bg-primary text-sand-50 mb-4 hidden inline-block rounded-full px-3 py-1 text-xs font-medium"
-    >
-      Доступ открыт
-    </span>
-
     <div data-lock class="border-primary/20 bg-surface rounded-2xl border p-6 sm:p-7">
       <div class="flex items-start gap-3">
         <svg
@@ -62,7 +55,7 @@ const { course } = Astro.props as { course: Course };
       </div>
     </div>
 
-    <div data-content class="hidden max-w-2xl mx-auto"></div>
+    <div data-content class="mx-auto hidden max-w-4xl"></div>
   </div>
 
   <script>
@@ -92,7 +85,6 @@ const { course } = Astro.props as { course: Course };
           .then((data) => {
             if (!data?.access) return;
 
-            document.querySelector<HTMLElement>("[data-access-badge]")?.classList.remove("hidden");
             const lock = document.querySelector<HTMLElement>("[data-lock]");
             const container = document.querySelector<HTMLElement>("[data-content]");
             if (!container) return;
@@ -103,14 +95,11 @@ const { course } = Astro.props as { course: Course };
 
             if (blocks.length === 0) {
               const box = document.createElement("div");
-              box.className = "border-ink/10 bg-surface rounded-2xl border p-6";
-              const title = document.createElement("p");
-              title.className = "font-medium";
-              title.textContent = "Доступ открыт";
+              box.className = "border-ink/10 bg-surface mx-auto max-w-2xl rounded-2xl border p-6";
               const soon = document.createElement("p");
-              soon.className = "prose-body mt-1.5 text-pretty";
+              soon.className = "prose-body text-pretty";
               soon.textContent = "Материалы курса скоро появятся — мы их готовим.";
-              box.append(title, soon);
+              box.append(soon);
               container.append(box);
               return;
             }
@@ -151,107 +140,73 @@ const { course } = Astro.props as { course: Course };
               sections[index].find((block) => block.type === "heading")?.text ??
               `Часть ${index + 1}`;
 
-            const renderSection = (index: number) => {
-              container.replaceChildren();
-              let songHeading = false;
+            // Видео в натуральных пропорциях: без тёмной рамки и пустых полос по бокам.
+            const renderVideo = (block: Block, parent: HTMLElement, flow: boolean) => {
+              if (!block.src) return;
+              const wrap = make("div", flow ? "relative mt-5 w-fit" : "relative shrink-0");
 
-              for (const block of sections[index]) {
-                const type = block.type ?? "";
-
-                if (type === "heading" && block.text) {
-                  container.append(
-                    make(
-                      "h2",
-                      "font-display border-ink/10 mt-0 mb-5 border-b pb-2.5 text-2xl font-semibold",
-                      block.text,
-                    ),
-                  );
-                  songHeading = block.text.startsWith("Песня");
-                  continue;
+              const video = document.createElement("video");
+              video.controls = true;
+              video.preload = "metadata";
+              video.src = resolve(block.src);
+              video.setAttribute("playsinline", "");
+              video.className = "bg-ink block h-auto w-auto max-w-full rounded-xl";
+              video.style.maxHeight = "380px";
+              video.style.aspectRatio = "9 / 16";
+              video.addEventListener("loadedmetadata", () => {
+                if (video.videoWidth && video.videoHeight) {
+                  video.style.aspectRatio = `${video.videoWidth} / ${video.videoHeight}`;
                 }
+              });
+              wrap.append(video);
 
-                if (type === "text" && block.text) {
-                  if (songHeading) renderLyrics(block.text);
-                  else if (isBulletList(block.text)) renderList(block.text);
-                  else renderNote(block.text);
-                  songHeading = false;
-                  continue;
-                }
-
-                songHeading = false;
-
-                if (type === "video" && block.src) {
-                  const wrap = make("div", "mt-6");
-                  if (block.title && cleanTitle(block.title)) {
-                    wrap.append(
-                      make(
-                        "span",
-                        "text-ink-mute mb-2 block text-xs font-semibold uppercase tracking-[0.14em]",
-                        cleanTitle(block.title),
-                      ),
-                    );
-                  }
-                  const frame = make("div", "bg-ink rounded-2xl p-1.5 shadow-lift");
-                  const video = document.createElement("video");
-                  video.controls = true;
-                  video.preload = "metadata";
-                  video.src = resolve(block.src);
-                  video.setAttribute("playsinline", "");
-                  video.className = "mx-auto block max-h-[60vh] max-w-full rounded-xl";
-                  frame.append(video);
-                  wrap.append(frame);
-                  container.append(wrap);
-                } else if (type === "audio" && block.src) {
-                  const wrap = make("div", "mt-4");
-                  if (block.title && cleanTitle(block.title)) {
-                    wrap.append(
-                      make("span", "text-ink-soft mb-1.5 block text-sm font-medium", cleanTitle(block.title)),
-                    );
-                  }
-                  const tray = make("div", "bg-surface border-ink/10 rounded-xl border px-4 py-2.5");
-                  const audio = document.createElement("audio");
-                  audio.controls = true;
-                  audio.src = resolve(block.src);
-                  audio.className = "block w-full";
-                  tray.append(audio);
-                  wrap.append(tray);
-                  container.append(wrap);
-                } else if (type === "image" && block.src) {
-                  const img = document.createElement("img");
-                  img.src = resolve(block.src);
-                  img.alt = block.alt ?? "";
-                  img.className = "border-ink/10 mt-4 rounded-xl border";
-                  img.loading = "lazy";
-                  container.append(img);
-                } else if (type === "link" && block.src) {
-                  const a = document.createElement("a");
-                  a.href = block.src;
-                  a.target = "_blank";
-                  a.rel = "noopener noreferrer";
-                  a.className =
-                    "group bg-surface border-ink/10 text-ink hover:border-primary/40 mt-2.5 flex items-center gap-3 rounded-xl border px-4 py-3 text-[16px] transition-colors";
-                  a.append(make("span", "bg-mustard h-2 w-2 shrink-0 rounded-full"));
-                  a.append(make("span", "link-underline", cleanTitle(block.text ?? block.src)));
-                  a.append(make("span", "text-ink-mute group-hover:text-primary-deep ml-auto shrink-0", "↗"));
-                  container.append(a);
-                }
+              const label = cleanTitle(block.title ?? "");
+              if (label) {
+                wrap.append(
+                  make(
+                    "span",
+                    "bg-ink/60 text-sand-50 pointer-events-none absolute left-2 top-2 rounded-full px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide backdrop-blur-sm",
+                    label,
+                  ),
+                );
               }
+
+              parent.append(wrap);
+            };
+
+            const renderAudio = (block: Block, parent: HTMLElement) => {
+              if (!block.src) return;
+              const wrap = make("div", "w-full max-w-sm");
+              const label = cleanTitle(block.title ?? "");
+              if (label) {
+                wrap.append(
+                  make("span", "text-ink-soft mb-1.5 block text-sm font-medium", label),
+                );
+              }
+              const tray = make("div", "bg-surface border-ink/10 rounded-xl border px-3.5 py-2");
+              const audio = document.createElement("audio");
+              audio.controls = true;
+              audio.src = resolve(block.src);
+              audio.className = "block w-full";
+              tray.append(audio);
+              wrap.append(tray);
+              parent.append(wrap);
             };
 
             // Текст песни: центрированные строфы в карточке с орнаментом,
             // первая строка до пустой строки - источник записи.
-            const renderLyrics = (text: string) => {
+            const renderLyrics = (text: string, parent: HTMLElement) => {
               const parts = text.split(/\n[ \t]*\n/);
               const source = parts.length > 1 ? parts[0].trim() : "";
               const body = (source ? parts.slice(1) : parts).join("\n\n");
 
               const figure = make(
                 "figure",
-                "bg-sand-50 border-primary/20 text-ink mt-1 rounded-2xl border px-6 py-8 text-center shadow-card sm:px-10",
+                "bg-sand-50 border-primary/20 text-ink rounded-2xl border px-6 py-7 text-center shadow-card sm:px-8",
               );
 
               const ornament = document.createElement("div");
-              ornament.className = "text-mustard-deep/70 mb-5 flex justify-center";
+              ornament.className = "text-mustard-deep/70 mb-4 flex justify-center";
               ornament.innerHTML =
                 '<svg viewBox="0 0 132 20" class="h-4 w-[132px]" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">' +
                 '<path d="M4 10h40" /><path d="M88 10h40" />' +
@@ -261,7 +216,7 @@ const { course } = Astro.props as { course: Course };
 
               const poem = make(
                 "p",
-                "font-display text-ink text-[17px] leading-[2.05] whitespace-pre-line sm:text-lg",
+                "font-display text-ink whitespace-pre-line text-[16px] leading-[1.95]",
                 body,
               );
 
@@ -271,13 +226,13 @@ const { course } = Astro.props as { course: Course };
                 figure.append(
                   make(
                     "figcaption",
-                    "border-ink/10 text-ink-mute mt-6 border-t pt-3 text-xs italic",
+                    "border-ink/10 text-ink-mute mt-5 border-t pt-3 text-xs italic",
                     source,
                   ),
                 );
               }
 
-              container.append(figure);
+              parent.append(figure);
             };
 
             const dashLine = /^\s*[-–—]\s+/;
@@ -286,7 +241,7 @@ const { course } = Astro.props as { course: Course };
               return lines.length > 0 && lines.every((line) => dashLine.test(line));
             };
 
-            const renderList = (text: string) => {
+            const renderList = (text: string, parent: HTMLElement) => {
               const tray = make(
                 "div",
                 "bg-surface border-ink/10 mt-3 rounded-2xl border px-5 py-4 sm:px-6 sm:py-5",
@@ -305,11 +260,11 @@ const { course } = Astro.props as { course: Course };
                 ul.append(li);
               }
               tray.append(ul);
-              container.append(tray);
+              parent.append(tray);
             };
 
-            const renderNote = (text: string) => {
-              container.append(
+            const renderNote = (text: string, parent: HTMLElement) => {
+              parent.append(
                 make(
                   "p",
                   "bg-mustard prose-body mt-3 rounded-xl px-5 py-4 whitespace-pre-line",
@@ -318,10 +273,83 @@ const { course } = Astro.props as { course: Course };
               );
             };
 
+            const renderLink = (block: Block, parent: HTMLElement) => {
+              if (!block.src) return;
+              const a = document.createElement("a");
+              a.href = block.src;
+              a.target = "_blank";
+              a.rel = "noopener noreferrer";
+              a.className =
+                "group bg-surface border-ink/10 text-ink hover:border-primary/40 mt-2.5 flex items-center gap-3 rounded-xl border px-4 py-3 text-[16px] transition-colors";
+              a.append(make("span", "bg-mustard h-2 w-2 shrink-0 rounded-full"));
+              a.append(make("span", "link-underline", cleanTitle(block.text ?? block.src)));
+              a.append(make("span", "text-ink-mute group-hover:text-primary-deep ml-auto shrink-0", "↗"));
+              parent.append(a);
+            };
+
+            const renderSection = (index: number) => {
+              container.replaceChildren();
+              const section = sections[index];
+              const heading = section.find((block) => block.type === "heading");
+              const rest = section.filter((block) => block !== heading);
+
+              if (heading?.text) {
+                container.append(
+                  make(
+                    "h2",
+                    "font-display border-ink/10 mb-5 border-b pb-2.5 text-2xl font-semibold",
+                    heading.text,
+                  ),
+                );
+              }
+
+              const isSong = (heading?.text ?? "").startsWith("Песня");
+
+              if (isSong) {
+                // Песня: текст слева (прилипает при прокрутке), видео и подголоски справа.
+                const grid = make(
+                  "div",
+                  "grid gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:items-start lg:gap-8",
+                );
+                const lyricsCol = make("div", "lg:sticky lg:top-24");
+                const mediaCol = make("div", "min-w-0");
+                const videos = make("div", "flex flex-wrap content-start items-start gap-3");
+                const audios = make("div", "mt-5 flex flex-col gap-2.5");
+
+                for (const block of rest) {
+                  if (block.type === "text" && block.text) renderLyrics(block.text, lyricsCol);
+                  else if (block.type === "video") renderVideo(block, videos, false);
+                  else if (block.type === "audio") renderAudio(block, audios);
+                  else if (block.type === "link") renderLink(block, mediaCol);
+                }
+
+                if (videos.childElementCount > 0) mediaCol.append(videos);
+                if (audios.childElementCount > 0) mediaCol.append(audios);
+                grid.append(lyricsCol, mediaCol);
+                container.append(grid);
+              } else {
+                // Остальные части - одна колонка по центру.
+                const flow = make("div", "mx-auto w-full max-w-2xl");
+                for (const block of rest) {
+                  if (block.type === "text" && block.text) {
+                    if (isBulletList(block.text)) renderList(block.text, flow);
+                    else renderNote(block.text, flow);
+                  } else if (block.type === "video") {
+                    renderVideo(block, flow, true);
+                  } else if (block.type === "audio") {
+                    renderAudio(block, flow);
+                  } else if (block.type === "link") {
+                    renderLink(block, flow);
+                  }
+                }
+                container.append(flow);
+              }
+            };
+
             // --- Навигация по частям курса ---
 
             const steps = document.createElement("nav");
-            steps.className = "mx-auto mb-5 mt-6 flex max-w-2xl flex-wrap gap-1.5";
+            steps.className = "mx-auto mb-5 mt-6 flex max-w-4xl flex-wrap gap-1.5";
             steps.setAttribute("aria-label", "Части курса");
 
             const chips: HTMLButtonElement[] = [];
@@ -340,7 +368,7 @@ const { course } = Astro.props as { course: Course };
             });
 
             const pager = document.createElement("div");
-            pager.className = "mx-auto mt-9 flex max-w-2xl items-center justify-between gap-4";
+            pager.className = "mx-auto mt-9 flex max-w-4xl items-center justify-between gap-4";
 
             const prev = document.createElement("button");
             prev.type = "button";

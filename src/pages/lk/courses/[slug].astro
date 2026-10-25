@@ -24,12 +24,12 @@ const { course } = Astro.props as { course: Course };
   <div class="mt-5" data-course={course.slug}>
     <span
       data-access-badge
-      class="bg-primary/15 text-primary-deep mb-4 hidden inline-block rounded-full px-3 py-1 text-xs font-medium"
+      class="bg-primary text-sand-50 mb-4 hidden inline-block rounded-full px-3 py-1 text-xs font-medium"
     >
       Доступ открыт
     </span>
 
-    <div data-lock class="border-primary/20 bg-primary/5 rounded-2xl border p-6 sm:p-7">
+    <div data-lock class="border-primary/20 bg-surface rounded-2xl border p-6 sm:p-7">
       <div class="flex items-start gap-3">
         <svg
           viewBox="0 0 24 24"
@@ -62,7 +62,7 @@ const { course } = Astro.props as { course: Course };
       </div>
     </div>
 
-    <div data-content class="mt-8 hidden max-w-2xl"></div>
+    <div data-content class="hidden max-w-2xl mx-auto"></div>
   </div>
 
   <script>
@@ -131,8 +131,115 @@ const { course } = Astro.props as { course: Course };
               return el;
             };
 
+            // Длительность в подписях не нужна - она видна на плеере.
+            const cleanTitle = (title: string) =>
+              title.replace(/\s*·\s*\d{1,2}:\d{2}(?::\d{2})?\s*$/, "");
+
+            // Каждая часть курса (блок с заголовком и всё после него) - отдельная страница.
+            const sections: Block[][] = [];
+            for (const block of blocks) {
+              if (block.type === "heading" && block.text) {
+                sections.push([block]);
+              } else if (sections.length > 0) {
+                sections[sections.length - 1].push(block);
+              } else {
+                sections.push([block]);
+              }
+            }
+
+            const sectionTitle = (index: number) =>
+              sections[index].find((block) => block.type === "heading")?.text ??
+              `Часть ${index + 1}`;
+
+            const renderSection = (index: number) => {
+              container.replaceChildren();
+              let songHeading = false;
+
+              for (const block of sections[index]) {
+                const type = block.type ?? "";
+
+                if (type === "heading" && block.text) {
+                  container.append(
+                    make(
+                      "h2",
+                      "font-display border-ink/10 mt-0 mb-5 border-b pb-2.5 text-2xl font-semibold",
+                      block.text,
+                    ),
+                  );
+                  songHeading = block.text.startsWith("Песня");
+                  continue;
+                }
+
+                if (type === "text" && block.text) {
+                  if (songHeading) renderLyrics(block.text);
+                  else if (isBulletList(block.text)) renderList(block.text);
+                  else renderNote(block.text);
+                  songHeading = false;
+                  continue;
+                }
+
+                songHeading = false;
+
+                if (type === "video" && block.src) {
+                  const wrap = make("div", "mt-6");
+                  if (block.title && cleanTitle(block.title)) {
+                    wrap.append(
+                      make(
+                        "span",
+                        "text-ink-mute mb-2 block text-xs font-semibold uppercase tracking-[0.14em]",
+                        cleanTitle(block.title),
+                      ),
+                    );
+                  }
+                  const frame = make("div", "bg-ink rounded-2xl p-1.5 shadow-lift");
+                  const video = document.createElement("video");
+                  video.controls = true;
+                  video.preload = "metadata";
+                  video.src = resolve(block.src);
+                  video.setAttribute("playsinline", "");
+                  video.className = "mx-auto block max-h-[60vh] max-w-full rounded-xl";
+                  frame.append(video);
+                  wrap.append(frame);
+                  container.append(wrap);
+                } else if (type === "audio" && block.src) {
+                  const wrap = make("div", "mt-4");
+                  if (block.title && cleanTitle(block.title)) {
+                    wrap.append(
+                      make("span", "text-ink-soft mb-1.5 block text-sm font-medium", cleanTitle(block.title)),
+                    );
+                  }
+                  const tray = make("div", "bg-surface border-ink/10 rounded-xl border px-4 py-2.5");
+                  const audio = document.createElement("audio");
+                  audio.controls = true;
+                  audio.src = resolve(block.src);
+                  audio.className = "block w-full";
+                  tray.append(audio);
+                  wrap.append(tray);
+                  container.append(wrap);
+                } else if (type === "image" && block.src) {
+                  const img = document.createElement("img");
+                  img.src = resolve(block.src);
+                  img.alt = block.alt ?? "";
+                  img.className = "border-ink/10 mt-4 rounded-xl border";
+                  img.loading = "lazy";
+                  container.append(img);
+                } else if (type === "link" && block.src) {
+                  const a = document.createElement("a");
+                  a.href = block.src;
+                  a.target = "_blank";
+                  a.rel = "noopener noreferrer";
+                  a.className =
+                    "group bg-surface border-ink/10 text-ink hover:border-primary/40 mt-2.5 flex items-center gap-3 rounded-xl border px-4 py-3 text-[16px] transition-colors";
+                  a.append(make("span", "bg-mustard h-2 w-2 shrink-0 rounded-full"));
+                  a.append(make("span", "link-underline", cleanTitle(block.text ?? block.src)));
+                  a.append(make("span", "text-ink-mute group-hover:text-primary-deep ml-auto shrink-0", "↗"));
+                  container.append(a);
+                }
+              }
+            };
+
             // Текст песни: центрированные строфы в карточке с орнаментом,
-            // первая строка до пустой строки — источник записи.
+            // первая строка до пустой строки - источник записи.
             const renderLyrics = (text: string) => {
               const parts = text.split(/\n[ \t]*\n/);
               const source = parts.length > 1 ? parts[0].trim() : "";
@@ -140,7 +247,7 @@ const { course } = Astro.props as { course: Course };
 
               const figure = make(
                 "figure",
-                "bg-sand-50/80 border-primary/20 text-ink mt-1 rounded-2xl border px-6 py-8 text-center shadow-card sm:px-10",
+                "bg-sand-50 border-primary/20 text-ink mt-1 rounded-2xl border px-6 py-8 text-center shadow-card sm:px-10",
               );
 
               const ornament = document.createElement("div");
@@ -205,93 +312,108 @@ const { course } = Astro.props as { course: Course };
               container.append(
                 make(
                   "p",
-                  "bg-mustard/10 border-mustard/30 prose-body mt-3 rounded-xl border px-5 py-4 whitespace-pre-line",
+                  "bg-mustard prose-body mt-3 rounded-xl px-5 py-4 whitespace-pre-line",
                   text,
                 ),
               );
             };
 
-            let songHeading = false;
+            // --- Навигация по частям курса ---
 
-            for (const block of blocks) {
-              const type = block.type ?? "";
+            const steps = document.createElement("nav");
+            steps.className = "mx-auto mb-5 mt-6 flex max-w-2xl flex-wrap gap-1.5";
+            steps.setAttribute("aria-label", "Части курса");
 
-              if (type === "heading" && block.text) {
-                container.append(
-                  make(
-                    "h2",
-                    "font-display border-ink/10 mt-10 mb-5 border-b pb-2.5 text-2xl font-semibold first:mt-0",
-                    block.text,
-                  ),
-                );
-                songHeading = block.text.startsWith("Песня");
-                continue;
+            const chips: HTMLButtonElement[] = [];
+            sections.forEach((_, index) => {
+              const chip = document.createElement("button");
+              chip.type = "button";
+              chip.className =
+                "border-ink/10 bg-surface text-ink-soft hover:border-primary/40 hover:text-ink h-8 w-8 rounded-full border text-sm font-medium transition-colors";
+              chip.textContent = String(index + 1);
+              chip.title = sectionTitle(index);
+              chip.addEventListener("click", () => {
+                location.hash = `part-${index + 1}`;
+              });
+              chips.push(chip);
+              steps.append(chip);
+            });
+
+            const pager = document.createElement("div");
+            pager.className = "mx-auto mt-9 flex max-w-2xl items-center justify-between gap-4";
+
+            const prev = document.createElement("button");
+            prev.type = "button";
+            prev.className =
+              "border-ink/15 bg-surface text-ink-soft hover:border-ink/30 hover:text-ink rounded-full border px-5 py-2.5 text-sm font-medium transition-colors";
+            prev.textContent = "← Назад";
+
+            const counter = document.createElement("span");
+            counter.className = "text-ink-mute text-center text-sm tabular-nums";
+
+            const next = document.createElement("button");
+            next.type = "button";
+            next.className =
+              "bg-primary text-sand-50 hover:bg-primary-hover rounded-full px-6 py-2.5 text-sm font-medium transition-colors";
+            next.textContent = "Далее →";
+
+            prev.addEventListener("click", () => {
+              location.hash = `part-${currentIndex()}`;
+            });
+            next.addEventListener("click", () => {
+              location.hash = `part-${currentIndex() + 2}`;
+            });
+
+            pager.append(prev, counter, next);
+
+            container.parentElement?.insertBefore(steps, container);
+            container.parentElement?.insertBefore(pager, container.nextSibling);
+
+            const currentIndex = () => {
+              const match = location.hash.match(/^#part-(\d+)$/);
+              const value = match ? Number(match[1]) : 1;
+              return Math.min(Math.max(value, 1), sections.length) - 1;
+            };
+
+            const render = () => {
+              const index = currentIndex();
+              renderSection(index);
+
+              chips.forEach((chip, chipIndex) => {
+                const active = chipIndex === index;
+                chip.className = active
+                  ? "bg-primary border-primary text-sand-50 h-8 w-8 rounded-full border text-sm font-medium"
+                  : "border-ink/10 bg-surface text-ink-soft hover:border-primary/40 hover:text-ink h-8 w-8 rounded-full border text-sm font-medium transition-colors";
+                chip.setAttribute("aria-current", active ? "step" : "false");
+              });
+
+              counter.textContent = `Часть ${index + 1} из ${sections.length}`;
+
+              const atStart = index === 0;
+              const atEnd = index === sections.length - 1;
+              prev.toggleAttribute("disabled", atStart);
+              next.toggleAttribute("disabled", atEnd);
+              prev.classList.toggle("pointer-events-none", atStart);
+              prev.classList.toggle("opacity-40", atStart);
+              next.classList.toggle("pointer-events-none", atEnd);
+              next.classList.toggle("opacity-40", atEnd);
+            };
+
+            window.addEventListener("hashchange", () => {
+              render();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+
+            document.addEventListener("keydown", (event) => {
+              if (event.target !== document.body) return;
+              if (event.key === "ArrowRight" && currentIndex() < sections.length - 1) {
+                location.hash = `part-${currentIndex() + 2}`;
+              } else if (event.key === "ArrowLeft" && currentIndex() > 0) {
+                location.hash = `part-${currentIndex()}`;
               }
+            });
 
-              if (type === "text" && block.text) {
-                if (songHeading) renderLyrics(block.text);
-                else if (isBulletList(block.text)) renderList(block.text);
-                else renderNote(block.text);
-                songHeading = false;
-                continue;
-              }
-
-              songHeading = false;
-
-              if (type === "video" && block.src) {
-                const wrap = make("div", "mt-6 max-w-xl");
-                if (block.title) {
-                  wrap.append(
-                    make(
-                      "span",
-                      "text-ink-mute mb-2 block text-xs font-semibold uppercase tracking-[0.14em]",
-                      block.title,
-                    ),
-                  );
-                }
-                const frame = make("div", "bg-ink rounded-2xl p-1.5 shadow-lift");
-                const video = document.createElement("video");
-                video.controls = true;
-                video.preload = "metadata";
-                video.src = resolve(block.src);
-                video.setAttribute("playsinline", "");
-                video.className = "mx-auto block max-h-[60vh] max-w-full rounded-xl";
-                frame.append(video);
-                wrap.append(frame);
-                container.append(wrap);
-              } else if (type === "audio" && block.src) {
-                const wrap = make("div", "mt-4 max-w-xl");
-                if (block.title) {
-                  wrap.append(make("span", "text-ink-soft mb-1.5 block text-sm font-medium", block.title));
-                }
-                const tray = make("div", "bg-surface border-ink/10 rounded-xl border px-4 py-2.5");
-                const audio = document.createElement("audio");
-                audio.controls = true;
-                audio.src = resolve(block.src);
-                audio.className = "block w-full";
-                tray.append(audio);
-                wrap.append(tray);
-                container.append(wrap);
-              } else if (type === "image" && block.src) {
-                const img = document.createElement("img");
-                img.src = resolve(block.src);
-                img.alt = block.alt ?? "";
-                img.className = "border-ink/10 mt-4 rounded-xl border";
-                img.loading = "lazy";
-                container.append(img);
-              } else if (type === "link" && block.src) {
-                const a = document.createElement("a");
-                a.href = block.src;
-                a.target = "_blank";
-                a.rel = "noopener noreferrer";
-                a.className =
-                  "group bg-surface border-ink/10 text-ink hover:border-primary/40 mt-2.5 flex items-center gap-3 rounded-xl border px-4 py-3 text-[16px] transition-colors";
-                a.append(make("span", "bg-mustard h-2 w-2 shrink-0 rounded-full"));
-                a.append(make("span", "link-underline", block.text ?? block.src));
-                a.append(make("span", "text-ink-mute group-hover:text-primary-deep ml-auto shrink-0", "↗"));
-                container.append(a);
-              }
-            }
+            render();
           })
           .catch(() => {});
       }

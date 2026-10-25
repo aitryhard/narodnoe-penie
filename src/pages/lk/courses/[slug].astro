@@ -140,57 +140,113 @@ const { course } = Astro.props as { course: Course };
               sections[index].find((block) => block.type === "heading")?.text ??
               `Часть ${index + 1}`;
 
-            // Видео в натуральных пропорциях: без тёмной рамки и пустых полос по бокам.
-            const renderVideo = (block: Block, parent: HTMLElement, flow: boolean) => {
-              if (!block.src) return;
-              const wrap = make("div", flow ? "relative mt-5 w-fit" : "relative shrink-0");
-
+            // Вертикальное видео - в натуральных пропорциях, без тёмной рамки и полос.
+            const createVideoEl = (block: Block, maxHeight: number) => {
               const video = document.createElement("video");
               video.controls = true;
               video.preload = "metadata";
-              video.src = resolve(block.src);
+              video.src = resolve(block.src ?? "");
               video.setAttribute("playsinline", "");
-              video.className = "bg-ink block h-auto w-auto max-w-full rounded-xl";
-              video.style.maxHeight = "380px";
+              video.className = "bg-ink block h-auto w-auto max-w-full rounded-xl shadow-card";
+              video.style.maxHeight = `${maxHeight}px`;
               video.style.aspectRatio = "9 / 16";
               video.addEventListener("loadedmetadata", () => {
                 if (video.videoWidth && video.videoHeight) {
                   video.style.aspectRatio = `${video.videoWidth} / ${video.videoHeight}`;
                 }
               });
-              wrap.append(video);
-
-              const label = cleanTitle(block.title ?? "");
-              if (label) {
-                wrap.append(
-                  make(
-                    "span",
-                    "bg-ink/60 text-sand-50 pointer-events-none absolute left-2 top-2 rounded-full px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide backdrop-blur-sm",
-                    label,
-                  ),
-                );
-              }
-
-              parent.append(wrap);
+              return video;
             };
 
-            const renderAudio = (block: Block, parent: HTMLElement) => {
-              if (!block.src) return;
-              const wrap = make("div", "w-full max-w-sm");
-              const label = cleanTitle(block.title ?? "");
-              if (label) {
-                wrap.append(
-                  make("span", "text-ink-soft mb-1.5 block text-sm font-medium", label),
+            // Список видео: переключение плеера по клику.
+            const createPlaylist = (videos: Block[], player: HTMLVideoElement) => {
+              const list = make(
+                "div",
+                "bg-surface border-ink/10 divide-ink/5 divide-y rounded-2xl border p-1.5 shadow-card",
+              );
+              const rows: { row: HTMLButtonElement; badge: HTMLElement }[] = [];
+
+              const apply = (activeIndex: number) => {
+                rows.forEach(({ row, badge }, index) => {
+                  const active = index === activeIndex;
+                  row.className = active
+                    ? "bg-primary/10 text-primary-deep flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-sm font-medium"
+                    : "text-ink-soft hover:bg-sand-50 flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-sm transition-colors";
+                  badge.className = active
+                    ? "bg-primary text-sand-50 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold"
+                    : "bg-ink/5 text-ink-mute flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold";
+                });
+              };
+
+              videos.forEach((block, index) => {
+                const row = document.createElement("button");
+                row.type = "button";
+                const badge = make("span", "", String(index + 1));
+                const label = make(
+                  "span",
+                  "min-w-0 flex-1 truncate",
+                  cleanTitle(block.title ?? `Видео ${index + 1}`),
                 );
+                const icon = make("span", "text-ink-mute/50 text-[10px]", "▶");
+                row.append(badge, label, icon);
+                row.addEventListener("click", () => {
+                  if (!block.src) return;
+                  player.src = resolve(block.src);
+                  void player.play().catch(() => {});
+                  apply(index);
+                });
+                rows.push({ row, badge });
+                list.append(row);
+              });
+
+              apply(0);
+              return list;
+            };
+
+            // Подголоски: компактная карточка с плеерами.
+            const createAudioCard = (audios: Block[]) => {
+              const card = make("div", "bg-surface border-ink/10 rounded-2xl border p-3.5 shadow-card");
+              card.append(
+                make(
+                  "p",
+                  "text-ink-mute mb-2.5 text-[11px] font-semibold uppercase tracking-[0.14em]",
+                  "Подголоски",
+                ),
+              );
+              const stack = make("div", "space-y-3");
+              for (const block of audios) {
+                if (!block.src) continue;
+                const item = document.createElement("div");
+                const label = cleanTitle(block.title ?? "")
+                  .replace(/^Подголосок:\s*/i, "")
+                  .replace(/^./, (char) => char.toUpperCase());
+                if (label) item.append(make("p", "text-ink-soft mb-1 text-xs font-medium", label));
+                const audio = document.createElement("audio");
+                audio.controls = true;
+                audio.src = resolve(block.src);
+                audio.className = "block w-full";
+                item.append(audio);
+                stack.append(item);
               }
-              const tray = make("div", "bg-surface border-ink/10 rounded-xl border px-3.5 py-2");
-              const audio = document.createElement("audio");
-              audio.controls = true;
-              audio.src = resolve(block.src);
-              audio.className = "block w-full";
-              tray.append(audio);
-              wrap.append(tray);
-              parent.append(wrap);
+              card.append(stack);
+              return card;
+            };
+
+            // Плеер + список видео + подголоски.
+            const renderMedia = (videos: Block[], audios: Block[], parent: HTMLElement) => {
+              const widget = make("div", "flex flex-col gap-4 sm:flex-row sm:items-start");
+
+              const stage = make("div", "shrink-0");
+              const player = videos.length > 0 ? createVideoEl(videos[0], 440) : null;
+              if (player) stage.append(player);
+              widget.append(stage);
+
+              const side = make("div", "flex min-w-0 flex-1 flex-col gap-3");
+              if (player && videos.length > 1) side.append(createPlaylist(videos, player));
+              if (audios.length > 0) side.append(createAudioCard(audios));
+              if (side.childElementCount > 0) widget.append(side);
+
+              parent.append(widget);
             };
 
             // Текст песни: центрированные строфы в карточке с орнаментом,
@@ -244,7 +300,7 @@ const { course } = Astro.props as { course: Course };
             const renderList = (text: string, parent: HTMLElement) => {
               const tray = make(
                 "div",
-                "bg-surface border-ink/10 mt-3 rounded-2xl border px-5 py-4 sm:px-6 sm:py-5",
+                "bg-surface border-ink/10 rounded-2xl border px-5 py-4 shadow-card sm:px-6 sm:py-5",
               );
               const ul = document.createElement("ul");
               ul.className = "space-y-2";
@@ -253,7 +309,7 @@ const { course } = Astro.props as { course: Course };
                 if (!item) continue;
                 const li = make(
                   "li",
-                  "text-ink-soft flex items-start gap-2.5 text-[16px] leading-relaxed",
+                  "text-ink-soft flex items-start gap-2.5 text-[15px] leading-relaxed",
                 );
                 li.append(make("span", "bg-mustard mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full"));
                 li.append(make("span", "", item));
@@ -267,24 +323,23 @@ const { course } = Astro.props as { course: Course };
               parent.append(
                 make(
                   "p",
-                  "bg-mustard prose-body mt-3 rounded-xl px-5 py-4 whitespace-pre-line",
+                  "bg-surface border-mustard/50 prose-body rounded-2xl border px-6 py-5 whitespace-pre-line shadow-card",
                   text,
                 ),
               );
             };
 
-            const renderLink = (block: Block, parent: HTMLElement) => {
-              if (!block.src) return;
+            const createLink = (block: Block) => {
               const a = document.createElement("a");
-              a.href = block.src;
+              a.href = block.src ?? "#";
               a.target = "_blank";
               a.rel = "noopener noreferrer";
               a.className =
-                "group bg-surface border-ink/10 text-ink hover:border-primary/40 mt-2.5 flex items-center gap-3 rounded-xl border px-4 py-3 text-[16px] transition-colors";
-              a.append(make("span", "bg-mustard h-2 w-2 shrink-0 rounded-full"));
-              a.append(make("span", "link-underline", cleanTitle(block.text ?? block.src)));
-              a.append(make("span", "text-ink-mute group-hover:text-primary-deep ml-auto shrink-0", "↗"));
-              parent.append(a);
+                "group bg-surface border-ink/10 text-ink hover:border-primary/40 flex items-center gap-2.5 rounded-xl border px-4 py-3 text-[15px] transition-colors";
+              a.append(make("span", "bg-mustard h-1.5 w-1.5 shrink-0 rounded-full"));
+              a.append(make("span", "min-w-0 flex-1", cleanTitle(block.text ?? block.src ?? "")));
+              a.append(make("span", "text-ink-mute group-hover:text-primary-deep shrink-0", "↗"));
+              return a;
             };
 
             const renderSection = (index: number) => {
@@ -303,46 +358,66 @@ const { course } = Astro.props as { course: Course };
                 );
               }
 
+              const videos = rest.filter((block) => block.type === "video" && block.src);
+              const audios = rest.filter((block) => block.type === "audio" && block.src);
+              const texts = rest.filter((block) => block.type === "text" && block.text);
+              const links = rest.filter((block) => block.type === "link" && block.src);
               const isSong = (heading?.text ?? "").startsWith("Песня");
 
               if (isSong) {
-                // Песня: текст слева (прилипает при прокрутке), видео и подголоски справа.
+                // Песня: текст слева (прилипает), плеер со списком видео справа.
                 const grid = make(
                   "div",
-                  "grid gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:items-start lg:gap-8",
+                  "grid gap-6 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:items-start lg:gap-8",
                 );
                 const lyricsCol = make("div", "lg:sticky lg:top-24");
+                for (const block of texts) renderLyrics(block.text ?? "", lyricsCol);
+
                 const mediaCol = make("div", "min-w-0");
-                const videos = make("div", "flex flex-wrap content-start items-start gap-3");
-                const audios = make("div", "mt-5 flex flex-col gap-2.5");
+                renderMedia(videos, audios, mediaCol);
 
-                for (const block of rest) {
-                  if (block.type === "text" && block.text) renderLyrics(block.text, lyricsCol);
-                  else if (block.type === "video") renderVideo(block, videos, false);
-                  else if (block.type === "audio") renderAudio(block, audios);
-                  else if (block.type === "link") renderLink(block, mediaCol);
-                }
-
-                if (videos.childElementCount > 0) mediaCol.append(videos);
-                if (audios.childElementCount > 0) mediaCol.append(audios);
                 grid.append(lyricsCol, mediaCol);
                 container.append(grid);
-              } else {
-                // Остальные части - одна колонка по центру.
-                const flow = make("div", "mx-auto w-full max-w-2xl");
-                for (const block of rest) {
-                  if (block.type === "text" && block.text) {
-                    if (isBulletList(block.text)) renderList(block.text, flow);
-                    else renderNote(block.text, flow);
-                  } else if (block.type === "video") {
-                    renderVideo(block, flow, true);
-                  } else if (block.type === "audio") {
-                    renderAudio(block, flow);
-                  } else if (block.type === "link") {
-                    renderLink(block, flow);
-                  }
+              } else if (videos.length > 0 && texts.length > 0) {
+                // Беседа: видео рядом со списком тем.
+                const grid = make(
+                  "div",
+                  "mx-auto grid w-full max-w-3xl items-start gap-6 lg:grid-cols-[auto_minmax(0,1fr)]",
+                );
+                const stage = make("div", "");
+                stage.append(createVideoEl(videos[0], 420));
+                const textCol = make("div", "space-y-3");
+                for (const block of texts) {
+                  const text = block.text ?? "";
+                  if (isBulletList(text)) renderList(text, textCol);
+                  else renderNote(text, textCol);
                 }
-                container.append(flow);
+                grid.append(stage, textCol);
+                container.append(grid);
+              } else {
+                // Вступление, завершение, приложения.
+                const flow = make("div", "mx-auto w-full max-w-2xl space-y-3");
+                for (const block of texts) {
+                  const text = block.text ?? "";
+                  if (isBulletList(text)) renderList(text, flow);
+                  else renderNote(text, flow);
+                }
+                if (videos.length > 0) {
+                  const stage = make("div", "mx-auto w-fit");
+                  stage.append(createVideoEl(videos[0], 460));
+                  flow.append(stage);
+                }
+                if (links.length > 0) {
+                  const gridLinks = make(
+                    "div",
+                    "mx-auto grid w-full max-w-3xl gap-2 pt-1 sm:grid-cols-2",
+                  );
+                  for (const block of links) gridLinks.append(createLink(block));
+                  container.append(flow);
+                  container.append(gridLinks);
+                } else {
+                  container.append(flow);
+                }
               }
             };
 

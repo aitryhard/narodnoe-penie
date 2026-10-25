@@ -95,11 +95,11 @@ const { course } = Astro.props as { course: Course };
       </details>
 
       <!-- Уроки: боковая панель на десктопе -->
-      <aside class="border-ink/10 sticky top-24 hidden w-56 shrink-0 lg:block">
+      <aside class="sticky top-24 hidden w-56 shrink-0 lg:block">
         <p class="text-ink-mute mb-2 text-[11px] font-semibold uppercase tracking-[0.16em]">
           Уроки курса
         </p>
-        <div data-lessons-list></div>
+        <div data-lessons-list class="border-ink/10 bg-surface rounded-2xl border p-1.5"></div>
       </aside>
 
       <div class="min-w-0 flex-1">
@@ -109,11 +109,15 @@ const { course } = Astro.props as { course: Course };
         >
         </h2>
 
-        <div class="grid gap-6 lg:grid-cols-[auto_minmax(0,1fr)] lg:items-start lg:gap-7">
+        <div class="grid gap-6 lg:grid-cols-[auto_minmax(340px,1fr)] lg:items-start lg:gap-7">
           <!-- Видео -->
           <div class="mx-auto w-fit lg:mx-0">
             <div data-video-stack class="grid"></div>
-            <div data-video-switch class="mt-3 flex flex-wrap justify-center gap-1.5"></div>
+            <div
+              data-video-switch
+              class="mt-3 flex flex-wrap justify-center gap-1.5 lg:justify-start"
+            >
+            </div>
             <p data-video-error hidden class="border-ink/10 bg-surface mt-3 rounded-xl border px-3 py-2 text-sm">
               Не удалось загрузить видео. Попробуйте обновить страницу.
             </p>
@@ -263,7 +267,7 @@ const { course } = Astro.props as { course: Course };
             }
 
             const lessonTitle = (index: number) =>
-              lessons[index]?.title ?? `Урок ${index + 1}`;
+              plainTitle(lessons[index]?.title ?? `Урок ${index + 1}`);
 
             // --- Вспомогательные построители ---
             const el = <K extends keyof HTMLElementTagNameMap>(
@@ -286,6 +290,9 @@ const { course } = Astro.props as { course: Course };
             const cleanTitle = (title: string) =>
               title.replace(/\s*·\s*\d{1,2}:\d{2}(?::\d{2})?\s*$/, "");
 
+            // Нумерация в названии дублирует номер в списке уроков - убираем.
+            const plainTitle = (title: string) => title.replace(/^\s*\d+\.\s*/, "");
+
             // --- Список уроков (две копии: десктоп и мобильный) ---
             const lessonButtons: { button: HTMLButtonElement; lessonIndex: number }[] = [];
 
@@ -300,7 +307,7 @@ const { course } = Astro.props as { course: Course };
                   "font-display text-ink-mute w-5 shrink-0 text-[13px] tabular-nums",
                   String(index + 1).padStart(2, "0"),
                 );
-                const title = el("span", "min-w-0 break-words", lesson.title);
+                const title = el("span", "min-w-0 break-words", plainTitle(lesson.title));
                 button.append(number, title);
                 button.addEventListener("click", () => {
                   location.hash = `part-${index + 1}`;
@@ -540,11 +547,10 @@ const { course } = Astro.props as { course: Course };
 
             const setVideo = (index: number) => {
               lessonVideos.forEach((video, videoIndex) => {
-                if (videoIndex === index) video.removeAttribute("hidden");
-                else {
-                  video.setAttribute("hidden", "");
-                  if (!video.paused) video.pause();
-                }
+                const isActive = videoIndex === index;
+                // Инлайн-стиль: атрибут hidden перебивается классом block в CSS.
+                video.style.display = isActive ? "" : "none";
+                if (!isActive && !video.paused) video.pause();
               });
               if (videoSwitch) {
                 Array.from(videoSwitch.children).forEach((chip, chipIndex) => {
@@ -552,8 +558,8 @@ const { course } = Astro.props as { course: Course };
                   const isActive = chipIndex === index;
                   button.setAttribute("aria-pressed", String(isActive));
                   button.className = isActive
-                    ? "bg-primary text-sand-50 rounded-lg border border-primary px-3 py-1.5 text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-                    : "border-ink/10 bg-surface text-ink-soft hover:border-primary/40 rounded-lg border px-3 py-1.5 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40";
+                    ? "bg-primary text-sand-50 rounded-lg border border-primary px-2.5 py-1 text-[11px] font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                    : "border-ink/10 bg-surface text-ink-soft hover:border-primary/40 rounded-lg border px-2.5 py-1 text-[11px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40";
                 });
               }
             };
@@ -636,9 +642,9 @@ const { course } = Astro.props as { course: Course };
               const lesson = lessons[index];
               if (!lesson) return;
 
-              if (titleEl) titleEl.textContent = lesson.title;
+              if (titleEl) titleEl.textContent = plainTitle(lesson.title);
               if (summary) {
-                summary.textContent = `Урок ${index + 1} из ${lessons.length}: ${lesson.title}`;
+                summary.textContent = `Урок ${index + 1} из ${lessons.length}: ${plainTitle(lesson.title)}`;
               }
 
               lessonButtons.forEach(({ button, lessonIndex }) => {

@@ -21,85 +21,48 @@ const { course } = Astro.props as { course: Course };
     <span class="text-ink-soft">{course.title}</span>
   </nav>
 
-  <div class="mt-6 grid gap-5 lg:grid-cols-3" data-course={course.slug}>
-    <article class="card bg-surface p-7 lg:col-span-2 sm:p-9">
-      <div class="flex flex-wrap items-center gap-2.5">
-        <span class="bg-ink/5 text-ink-soft inline-block rounded-full px-3 py-1 text-xs font-medium">
-          {course.duration}
-        </span>
-        <span
-          data-access-badge
-          class="bg-mustard/30 text-mustard-deep inline-block rounded-full px-3 py-1 text-xs font-medium"
+  <div class="mt-5" data-course={course.slug}>
+    <span
+      data-access-badge
+      class="bg-primary/15 text-primary-deep mb-4 hidden inline-block rounded-full px-3 py-1 text-xs font-medium"
+    >
+      Доступ открыт
+    </span>
+
+    <div data-lock class="border-primary/20 bg-primary/5 rounded-2xl border p-6 sm:p-7">
+      <div class="flex items-start gap-3">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.75"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="text-primary-deep mt-0.5 h-5 w-5 shrink-0"
+          aria-hidden="true"
         >
-          Доступ закрыт
-        </span>
-      </div>
-
-      <h2 class="mt-5 text-2xl sm:text-3xl">{course.title}</h2>
-      <p class="prose-body mt-3 text-pretty">{course.description}</p>
-
-      <div data-lock class="border-primary/20 bg-primary/5 mt-9 rounded-2xl border p-6">
-        <div class="flex items-start gap-3">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.75"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="text-primary-deep mt-0.5 h-5 w-5 shrink-0"
-            aria-hidden="true"
-          >
-            <rect x="3" y="11" width="18" height="11" rx="2" />
-            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-          </svg>
-          <div>
-            <p class="font-medium">Материалы закрыты</p>
-            <p class="prose-body mt-1.5 text-pretty">
-              Купите курс, чтобы открыть тексты, аудио и видеоразборы. Доступ
-              остаётся навсегда.
-            </p>
-            <div class="mt-5 flex flex-wrap gap-2.5">
-              <Button href={withBase(`/kursy/${course.slug}`)} variant="mustard" size="sm">
-                Купить курс
-              </Button>
-              <Button href={withBase("/lk")} variant="ghost" size="sm">
-                Личный кабинет
-              </Button>
-            </div>
+          <rect x="3" y="11" width="18" height="11" rx="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </svg>
+        <div>
+          <p class="font-medium">Материалы закрыты</p>
+          <p class="prose-body mt-1.5 text-pretty">
+            Купите курс, чтобы открыть тексты, аудио и видеоразборы. Доступ
+            остаётся навсегда.
+          </p>
+          <div class="mt-5 flex flex-wrap gap-2.5">
+            <Button href={withBase(`/kursy/${course.slug}`)} variant="mustard" size="sm">
+              Купить курс
+            </Button>
+            <Button href={withBase("/lk")} variant="ghost" size="sm">
+              Личный кабинет
+            </Button>
           </div>
         </div>
       </div>
-    </article>
+    </div>
 
-    <aside class="card bg-sand-50 p-7">
-      <p class="text-ink-mute text-xs font-medium uppercase tracking-[0.14em]">О курсе</p>
-      <dl class="mt-5 space-y-4 text-sm">
-        <div>
-          <dt class="text-ink-mute">Длительность</dt>
-          <dd class="text-ink mt-0.5 text-[16px] font-medium">{course.duration}</dd>
-        </div>
-        <div>
-          <dt class="text-ink-mute">Стоимость</dt>
-          <dd class="font-display text-ink mt-0.5 text-lg font-semibold">{course.price}</dd>
-        </div>
-        <div>
-          <dt class="text-ink-mute">Что внутри</dt>
-          <dd class="mt-2">
-            <ul class="space-y-1.5">
-              {
-                course.highlights.map((item) => (
-                  <li class="text-ink-soft flex items-start gap-2 text-[16px]">
-                    <span class="bg-primary/40 mt-2 h-1.5 w-1.5 shrink-0 rounded-full" />
-                    {item}
-                  </li>
-                ))
-              }
-            </ul>
-          </dd>
-        </div>
-      </dl>
-    </aside>
+    <div data-content class="mt-8 hidden max-w-2xl"></div>
   </div>
 
   <script>
@@ -129,103 +92,206 @@ const { course } = Astro.props as { course: Course };
           .then((data) => {
             if (!data?.access) return;
 
-            const badge = document.querySelector<HTMLElement>("[data-access-badge]");
-            if (badge) {
-              badge.textContent = "Доступ открыт";
-              badge.classList.remove("bg-mustard/30", "text-mustard-deep");
-              badge.classList.add("bg-primary/15", "text-primary-deep");
-            }
-
+            document.querySelector<HTMLElement>("[data-access-badge]")?.classList.remove("hidden");
             const lock = document.querySelector<HTMLElement>("[data-lock]");
-            if (!lock) return;
-
-            const box = document.createElement("div");
-            box.className = "border-primary/20 bg-primary/5 mt-9 rounded-2xl border p-6 sm:p-7";
+            const container = document.querySelector<HTMLElement>("[data-content]");
+            if (!container) return;
+            lock?.classList.add("hidden");
+            container.classList.remove("hidden");
 
             const blocks = data.content?.blocks ?? [];
 
             if (blocks.length === 0) {
-              const ok = document.createElement("p");
-              ok.className = "font-medium";
-              ok.textContent = "Доступ открыт";
+              const box = document.createElement("div");
+              box.className = "border-ink/10 bg-surface rounded-2xl border p-6";
+              const title = document.createElement("p");
+              title.className = "font-medium";
+              title.textContent = "Доступ открыт";
               const soon = document.createElement("p");
               soon.className = "prose-body mt-1.5 text-pretty";
-              soon.textContent = "Материалы курса скоро появятся - мы их готовим.";
-              box.append(ok, soon);
-            } else {
-              const resolve = (src: string) =>
-                /^(https?:)?\/\//.test(src) || src.startsWith("/")
-                  ? src
-                  : `${API_BASE}/api/content/courses/${slug}/${src}`;
-
-              for (const block of blocks) {
-                const type = block.type ?? "";
-                if (type === "heading" && block.text) {
-                  const el = document.createElement("h3");
-                  el.className = "font-display mt-7 first:mt-0 text-xl font-semibold";
-                  el.textContent = block.text;
-                  box.append(el);
-                } else if (type === "text" && block.text) {
-                  const el = document.createElement("p");
-                  el.className = "prose-body mt-3 whitespace-pre-line text-pretty";
-                  el.textContent = block.text;
-                  box.append(el);
-                } else if (type === "audio" && block.src) {
-                  const wrap = document.createElement("div");
-                  wrap.className = "mt-4";
-                  if (block.title) {
-                    const t = document.createElement("p");
-                    t.className = "mb-1.5 text-sm font-medium";
-                    t.textContent = block.title;
-                    wrap.append(t);
-                  }
-                  const audio = document.createElement("audio");
-                  audio.controls = true;
-                  audio.src = resolve(block.src);
-                  audio.className = "w-full";
-                  wrap.append(audio);
-                  box.append(wrap);
-                } else if (type === "video" && block.src) {
-                  const wrap = document.createElement("div");
-                  wrap.className = "mt-5";
-                  if (block.title) {
-                    const t = document.createElement("p");
-                    t.className = "mb-2 text-sm font-medium";
-                    t.textContent = block.title;
-                    wrap.append(t);
-                  }
-                  const video = document.createElement("video");
-                  video.controls = true;
-                  video.src = resolve(block.src);
-                  video.className = "w-full rounded-xl";
-                  video.preload = "metadata";
-                  wrap.append(video);
-                  box.append(wrap);
-                } else if (type === "image" && block.src) {
-                  const img = document.createElement("img");
-                  img.src = resolve(block.src);
-                  img.alt = block.alt ?? "";
-                  img.className = "mt-4 w-full rounded-xl";
-                  img.loading = "lazy";
-                  box.append(img);
-                } else if (type === "link" && block.src) {
-                  const a = document.createElement("a");
-                  a.href = block.src;
-                  a.target = "_blank";
-                  a.rel = "noopener noreferrer";
-                  a.className =
-                    "link-underline text-primary-deep mt-2.5 flex items-start gap-2 text-[16px]";
-                  const dot = document.createElement("span");
-                  dot.className = "bg-primary/40 mt-2 h-1.5 w-1.5 shrink-0 rounded-full";
-                  const label = document.createElement("span");
-                  label.textContent = block.text ?? block.src;
-                  a.append(dot, label);
-                  box.append(a);
-                }
-              }
+              soon.textContent = "Материалы курса скоро появятся — мы их готовим.";
+              box.append(title, soon);
+              container.append(box);
+              return;
             }
 
-            lock.replaceWith(box);
+            const resolve = (src: string) =>
+              /^(https?:)?\/\//.test(src) || src.startsWith("/")
+                ? src
+                : `${API_BASE}/api/content/courses/${slug}/${src}`;
+
+            const make = <K extends keyof HTMLElementTagNameMap>(
+              tag: K,
+              className: string,
+              text?: string,
+            ) => {
+              const el = document.createElement(tag);
+              el.className = className;
+              if (text !== undefined) el.textContent = text;
+              return el;
+            };
+
+            // Текст песни: центрированные строфы в карточке с орнаментом,
+            // первая строка до пустой строки — источник записи.
+            const renderLyrics = (text: string) => {
+              const parts = text.split(/\n[ \t]*\n/);
+              const source = parts.length > 1 ? parts[0].trim() : "";
+              const body = (source ? parts.slice(1) : parts).join("\n\n");
+
+              const figure = make(
+                "figure",
+                "bg-sand-50/80 border-primary/20 text-ink mt-1 rounded-2xl border px-6 py-8 text-center shadow-card sm:px-10",
+              );
+
+              const ornament = document.createElement("div");
+              ornament.className = "text-mustard-deep/70 mb-5 flex justify-center";
+              ornament.innerHTML =
+                '<svg viewBox="0 0 132 20" class="h-4 w-[132px]" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">' +
+                '<path d="M4 10h40" /><path d="M88 10h40" />' +
+                '<path d="M66 3c3.8 3.4 3.8 10.6 0 14-3.8-3.4-3.8-10.6 0-14z" />' +
+                '<path d="M59 10c3.4-3.8 10.6-3.8 14 0-3.4 3.8-10.6 3.8-14 0z" />' +
+                '<circle cx="66" cy="10" r="1.7" fill="currentColor" stroke="none" /></svg>';
+
+              const poem = make(
+                "p",
+                "font-display text-ink text-[17px] leading-[2.05] whitespace-pre-line sm:text-lg",
+                body,
+              );
+
+              figure.append(ornament, poem);
+
+              if (source) {
+                figure.append(
+                  make(
+                    "figcaption",
+                    "border-ink/10 text-ink-mute mt-6 border-t pt-3 text-xs italic",
+                    source,
+                  ),
+                );
+              }
+
+              container.append(figure);
+            };
+
+            const dashLine = /^\s*[-–—]\s+/;
+            const isBulletList = (text: string) => {
+              const lines = text.split("\n").map((line) => line.trim()).filter(Boolean);
+              return lines.length > 0 && lines.every((line) => dashLine.test(line));
+            };
+
+            const renderList = (text: string) => {
+              const tray = make(
+                "div",
+                "bg-surface border-ink/10 mt-3 rounded-2xl border px-5 py-4 sm:px-6 sm:py-5",
+              );
+              const ul = document.createElement("ul");
+              ul.className = "space-y-2";
+              for (const line of text.split("\n")) {
+                const item = line.trim().replace(/^[-–—]\s*/, "");
+                if (!item) continue;
+                const li = make(
+                  "li",
+                  "text-ink-soft flex items-start gap-2.5 text-[16px] leading-relaxed",
+                );
+                li.append(make("span", "bg-mustard mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full"));
+                li.append(make("span", "", item));
+                ul.append(li);
+              }
+              tray.append(ul);
+              container.append(tray);
+            };
+
+            const renderNote = (text: string) => {
+              container.append(
+                make(
+                  "p",
+                  "bg-mustard/10 border-mustard/30 prose-body mt-3 rounded-xl border px-5 py-4 whitespace-pre-line",
+                  text,
+                ),
+              );
+            };
+
+            let songHeading = false;
+
+            for (const block of blocks) {
+              const type = block.type ?? "";
+
+              if (type === "heading" && block.text) {
+                container.append(
+                  make(
+                    "h2",
+                    "font-display border-ink/10 mt-10 mb-5 border-b pb-2.5 text-2xl font-semibold first:mt-0",
+                    block.text,
+                  ),
+                );
+                songHeading = block.text.startsWith("Песня");
+                continue;
+              }
+
+              if (type === "text" && block.text) {
+                if (songHeading) renderLyrics(block.text);
+                else if (isBulletList(block.text)) renderList(block.text);
+                else renderNote(block.text);
+                songHeading = false;
+                continue;
+              }
+
+              songHeading = false;
+
+              if (type === "video" && block.src) {
+                const wrap = make("div", "mt-6 max-w-xl");
+                if (block.title) {
+                  wrap.append(
+                    make(
+                      "span",
+                      "text-ink-mute mb-2 block text-xs font-semibold uppercase tracking-[0.14em]",
+                      block.title,
+                    ),
+                  );
+                }
+                const frame = make("div", "bg-ink rounded-2xl p-1.5 shadow-lift");
+                const video = document.createElement("video");
+                video.controls = true;
+                video.preload = "metadata";
+                video.src = resolve(block.src);
+                video.setAttribute("playsinline", "");
+                video.className = "mx-auto block max-h-[60vh] max-w-full rounded-xl";
+                frame.append(video);
+                wrap.append(frame);
+                container.append(wrap);
+              } else if (type === "audio" && block.src) {
+                const wrap = make("div", "mt-4 max-w-xl");
+                if (block.title) {
+                  wrap.append(make("span", "text-ink-soft mb-1.5 block text-sm font-medium", block.title));
+                }
+                const tray = make("div", "bg-surface border-ink/10 rounded-xl border px-4 py-2.5");
+                const audio = document.createElement("audio");
+                audio.controls = true;
+                audio.src = resolve(block.src);
+                audio.className = "block w-full";
+                tray.append(audio);
+                wrap.append(tray);
+                container.append(wrap);
+              } else if (type === "image" && block.src) {
+                const img = document.createElement("img");
+                img.src = resolve(block.src);
+                img.alt = block.alt ?? "";
+                img.className = "border-ink/10 mt-4 rounded-xl border";
+                img.loading = "lazy";
+                container.append(img);
+              } else if (type === "link" && block.src) {
+                const a = document.createElement("a");
+                a.href = block.src;
+                a.target = "_blank";
+                a.rel = "noopener noreferrer";
+                a.className =
+                  "group bg-surface border-ink/10 text-ink hover:border-primary/40 mt-2.5 flex items-center gap-3 rounded-xl border px-4 py-3 text-[16px] transition-colors";
+                a.append(make("span", "bg-mustard h-2 w-2 shrink-0 rounded-full"));
+                a.append(make("span", "link-underline", block.text ?? block.src));
+                a.append(make("span", "text-ink-mute group-hover:text-primary-deep ml-auto shrink-0", "↗"));
+                container.append(a);
+              }
+            }
           })
           .catch(() => {});
       }

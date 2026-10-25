@@ -1,4 +1,4 @@
----
+﻿---
 import LkLayout from "../../../layouts/LkLayout.astro";
 import Button from "../../../components/ui/Button.astro";
 import { withBase } from "../../../utils/base";
@@ -147,7 +147,7 @@ const { course } = Astro.props as { course: Course };
               video.preload = "metadata";
               video.src = resolve(block.src ?? "");
               video.setAttribute("playsinline", "");
-              video.className = "bg-ink block h-auto w-auto max-w-full rounded-xl shadow-card";
+              video.className = "bg-ink mx-auto block h-auto w-auto max-w-full rounded-xl shadow-card";
               video.style.maxHeight = `${maxHeight}px`;
               video.style.aspectRatio = "9 / 16";
               video.addEventListener("loadedmetadata", () => {
@@ -158,8 +158,8 @@ const { course } = Astro.props as { course: Course };
               return video;
             };
 
-            // Список видео: переключение плеера по клику.
-            const createPlaylist = (videos: Block[], player: HTMLVideoElement) => {
+            // Список видео: переключаем видимость готовых плееров - без мигания.
+            const createPlaylist = (videos: Block[], players: HTMLVideoElement[]) => {
               const list = make(
                 "div",
                 "bg-surface border-ink/10 divide-ink/5 divide-y rounded-2xl border p-1.5 shadow-card",
@@ -167,6 +167,14 @@ const { course } = Astro.props as { course: Course };
               const rows: { row: HTMLButtonElement; badge: HTMLElement }[] = [];
 
               const apply = (activeIndex: number) => {
+                players.forEach((video, index) => {
+                  if (index === activeIndex) {
+                    video.classList.remove("hidden");
+                  } else {
+                    video.classList.add("hidden");
+                    if (!video.paused) video.pause();
+                  }
+                });
                 rows.forEach(({ row, badge }, index) => {
                   const active = index === activeIndex;
                   row.className = active
@@ -190,10 +198,8 @@ const { course } = Astro.props as { course: Course };
                 const icon = make("span", "text-ink-mute/50 text-[10px]", "▶");
                 row.append(badge, label, icon);
                 row.addEventListener("click", () => {
-                  if (!block.src) return;
-                  player.src = resolve(block.src);
-                  void player.play().catch(() => {});
                   apply(index);
+                  void players[index].play().catch(() => {});
                 });
                 rows.push({ row, badge });
                 list.append(row);
@@ -236,13 +242,23 @@ const { course } = Astro.props as { course: Course };
             const renderMedia = (videos: Block[], audios: Block[], parent: HTMLElement) => {
               const widget = make("div", "flex flex-col gap-4 sm:flex-row sm:items-start");
 
-              const stage = make("div", "shrink-0");
-              const player = videos.length > 0 ? createVideoEl(videos[0], 440) : null;
-              if (player) stage.append(player);
+              const stage = make("div", "mx-auto w-full max-w-[268px] shrink-0 sm:mx-0");
+              const players: HTMLVideoElement[] = [];
+              if (videos.length > 0) {
+                const stack = make("div", "grid");
+                videos.forEach((block, index) => {
+                  const video = createVideoEl(block, 440);
+                  video.style.gridArea = "1 / 1";
+                  if (index > 0) video.classList.add("hidden");
+                  players.push(video);
+                  stack.append(video);
+                });
+                stage.append(stack);
+              }
               widget.append(stage);
 
               const side = make("div", "flex min-w-0 flex-1 flex-col gap-3");
-              if (player && videos.length > 1) side.append(createPlaylist(videos, player));
+              if (players.length > 1) side.append(createPlaylist(videos, players));
               if (audios.length > 0) side.append(createAudioCard(audios));
               if (side.childElementCount > 0) widget.append(side);
 
@@ -421,29 +437,10 @@ const { course } = Astro.props as { course: Course };
               }
             };
 
-            // --- Навигация по частям курса ---
-
-            const steps = document.createElement("nav");
-            steps.className = "mx-auto mb-5 mt-6 flex max-w-4xl flex-wrap gap-1.5";
-            steps.setAttribute("aria-label", "Части курса");
-
-            const chips: HTMLButtonElement[] = [];
-            sections.forEach((_, index) => {
-              const chip = document.createElement("button");
-              chip.type = "button";
-              chip.className =
-                "border-ink/10 bg-surface text-ink-soft hover:border-primary/40 hover:text-ink h-8 w-8 rounded-full border text-sm font-medium transition-colors";
-              chip.textContent = String(index + 1);
-              chip.title = sectionTitle(index);
-              chip.addEventListener("click", () => {
-                location.hash = `part-${index + 1}`;
-              });
-              chips.push(chip);
-              steps.append(chip);
-            });
+            // --- Навигация по частям курса (внизу страницы) ---
 
             const pager = document.createElement("div");
-            pager.className = "mx-auto mt-9 flex max-w-4xl items-center justify-between gap-4";
+            pager.className = "mx-auto mt-10 flex max-w-4xl items-center justify-between gap-4";
 
             const prev = document.createElement("button");
             prev.type = "button";
@@ -469,8 +466,42 @@ const { course } = Astro.props as { course: Course };
 
             pager.append(prev, counter, next);
 
-            container.parentElement?.insertBefore(steps, container);
-            container.parentElement?.insertBefore(pager, container.nextSibling);
+            // Содержание курса: все части списком, текущая выделена.
+            const toc = make("nav", "mx-auto mt-8 max-w-4xl");
+            toc.setAttribute("aria-label", "Содержание курса");
+            toc.append(
+              make(
+                "p",
+                "text-ink-mute mb-3 text-[11px] font-semibold uppercase tracking-[0.16em]",
+                "Содержание курса",
+              ),
+            );
+
+            const tocGrid = make("div", "grid gap-1.5 sm:grid-cols-2");
+            toc.append(tocGrid);
+
+            const tocItems: { row: HTMLButtonElement; num: HTMLElement; arrow: HTMLElement }[] = [];
+            sections.forEach((_, index) => {
+              const row = document.createElement("button");
+              row.type = "button";
+              const num = make(
+                "span",
+                "font-display text-ink-mute/70 w-6 shrink-0 text-[13px] tabular-nums",
+                String(index + 1).padStart(2, "0"),
+              );
+              const title = make("span", "min-w-0 flex-1 text-left leading-snug", sectionTitle(index));
+              const arrow = make("span", "text-ink-mute/40 shrink-0 text-[13px]", "→");
+              row.append(num, title, arrow);
+              row.addEventListener("click", () => {
+                location.hash = `part-${index + 1}`;
+              });
+              tocItems.push({ row, num, arrow });
+              tocGrid.append(row);
+            });
+
+            const nav = document.createElement("div");
+            nav.append(pager, toc);
+            container.parentElement?.insertBefore(nav, container.nextSibling);
 
             const currentIndex = () => {
               const match = location.hash.match(/^#part-(\d+)$/);
@@ -482,12 +513,18 @@ const { course } = Astro.props as { course: Course };
               const index = currentIndex();
               renderSection(index);
 
-              chips.forEach((chip, chipIndex) => {
-                const active = chipIndex === index;
-                chip.className = active
-                  ? "bg-primary border-primary text-sand-50 h-8 w-8 rounded-full border text-sm font-medium"
-                  : "border-ink/10 bg-surface text-ink-soft hover:border-primary/40 hover:text-ink h-8 w-8 rounded-full border text-sm font-medium transition-colors";
-                chip.setAttribute("aria-current", active ? "step" : "false");
+              tocItems.forEach(({ row, num, arrow }, itemIndex) => {
+                const active = itemIndex === index;
+                row.className = active
+                  ? "border-primary/30 bg-primary/10 text-primary-deep flex items-center gap-3 rounded-xl border px-3.5 py-2.5 text-sm font-medium"
+                  : "border-ink/10 bg-surface text-ink-soft hover:border-primary/40 hover:text-ink flex items-center gap-3 rounded-xl border px-3.5 py-2.5 text-sm transition-colors";
+                num.className = active
+                  ? "font-display text-primary-deep w-6 shrink-0 text-[13px] tabular-nums"
+                  : "font-display text-ink-mute/70 w-6 shrink-0 text-[13px] tabular-nums";
+                arrow.className = active
+                  ? "text-primary-deep shrink-0 text-[13px]"
+                  : "text-ink-mute/40 shrink-0 text-[13px]";
+                row.setAttribute("aria-current", active ? "step" : "false");
               });
 
               counter.textContent = `Часть ${index + 1} из ${sections.length}`;

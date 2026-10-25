@@ -4,13 +4,13 @@ import BaseLayout from "./BaseLayout.astro";
 export interface Props {
   title: string;
   description?: string;
-  /** Страницы авторизации - без кнопки «Выйти». */
-  auth?: boolean;
+  /** Кнопка «Выйти» - только на странице профиля. */
+  logout?: boolean;
   /** Заголовок по центру (страницы авторизации). */
   titleCentered?: boolean;
 }
 
-const { title, description, auth = false, titleCentered = false } = Astro.props;
+const { title, description, logout = false, titleCentered = false } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description}>
@@ -24,7 +24,7 @@ const { title, description, auth = false, titleCentered = false } = Astro.props;
     </div>
 
     {
-      !auth && (
+      logout && (
         <div class="mt-12 flex justify-end">
           <button
             type="button"

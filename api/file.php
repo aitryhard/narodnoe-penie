@@ -44,7 +44,9 @@ if (!($isAdmin || access_has((int) $user['id'], $slug))) {
 // Сессия больше не нужна - снимаем блокировку для параллельных запросов плеера.
 session_write_close();
 
-$file = __DIR__ . '/content/courses/' . $slug . '/' . $subdir . '/' . $fileName;
+// Файлы лежат за пределами веб-директории (narodnoe-penie.ru/media),
+// поэтому прямой доступ к ним невозможен - только через этот скрипт.
+$file = __DIR__ . '/../../media/courses/' . $slug . '/' . $subdir . '/' . $fileName;
 if (!is_file($file) || !is_readable($file)) {
     http_response_code(404);
     exit;

@@ -95,11 +95,11 @@ const { course } = Astro.props as { course: Course };
       </details>
 
       <!-- Уроки: боковая панель на десктопе -->
-      <aside class="sticky top-24 hidden w-56 shrink-0 lg:block">
+      <aside class="sticky top-24 hidden w-52 shrink-0 lg:block">
         <p class="text-ink-mute mb-2 text-[11px] font-semibold uppercase tracking-[0.16em]">
           Уроки курса
         </p>
-        <div data-lessons-list class="border-ink/10 bg-surface rounded-2xl border p-1.5"></div>
+        <div data-lessons-list></div>
       </aside>
 
       <div class="min-w-0 flex-1">
@@ -110,8 +110,8 @@ const { course } = Astro.props as { course: Course };
         </h2>
 
         <div class="grid gap-6 lg:grid-cols-[auto_minmax(340px,1fr)] lg:items-start lg:gap-7">
-          <!-- Видео -->
-          <div class="mx-auto w-fit lg:mx-0">
+          <!-- Видео: ширина блока задаётся в JS из пропорций видео -->
+          <div class="mx-auto max-w-full lg:mx-0" data-video-frame>
             <div data-video-stack class="grid"></div>
             <div
               data-video-switch
@@ -124,7 +124,7 @@ const { course } = Astro.props as { course: Course };
           </div>
 
           <!-- Панель материалов -->
-          <div class="border-ink/10 bg-surface min-w-0 rounded-2xl border">
+          <div data-panel class="border-ink/10 bg-surface min-w-0 rounded-2xl border">
             <div
               class="border-ink/10 flex gap-1 overflow-x-auto border-b px-2 py-2"
               role="tablist"
@@ -301,10 +301,10 @@ const { course } = Astro.props as { course: Course };
                 const button = document.createElement("button");
                 button.type = "button";
                 button.className =
-                  "border-ink/10 text-ink-soft hover:border-primary/40 hover:text-ink mb-1.5 flex w-full items-start gap-2.5 rounded-xl border px-3 py-2.5 text-left text-sm leading-snug transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40";
+                  "text-ink-soft hover:bg-sand-50 hover:text-ink mb-0.5 flex w-full items-start gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm leading-snug transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40";
                 const number = el(
                   "span",
-                  "font-display text-ink-mute w-5 shrink-0 text-[13px] tabular-nums",
+                  "font-display w-5 shrink-0 text-[13px] tabular-nums opacity-70",
                   String(index + 1).padStart(2, "0"),
                 );
                 const title = el("span", "min-w-0 break-words", plainTitle(lesson.title));
@@ -544,14 +544,28 @@ const { course } = Astro.props as { course: Course };
             const videoStack = $<HTMLElement>("[data-video-stack]");
             const videoSwitch = $<HTMLElement>("[data-video-switch]");
             const videoError = $<HTMLElement>("[data-video-error]");
+            const videoFrame = $<HTMLElement>("[data-video-frame]");
+
+            let currentVideoIndex = 0;
+
+            // Ширина блока = высота × пропорция видео: место ровно в размер кадра.
+            const applyFrameWidth = () => {
+              const active = lessonVideos[currentVideoIndex];
+              const ratio = active?.dataset.ratio ? Number(active.dataset.ratio) : 9 / 16;
+              if (videoFrame) {
+                videoFrame.style.width = `calc(min(75vh, 720px) * ${ratio})`;
+              }
+            };
 
             const setVideo = (index: number) => {
+              currentVideoIndex = index;
               lessonVideos.forEach((video, videoIndex) => {
                 const isActive = videoIndex === index;
                 // Инлайн-стиль: атрибут hidden перебивается классом block в CSS.
                 video.style.display = isActive ? "" : "none";
                 if (!isActive && !video.paused) video.pause();
               });
+              applyFrameWidth();
               if (videoSwitch) {
                 Array.from(videoSwitch.children).forEach((chip, chipIndex) => {
                   const button = chip as HTMLButtonElement;
@@ -570,8 +584,18 @@ const { course } = Astro.props as { course: Course };
               videoSwitch.replaceChildren();
               videoError?.setAttribute("hidden", "");
               lessonVideos = [];
+              currentVideoIndex = 0;
+              applyFrameWidth();
 
               const videos = lesson.blocks.filter((block) => block.type === "video" && block.src);
+              const panel = $<HTMLElement>("[data-panel]");
+              if (videos.length === 0) {
+                videoFrame?.setAttribute("hidden", "");
+                panel?.classList.add("lg:col-span-2");
+              } else {
+                videoFrame?.removeAttribute("hidden");
+                panel?.classList.remove("lg:col-span-2");
+              }
               videos.forEach((block, index) => {
                 const video = document.createElement("video");
                 video.controls = true;
@@ -579,13 +603,14 @@ const { course } = Astro.props as { course: Course };
                 video.src = resolve(block.src);
                 video.setAttribute("playsinline", "");
                 // 9/16 до загрузки метаданных, затем фактические пропорции - без обрезки и полос.
-                video.className = "bg-ink block h-auto w-auto max-w-full rounded-xl";
-                video.style.maxHeight = "min(72vh, 640px)";
+                video.className = "bg-ink block h-auto w-full max-w-full rounded-xl";
                 video.style.aspectRatio = "9 / 16";
                 video.setAttribute("aria-label", cleanTitle(block.title ?? `Видео ${index + 1}`));
                 video.addEventListener("loadedmetadata", () => {
                   if (video.videoWidth && video.videoHeight) {
                     video.style.aspectRatio = `${video.videoWidth} / ${video.videoHeight}`;
+                    video.dataset.ratio = String(video.videoWidth / video.videoHeight);
+                    if (index === currentVideoIndex) applyFrameWidth();
                   }
                 });
                 video.addEventListener("error", () => {
@@ -651,8 +676,8 @@ const { course } = Astro.props as { course: Course };
                 const isActive = lessonIndex === index;
                 button.setAttribute("aria-current", isActive ? "true" : "false");
                 button.className = isActive
-                  ? "border-primary/30 bg-primary/10 text-primary-deep mb-1.5 flex w-full items-start gap-2.5 rounded-xl border px-3 py-2.5 text-left text-sm font-medium leading-snug focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-                  : "border-ink/10 text-ink-soft hover:border-primary/40 hover:text-ink mb-1.5 flex w-full items-start gap-2.5 rounded-xl border px-3 py-2.5 text-left text-sm leading-snug transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40";
+                  ? "bg-primary text-sand-50 mb-0.5 flex w-full items-start gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm font-medium leading-snug focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
+                  : "text-ink-soft hover:bg-sand-50 hover:text-ink mb-0.5 flex w-full items-start gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm leading-snug transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40";
               });
 
               renderVideo(lesson);

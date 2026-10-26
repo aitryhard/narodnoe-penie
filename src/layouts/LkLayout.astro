@@ -8,18 +8,28 @@ export interface Props {
   logout?: boolean;
   /** Заголовок по центру (страницы авторизации). */
   titleCentered?: boolean;
+  /** Страница рисует свой заголовок (кроме крошек). */
+  hideTitle?: boolean;
 }
 
-const { title, description, logout = false, titleCentered = false } = Astro.props;
+const {
+  title,
+  description,
+  logout = false,
+  titleCentered = false,
+  hideTitle = false,
+} = Astro.props;
 ---
 
 <BaseLayout title={title} description={description}>
   <div class="wrap py-10 sm:py-14">
-    <div class:list={[titleCentered && "text-center"]}>
-      <h1 class="text-3xl leading-tight sm:text-4xl">{title}</h1>
-    </div>
+    {!hideTitle && (
+      <div class:list={[titleCentered && "text-center"]}>
+        <h1 class="text-3xl leading-tight sm:text-4xl">{title}</h1>
+      </div>
+    )}
 
-    <div class="mt-7">
+    <div class:list={[!hideTitle && "mt-7"]}>
       <slot />
     </div>
 

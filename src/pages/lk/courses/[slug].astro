@@ -364,15 +364,17 @@ const { course } = Astro.props as { course: Course };
                 const keys = ["ArrowLeft", "ArrowRight", "Home", "End"];
                 if (!keys.includes(event.key)) return;
                 event.preventDefault();
-                const index = tabButtons.indexOf(button);
-                let next = index;
-                if (event.key === "ArrowRight") next = (index + 1) % tabButtons.length;
+                const visible = tabButtons.filter((tab) => !tab.hasAttribute("hidden"));
+                if (visible.length === 0) return;
+                const index = visible.indexOf(button);
+                let next = index < 0 ? 0 : index;
+                if (event.key === "ArrowRight") next = (next + 1) % visible.length;
                 else if (event.key === "ArrowLeft")
-                  next = (index - 1 + tabButtons.length) % tabButtons.length;
+                  next = (next - 1 + visible.length) % visible.length;
                 else if (event.key === "Home") next = 0;
-                else if (event.key === "End") next = tabButtons.length - 1;
-                tabButtons[next].focus();
-                setActiveTab(tabButtons[next].dataset.tab as TabName);
+                else if (event.key === "End") next = visible.length - 1;
+                visible[next].focus();
+                setActiveTab(visible[next].dataset.tab as TabName);
               });
             });
 
@@ -527,7 +529,7 @@ const { course } = Astro.props as { course: Course };
                 );
                 return;
               }
-              const list = el("divide-ink/10 divide-y");
+              const list = el("div", "divide-ink/10 divide-y");
               for (const block of links) {
                 const a = document.createElement("a");
                 a.href = block.src;
@@ -689,10 +691,20 @@ const { course } = Astro.props as { course: Course };
 
               renderVideo(lesson);
 
-              // Вкладка по умолчанию: первая с содержимым.
+              // Вкладки по содержимому урока: пустые не показываем.
               const hasText = lesson.blocks.some((block) => block.type === "text");
               const hasAudio = lesson.blocks.some((block) => block.type === "audio");
               const hasLinks = lesson.blocks.some((block) => block.type === "link");
+              const visibility: Record<TabName, boolean> = {
+                text: true,
+                audio: hasAudio,
+                materials: hasLinks,
+              };
+              tabButtons.forEach((button) => {
+                const name = button.dataset.tab as TabName;
+                button.toggleAttribute("hidden", !visibility[name]);
+              });
+
               const defaultTab: TabName = hasText ? "text" : hasAudio ? "audio" : hasLinks ? "materials" : "text";
               setActiveTab(defaultTab);
 

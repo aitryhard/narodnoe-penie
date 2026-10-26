@@ -1,4 +1,5 @@
-# Контент курсов: тексты и структура (JSON) отдаются только через API.
-<FilesMatch "\.json$">
+# Контент курсов: тексты (JSON) и медиафайлы отдаются только через API
+# (course.php / file.php проверяют вход и покупку).
+<FilesMatch "\.(json|mp4|mov|qt|webm|m4a|mp3|ogg|oga|wav|mkv|avi)$">
     Require all denied
 </FilesMatch>

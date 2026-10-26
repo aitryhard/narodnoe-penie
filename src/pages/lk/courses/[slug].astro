@@ -299,10 +299,20 @@ const { course } = Astro.props as { course: Course };
               return node;
             };
 
-            const resolve = (src: string) =>
-              /^(https?:)?\/\//.test(src) || src.startsWith("/")
-                ? src
-                : `${API_BASE}/api/content/courses/${slug}/${src}`;
+            const resolve = (src: string) => {
+              if (/^(https?:)?\/\//.test(src) || src.startsWith("/")) return src;
+              // Медиа отдаётся только через file.php с проверкой входа и покупки.
+              if (/^(video_files|voices)\//.test(src)) {
+                return `${API_BASE}/api/file.php?path=${encodeURIComponent(`${slug}/${src}`)}`;
+              }
+              return `${API_BASE}/api/content/courses/${slug}/${src}`;
+            };
+
+            // Защита от «Сохранить как» и кнопок скачивания в плеерах.
+            const hardenMedia = (media: HTMLMediaElement) => {
+              media.controlsList.add("nodownload");
+              media.addEventListener("contextmenu", (event) => event.preventDefault());
+            };
 
             // Длительность не дублируем в подписях - она видна на плеере.
             const cleanTitle = (title: string) =>
@@ -497,14 +507,9 @@ const { course } = Astro.props as { course: Course };
                 const list = el("div", "space-y-4");
                 for (const block of audios) {
                   const item = el("div", "bg-sand-50 rounded-2xl px-4 py-3");
-                  const header = el("div", "mb-2 flex items-center justify-between gap-3");
+                  const header = el("div", "mb-2 flex items-center gap-3");
                   const label = cleanTitle(block.title ?? "Аудиозапись");
                   header.append(el("p", "text-sm font-medium", label));
-                  const download = el("a", "link-underline text-primary-deep text-xs font-medium");
-                  download.href = resolve(block.src);
-                  download.setAttribute("download", "");
-                  download.textContent = "Скачать";
-                  header.append(download);
                   item.append(header);
                   const audio = document.createElement("audio");
                   audio.controls = true;
@@ -512,6 +517,7 @@ const { course } = Astro.props as { course: Course };
                   audio.src = resolve(block.src);
                   audio.className = "block w-full";
                   audio.setAttribute("aria-label", label);
+                  hardenMedia(audio);
                   const error = el("p", "text-mustard-deep mt-1 hidden text-xs font-medium");
                   error.textContent = "Не удалось загрузить запись.";
                   audio.addEventListener("error", () => error.classList.remove("hidden"));
@@ -623,6 +629,7 @@ const { course } = Astro.props as { course: Course };
                 video.addEventListener("error", () => {
                   videoError?.removeAttribute("hidden");
                 });
+                hardenMedia(video);
                 videoStack.append(video);
                 lessonVideos.push(video);
               });
@@ -731,6 +738,25 @@ const { course } = Astro.props as { course: Course };
                 location.hash = `part-${currentLesson}`;
               }
             });
+
+            // Блокировка «Сохранить как»/девтулзов (косметика - обходится,
+            // но закрывает случайные пути скачивания).
+            document.addEventListener(
+              "keydown",
+              (event) => {
+                const key = event.key.toLowerCase();
+                const mod = event.ctrlKey || event.metaKey;
+                const blocked =
+                  event.key === "F12" ||
+                  (mod && event.shiftKey && ["i", "j", "c", "k"].includes(key)) ||
+                  (mod && !event.shiftKey && ["s", "u"].includes(key));
+                if (blocked) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }
+              },
+              true,
+            );
 
             show("workspace");
             renderLesson(currentIndex());

@@ -20,7 +20,7 @@ const toneClass = {
 <!-- Блок 1. Первый экран -->
 <section class="wrap pt-8 sm:pt-12">
   <div
-    class="lg:relative lg:min-h-[580px] lg:overflow-hidden lg:rounded-3xl lg:border lg:border-ink/10 lg:bg-rose-100 lg:shadow-card"
+    class="lg:relative lg:min-h-[625px] lg:overflow-hidden lg:rounded-3xl lg:bg-rose-100 lg:shadow-card"
   >
     <Photo
       src={withBase(images.hero)}
@@ -99,7 +99,7 @@ const toneClass = {
       courses.map((course) => {
         const cover = images.courses[course.slug];
         return (
-          <article class="flex flex-col overflow-hidden rounded-3xl border border-primary/15 bg-surface shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-lift">
+          <article class="flex flex-col overflow-hidden rounded-3xl bg-surface shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-lift">
             {cover ? (
               <img
                 src={withBase(cover)}
@@ -165,7 +165,7 @@ const toneClass = {
       lessonCards.map((lesson) => {
         const photo = images.formats[lesson.anchor];
         return (
-          <article class="flex flex-col gap-5 rounded-3xl border border-ink/10 bg-surface p-5 sm:flex-row sm:items-start sm:gap-5 sm:p-6">
+          <article class="flex flex-col gap-5 rounded-3xl bg-surface p-5 sm:flex-row sm:items-start sm:gap-5 sm:p-6">
             {photo ? (
               <img
                 src={withBase(photo)}
@@ -221,9 +221,9 @@ const toneClass = {
     <Photo
       src={withBase(images.lessons)}
       alt="Занятие школы: участницы поют в зале"
-      width={952}
-      height={634}
-      class="aspect-[16/10] lg:aspect-[16/9]"
+      width={634}
+      height={952}
+      class="aspect-[4/5]"
       imgClass="object-top"
     />
 
@@ -288,57 +288,26 @@ const toneClass = {
 
   <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <h2 class="text-balance text-2xl sm:text-3xl">Что говорят после занятий</h2>
-    <div class="flex items-center gap-4">
-      <a
-        href={withBase("/otzyvy")}
-        class="link-underline inline-flex min-h-8 shrink-0 items-center text-[16px] text-ink-soft hover:text-ink"
-      >
-        Все отзывы
-      </a>
-      <div class="hidden items-center gap-2.5" data-carousel-controls>
-        <button
-          type="button"
-          data-carousel-prev
-          aria-label="Предыдущий отзыв"
-          class="grid h-10 w-10 place-items-center rounded-full border border-ink/10 bg-surface text-ink-soft shadow-soft transition-all hover:border-ink/20 hover:bg-sand-50 hover:text-ink disabled:pointer-events-none disabled:opacity-40"
-        >
-          <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
-            <path
-              fill-rule="evenodd"
-              d="M12.79 5.23a.75.75 0 0 1-.02 1.06L8.832 10l3.938 3.71a.75.75 0 1 1-1.04 1.08l-4.5-4.25a.75.75 0 0 1 0-1.08l4.5-4.25a.75.75 0 0 1 1.06.02Z"
-              clip-rule="evenodd"
-            ></path>
-          </svg>
-        </button>
-        <button
-          type="button"
-          data-carousel-next
-          aria-label="Следующий отзыв"
-          class="grid h-10 w-10 place-items-center rounded-full border border-ink/10 bg-surface text-ink-soft shadow-soft transition-all hover:border-ink/20 hover:bg-sand-50 hover:text-ink disabled:pointer-events-none disabled:opacity-40"
-        >
-          <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
-            <path
-              fill-rule="evenodd"
-              d="M7.21 14.77a.75.75 0 0 1 .02-1.06L11.168 10 7.23 6.29a.75.75 0 1 1 1.04-1.08l4.5 4.25a.75.75 0 0 1 0 1.08l-4.5 4.25a.75.75 0 0 1-1.06-.02Z"
-              clip-rule="evenodd"
-            ></path>
-          </svg>
-        </button>
-      </div>
-    </div>
+    <a
+      href={withBase("/otzyvy")}
+      class="link-underline inline-flex min-h-8 shrink-0 items-center text-[16px] text-ink-soft hover:text-ink"
+    >
+      Все отзывы
+    </a>
   </div>
 
-  <div
-    class="mt-8 flex snap-x snap-mandatory gap-5 overflow-x-auto overflow-y-hidden overscroll-x-contain pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-    id="home-reviews"
-    role="region"
-    aria-label="Отзывы учениц"
-    tabindex="0"
-  >
+  <div class="relative mt-8">
+    <div
+      class="flex snap-x snap-mandatory gap-5 overflow-x-auto overflow-y-hidden overscroll-x-contain pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      id="home-reviews"
+      role="region"
+      aria-label="Отзывы учениц"
+      tabindex="0"
+    >
     {
       reviews.map((review) => (
         <figure
-          class={`card flex w-[85%] shrink-0 snap-start flex-col p-6 sm:w-[calc((100%-1.25rem)/2)] sm:p-7 lg:w-[calc((100%-2.5rem)/3)] ${review.tone}`}
+          class={`flex w-[85%] shrink-0 snap-start flex-col rounded-3xl p-6 shadow-card sm:w-[calc((100%-1.25rem)/2)] sm:p-7 lg:w-[calc((100%-2.5rem)/3)] ${review.tone}`}
         >
           <svg
             viewBox="0 0 24 24"
@@ -385,6 +354,38 @@ const toneClass = {
         </figure>
       ))
     }
+    </div>
+
+    <div data-carousel-controls class="hidden">
+      <button
+        type="button"
+        data-carousel-prev
+        aria-label="Предыдущий отзыв"
+        class="border-ink/15 bg-surface text-ink-soft hover:border-ink/30 hover:text-ink absolute -left-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border shadow-soft transition-all disabled:pointer-events-none disabled:opacity-40"
+      >
+        <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
+          <path
+            fill-rule="evenodd"
+            d="M12.79 5.23a.75.75 0 0 1-.02 1.06L8.832 10l3.938 3.71a.75.75 0 1 1-1.04 1.08l-4.5-4.25a.75.75 0 0 1 0-1.08l4.5-4.25a.75.75 0 0 1 1.06.02Z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+      </button>
+      <button
+        type="button"
+        data-carousel-next
+        aria-label="Следующий отзыв"
+        class="border-ink/15 bg-surface text-ink-soft hover:border-ink/30 hover:text-ink absolute -right-3 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border shadow-soft transition-all disabled:pointer-events-none disabled:opacity-40"
+      >
+        <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
+          <path
+            fill-rule="evenodd"
+            d="M7.21 14.77a.75.75 0 0 1 .02-1.06L11.168 10 7.23 6.29a.75.75 0 1 1 1.04-1.08l4.5 4.25a.75.75 0 0 1 0 1.08l-4.5 4.25a.75.75 0 0 1-1.06-.02Z"
+            clip-rule="evenodd"
+          ></path>
+        </svg>
+      </button>
+    </div>
   </div>
 
   <script is:inline>
@@ -396,7 +397,7 @@ const toneClass = {
       var prev = controls.querySelector("[data-carousel-prev]");
       var next = controls.querySelector("[data-carousel-next]");
       var reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-      var desktop = window.matchMedia("(min-width: 640px)");
+      var desktop = window.matchMedia("(min-width: 1024px)");
 
       function update() {
         var max = track.scrollWidth - track.clientWidth;
@@ -441,7 +442,7 @@ const toneClass = {
 <!-- Блок 8. Завершение страницы -->
 <section class="wrap pb-16 sm:pb-20">
   <div
-    class="card relative overflow-hidden bg-ink px-7 py-12 text-center text-sand-50 sm:px-12 sm:py-16"
+    class="relative overflow-hidden rounded-3xl bg-ink px-7 py-12 text-center text-sand-50 shadow-card sm:px-12 sm:py-16"
   >
     <div
       class="pointer-events-none absolute inset-0 bg-[radial-gradient(80%_100%_at_50%_0%,rgba(222,205,149,0.22),transparent_65%)]"

@@ -217,13 +217,13 @@ const toneClass = {
 <section class="wrap pb-16 sm:pb-20">
   <Ornament class="mb-10" />
 
-  <div class="grid gap-8 lg:grid-cols-2 lg:items-center lg:gap-12">
+  <div class="grid gap-8 lg:grid-cols-[minmax(0,420px)_1fr] lg:items-center lg:gap-12">
     <Photo
       src={withBase(images.lessons)}
       alt="Занятие школы: участницы поют в зале"
       width={634}
       height={952}
-      class="aspect-[4/5]"
+      class="aspect-[4/5] w-full"
       imgClass="object-top"
     />
 
@@ -252,7 +252,7 @@ const toneClass = {
 <!-- Блок 6. О ведущей -->
 <section class="wrap pb-16 sm:pb-20">
   <div class="grid gap-8 lg:grid-cols-[1fr_minmax(0,420px)] lg:items-center lg:gap-12">
-    <div>
+    <div class="rounded-3xl bg-rose-50/95 px-6 py-7 sm:px-9 sm:py-9">
       <h2 class="text-balance text-2xl sm:text-3xl">О ведущей</h2>
       <div class="prose-body mt-4 text-pretty">
         <p>

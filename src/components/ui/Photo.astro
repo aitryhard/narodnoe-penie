@@ -6,12 +6,22 @@ export interface Props {
   height?: number;
   /** Дополнительные классы контейнера: aspect-соотношение, sticky и т.п. */
   class?: string;
+  /** Дополнительные классы самого изображения: object-position и т.п. */
+  imgClass?: string;
   loading?: "lazy" | "eager";
   fetchpriority?: "high";
 }
 
-const { src, alt, width, height, class: className = "", loading = "lazy", fetchpriority } =
-  Astro.props;
+const {
+  src,
+  alt,
+  width,
+  height,
+  class: className = "",
+  imgClass = "",
+  loading = "lazy",
+  fetchpriority,
+} = Astro.props;
 ---
 
 <div class:list={["overflow-hidden rounded-3xl shadow-card", className]}>
@@ -22,6 +32,6 @@ const { src, alt, width, height, class: className = "", loading = "lazy", fetchp
     height={height}
     loading={loading}
     fetchpriority={fetchpriority}
-    class="h-full w-full object-cover"
+    class:list={["h-full w-full object-cover", imgClass]}
   />
 </div>

@@ -506,7 +506,7 @@ const { course } = Astro.props as { course: Course };
                 }
                 const list = el("div", "space-y-4");
                 for (const block of audios) {
-                  const item = el("div", "bg-sand-50 rounded-2xl px-4 py-3");
+                  const item = el("div", "bg-sand-50 min-w-0 rounded-2xl px-4 py-3");
                   const header = el("div", "mb-2 flex items-center gap-3");
                   const label = cleanTitle(block.title ?? "Аудиозапись");
                   header.append(el("p", "text-sm font-medium", label));
@@ -561,13 +561,19 @@ const { course } = Astro.props as { course: Course };
 
             let currentVideoIndex = 0;
 
-            // Ширина блока = высота × пропорция видео: место ровно в размер кадра.
+            // Ширина блока = min(высота × пропорция, реально доступное место в
+            // колонке) - чтобы на телефонах и узких ноутбуках ничего не вылезало.
             const applyFrameWidth = () => {
+              if (!videoFrame) return;
               const active = lessonVideos[currentVideoIndex];
               const ratio = active?.dataset.ratio ? Number(active.dataset.ratio) : 9 / 16;
-              if (videoFrame) {
-                videoFrame.style.width = `calc(min(75vh, 720px) * ${ratio})`;
-              }
+              const byHeight = Math.min(window.innerHeight * 0.75, 720) * ratio;
+              const grid = videoFrame.parentElement;
+              const wide = window.matchMedia("(min-width: 1024px)").matches;
+              // На десктопе часть колонки занимает панель материалов (мин. 340) + отступ.
+              const available = (grid?.clientWidth ?? 0) - (wide ? 360 : 0);
+              const width = available > 120 ? Math.min(byHeight, available) : byHeight;
+              videoFrame.style.width = `${Math.floor(width)}px`;
             };
 
             const setVideo = (index: number) => {
@@ -728,6 +734,12 @@ const { course } = Astro.props as { course: Course };
             window.addEventListener("hashchange", () => {
               renderLesson(currentIndex());
               window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+
+            let resizeTimer: ReturnType<typeof setTimeout> | undefined;
+            window.addEventListener("resize", () => {
+              clearTimeout(resizeTimer);
+              resizeTimer = setTimeout(applyFrameWidth, 120);
             });
 
             document.addEventListener("keydown", (event) => {

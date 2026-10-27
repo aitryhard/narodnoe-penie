@@ -1,8 +1,10 @@
 ﻿---
 import Button from "../ui/Button.astro";
 import Photo from "../ui/Photo.astro";
+import Stub from "../ui/Stub.astro";
 import Ornament from "../Ornament.astro";
 import { links } from "../../config/links";
+import { images } from "../../config/images";
 import { lessonCards, courses } from "../../data/products";
 import { reviews } from "../../data/reviews";
 import { withBase } from "../../utils/base";
@@ -13,8 +15,12 @@ const toneClass = {
   sand: "bg-sand-200 text-ink",
   mustard: "bg-mustard/30 text-mustard-deep",
 };
+
+/** Первые три отзыва - для компактного блока на главной. */
+const previewReviews = reviews.slice(0, 3);
 ---
 
+<!-- Блок 1. Первый экран -->
 <section class="wrap pt-8 sm:pt-12">
   <div class="card relative overflow-hidden bg-rose-100">
     <div
@@ -23,185 +29,208 @@ const toneClass = {
     >
     </div>
 
-    <div class="relative grid gap-12 p-8 sm:p-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:p-16">
+    <div class="relative grid gap-9 p-8 sm:p-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-12 lg:p-14">
       <div>
         <h1 class="text-balance text-3xl leading-[1.15] sm:text-4xl sm:leading-[1.15] lg:text-5xl lg:leading-[1.1]">
           Народное пение,<br class="hidden sm:block" />
           которому учатся и которое радует
         </h1>
 
-        <p class="prose-body mt-6 max-w-xl text-pretty">
+        <p class="prose-body mt-5 max-w-xl text-pretty">
           Женская школа народного пения: онлайн-курсы и обучающие проекты по песенному
           фольклору, живые занятия в центре Петербурга и камерные онлайн-группы. Учимся
           не спеша - интонации, строю и манере исполнения.
         </p>
 
-        <div class="mt-9 flex flex-wrap items-center gap-3">
+        <div class="mt-7">
           <Button href={links.signup} variant="primary" size="lg">
             Записаться на занятие
           </Button>
         </div>
 
-        <dl class="mt-10 grid max-w-lg grid-cols-3 gap-6 border-t border-ink/10 pt-7">
-          <div>
-            <dt class="font-display text-2xl font-semibold text-primary-deep">6</dt>
-            <dd class="mt-1 text-sm leading-snug text-ink-soft">курсов и проектов</dd>
-          </div>
-          <div>
-            <dt class="font-display text-2xl font-semibold text-primary-deep">3</dt>
-            <dd class="mt-1 text-sm leading-snug text-ink-soft">формата занятий</dd>
-          </div>
-          <div>
-            <dt class="font-display text-2xl font-semibold text-primary-deep">6</dt>
-            <dd class="mt-1 text-sm leading-snug text-ink-soft">человек в группе</dd>
-          </div>
-        </dl>
+        <ul class="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-sm text-ink-soft">
+          <li class="flex items-center gap-2">
+            <span class="bg-primary/60 h-1.5 w-1.5 shrink-0 rounded-full" aria-hidden="true"></span>
+            Живые занятия в Петербурге
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="bg-primary/60 h-1.5 w-1.5 shrink-0 rounded-full" aria-hidden="true"></span>
+            Онлайн-занятия
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="bg-primary/60 h-1.5 w-1.5 shrink-0 rounded-full" aria-hidden="true"></span>
+            Обучающие проекты
+          </li>
+        </ul>
       </div>
 
       <div class="relative">
         <Photo
-          src={withBase("/img/zastavka.jpg")}
+          src={withBase(images.hero)}
           alt="Ведущая школы на фоне поля на закате"
           width={1440}
           height={1092}
           loading="eager"
           fetchpriority="high"
-          class="aspect-[4/5]"
+          class="aspect-[4/3] sm:aspect-[4/5]"
         />
-
-        <div
-          class="absolute -bottom-5 -left-5 hidden rounded-2xl border border-ink/5 bg-surface px-5 py-4 shadow-lift sm:block"
-        >
-          <p class="font-display text-lg font-semibold">Онлайн-занятия</p>
-          <p class="mt-0.5 text-xs text-ink-mute">по средам · 11:00-12:00</p>
-        </div>
       </div>
     </div>
   </div>
 </section>
 
+<!-- Блоки 3-4. Каталог курсов и форматы участия -->
 <section class="wrap py-16 sm:py-20">
-  <Ornament class="mb-12 -mt-4" />
-
   <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
       <p class="text-xs font-semibold uppercase tracking-[0.14em] text-mustard-deep">
-        Продаются онлайн
+        Онлайн-курсы
       </p>
       <h2 class="text-balance mt-2 text-2xl sm:text-3xl">Курсы по песенному фольклору</h2>
     </div>
     <a
       href={withBase("/info-produkty#proekty")}
-      class="link-underline shrink-0 self-start inline-flex min-h-8 items-center text-[16px] text-ink-soft hover:text-ink sm:self-auto"
+      class="link-underline inline-flex min-h-8 shrink-0 self-start items-center text-[16px] text-ink-soft hover:text-ink sm:self-auto"
     >
       Все курсы
     </a>
   </div>
 
-  <div class="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+  <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
     {
-      courses.map((course) => (
-        <article
-          class="flex flex-col rounded-3xl border border-primary/15 bg-sand-50 p-6 shadow-card transition-all duration-200 hover:-translate-y-1 hover:border-primary/30 hover:bg-surface hover:shadow-lift sm:p-7"
-        >
-          <h3 class="text-xl">{course.title}</h3>
-          <p class="mt-2.5 flex-1 text-[16px] leading-relaxed text-ink-soft text-pretty">
-            {course.lead}
-          </p>
+      courses.map((course) => {
+        const cover = images.courses[course.slug];
+        return (
+          <article class="flex flex-col overflow-hidden rounded-3xl border border-primary/15 bg-surface shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-lift">
+            {cover ? (
+              <img
+                src={withBase(cover)}
+                alt={`Фотография курса «${course.title}»`}
+                loading="lazy"
+                class="aspect-[16/10] w-full object-cover"
+              />
+            ) : (
+              <Stub label="Фотография курса" class="aspect-[16/10] rounded-none" />
+            )}
+            <div class="flex flex-1 flex-col p-6">
+              <h3 class="font-display text-xl">{course.title}</h3>
+              <p class="mt-2.5 flex-1 text-[16px] leading-relaxed text-ink-soft text-pretty">
+                {course.lead}
+              </p>
 
-          <dl class="mt-5 flex justify-between gap-5 border-t border-ink/10 pt-4 text-xs">
-            <div>
-              <dt class="text-ink-mute">Длительность</dt>
-              <dd class="mt-0.5 font-medium text-ink-soft">{course.duration}</dd>
-            </div>
-            <div class="text-right">
-              <dt class="text-ink-mute">Стоимость</dt>
-              <dd
-                class="mt-1 inline-block border-b-[3px] border-mustard pb-0.5 font-display text-xl font-semibold text-ink"
+              <dl class="mt-5 flex items-end justify-between gap-4 border-t border-ink/10 pt-4 text-xs">
+                <div>
+                  <dt class="text-ink-mute">Длительность</dt>
+                  <dd class="mt-0.5 font-medium text-ink-soft">{course.duration}</dd>
+                </div>
+                <div class="text-right">
+                  <dt class="text-ink-mute">Стоимость</dt>
+                  <dd class="mt-1 inline-block border-b-[3px] border-mustard pb-0.5 font-display text-xl font-semibold text-ink">
+                    {course.price}
+                  </dd>
+                </div>
+              </dl>
+
+              <Button
+                href={withBase(`/kursy/${course.slug}`)}
+                variant="ghost"
+                size="md"
+                fullWidth
+                class="mt-5"
               >
-                {course.price}
-              </dd>
+                Узнать подробнее
+              </Button>
             </div>
-          </dl>
-
-          <a
-            href={withBase(`/kursy/${course.slug}`)}
-            class="mt-6 inline-flex h-[52px] items-center justify-center gap-2 rounded-full bg-primary px-6 text-[16px] font-medium text-surface transition-all duration-200 hover:bg-primary-hover active:scale-[0.98]"
-          >
-            Узнать подробнее
-            <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
-              <path
-                fill-rule="evenodd"
-                d="M3 10a.75.75 0 0 1 .75-.75h12.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 10Zm4.22-4.72a.75.75 0 0 1 1.06 0l4.72 4.72-4.72 4.72a.75.75 0 1 1-1.06-1.06L11.44 10 7.28 5.78a.75.75 0 0 1 0-1.06Z"
-                clip-rule="evenodd"
-              ></path>
-            </svg>
-          </a>
-        </article>
-      ))
+          </article>
+        );
+      })
     }
   </div>
 
   <div class="mt-14 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
-      <h2 class="text-balance text-xl text-ink-soft sm:text-2xl">Форматы участия</h2>
+      <p class="text-xs font-semibold uppercase tracking-[0.14em] text-mustard-deep">
+        Как заниматься
+      </p>
+      <h2 class="text-balance mt-2 text-2xl sm:text-3xl">Форматы участия</h2>
     </div>
     <a
       href={withBase("/info-produkty")}
-      class="link-underline shrink-0 self-start inline-flex min-h-8 items-center text-[16px] text-ink-soft hover:text-ink sm:self-auto"
+      class="link-underline inline-flex min-h-8 shrink-0 self-start items-center text-[16px] text-ink-soft hover:text-ink sm:self-auto"
     >
       Все инфо-продукты
     </a>
   </div>
 
-  <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+  <div class="mt-8 grid gap-5 sm:grid-cols-2">
     {
-      lessonCards.map((lesson) => (
-        <article class="flex flex-col rounded-3xl border border-ink/10 bg-surface p-6">
-          <span
-            class:list={[
-              "w-fit rounded-full px-3 py-1 text-xs font-medium",
-              toneClass[lesson.tone],
-            ]}
-          >
-            {lesson.format}
-          </span>
+      lessonCards.map((lesson) => {
+        const photo = images.formats[lesson.anchor];
+        return (
+          <article class="flex flex-col gap-5 rounded-3xl border border-ink/10 bg-surface p-5 sm:flex-row sm:items-start sm:gap-5 sm:p-6">
+            {photo ? (
+              <img
+                src={withBase(photo)}
+                alt={`Формат «${lesson.title}»`}
+                loading="lazy"
+                class="h-20 w-20 shrink-0 rounded-2xl object-cover"
+              />
+            ) : (
+              <Stub class="h-20 w-20 shrink-0 rounded-2xl" />
+            )}
 
-          <h3 class="mt-4 text-lg">{lesson.title}</h3>
-          <p class="mt-2 text-sm leading-relaxed text-ink-soft text-pretty">
-            {lesson.description}
-          </p>
-            <p class="mt-3 mb-5 text-xs text-ink-mute">{lesson.bullet}</p>
+            <div class="flex flex-1 flex-col">
+              <span
+                class:list={[
+                  "w-fit rounded-full px-3 py-1 text-xs font-medium",
+                  toneClass[lesson.tone],
+                ]}
+              >
+                {lesson.format}
+              </span>
 
-            <div
-              class="mt-auto flex flex-wrap items-end justify-between gap-3 border-t border-ink/10 pt-4"
-            >
-              <div>
-                <p class="text-xs text-ink-mute">Стоимость</p>
-                <p
-                  class="mt-1 inline-block border-b-[3px] border-mustard pb-0.5 font-display text-lg font-semibold"
-                >
-                  {lesson.priceMain}
-                </p>
-                <p class="mt-1 min-h-[1.125rem] text-xs text-ink-mute">{lesson.priceNote}</p>
+              <h3 class="mt-3 font-display text-lg">{lesson.title}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-ink-soft text-pretty">
+                {lesson.description}
+              </p>
+              <p class="mt-2 text-xs text-ink-mute">{lesson.bullet}</p>
+
+              <div class="mt-auto flex flex-wrap items-end justify-between gap-3 border-t border-ink/10 pt-4">
+                <div>
+                  <p class="text-xs text-ink-mute">Стоимость</p>
+                  <p class="mt-1 inline-block border-b-[3px] border-mustard pb-0.5 font-display text-lg font-semibold">
+                    {lesson.priceMain}
+                  </p>
+                  <p class="mt-1 text-xs text-ink-mute">{lesson.priceNote}</p>
+                </div>
+                <Button href={links.buy} variant="primary" size="sm">
+                  Купить курс
+                </Button>
               </div>
-              <Button href={links.buy} variant="primary" size="sm">
-                Купить курс
-              </Button>
             </div>
-        </article>
-      ))
+          </article>
+        );
+      })
     }
   </div>
 </section>
 
+<!-- Блок 5. Как проходят занятия -->
 <section class="wrap pb-16 sm:pb-20">
-  <div class="grid gap-5 lg:grid-cols-2">
-    <article
-      class="card flex flex-col bg-surface p-7 transition-all duration-200 hover:-translate-y-1 hover:shadow-lift sm:p-9"
-    >
-      <h2 class="text-2xl">О школе</h2>
-      <div class="prose-body mt-4 flex-1 text-pretty">
+  <Ornament class="mb-10" />
+
+  <div class="grid gap-8 lg:grid-cols-2 lg:items-center lg:gap-12">
+    <Photo
+      src={withBase(images.lessons)}
+      alt="Занятие школы: участницы поют в зале"
+      width={952}
+      height={634}
+      class="aspect-[4/3] lg:aspect-[3/2]"
+    />
+
+    <div>
+      <h2 class="text-balance text-2xl sm:text-3xl">Как проходят занятия</h2>
+      <div class="prose-body mt-4 text-pretty">
         <p>
           Мы собираем женщин, которым интересно петь настоящее: календарные,
           свадебные и обрядовые песни.
@@ -217,13 +246,16 @@ const toneClass = {
       >
         Подробнее о школе
       </a>
-    </article>
+    </div>
+  </div>
+</section>
 
-    <article
-      class="card flex flex-col bg-surface p-7 transition-all duration-200 hover:-translate-y-1 hover:shadow-lift sm:p-9"
-    >
-      <h2 class="text-2xl">О ведущей</h2>
-      <div class="prose-body mt-4 flex-1 text-pretty">
+<!-- Блок 6. О ведущей -->
+<section class="wrap pb-16 sm:pb-20">
+  <div class="grid gap-8 lg:grid-cols-[1fr_minmax(0,420px)] lg:items-center lg:gap-12">
+    <div>
+      <h2 class="text-balance text-2xl sm:text-3xl">О ведущей</h2>
+      <div class="prose-body mt-4 text-pretty">
         <p>
           Ведущая - фольклорист и певица. Она собирает и поёт материал, разбирает
           песни по частям.
@@ -239,108 +271,71 @@ const toneClass = {
       >
         Прочитать историю
       </a>
-    </article>
+    </div>
+
+    <Photo
+      src={withBase(images.lead)}
+      alt="Ведущая школы с нотами в руках"
+      width={1400}
+      height={1750}
+      class="aspect-[4/5] w-full"
+    />
   </div>
 </section>
 
+<!-- Блок 7. Отзывы -->
 <section class="wrap pb-16 sm:pb-20">
   <Ornament class="mb-10" />
 
   <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-    <div>
-      <h2 class="text-balance text-2xl sm:text-3xl">Что говорят после занятий</h2>
-    </div>
-    <div class="flex items-center gap-4">
-      <a
-        href={withBase("/otzyvy")}
-        class="link-underline inline-flex min-h-8 items-center text-[16px] text-ink-soft hover:text-ink"
-      >
-        Все отзывы
-      </a>
-      <div class="hidden items-center gap-2.5" data-carousel-controls>
-        <button
-          type="button"
-          data-carousel-prev
-          aria-label="Предыдущий отзыв"
-          class="grid h-10 w-10 place-items-center rounded-full border border-ink/10 bg-surface text-ink-soft shadow-soft transition-all hover:border-ink/20 hover:bg-sand-50 hover:text-ink disabled:pointer-events-none disabled:opacity-40"
-        >
-          <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
-            <path
-              fill-rule="evenodd"
-              d="M12.79 5.23a.75.75 0 0 1-.02 1.06L8.832 10l3.938 3.71a.75.75 0 1 1-1.04 1.08l-4.5-4.25a.75.75 0 0 1 0-1.08l4.5-4.25a.75.75 0 0 1 1.06.02Z"
-              clip-rule="evenodd"
-            ></path>
-          </svg>
-        </button>
-        <button
-          type="button"
-          data-carousel-next
-          aria-label="Следующий отзыв"
-          class="grid h-10 w-10 place-items-center rounded-full border border-ink/10 bg-surface text-ink-soft shadow-soft transition-all hover:border-ink/20 hover:bg-sand-50 hover:text-ink disabled:pointer-events-none disabled:opacity-40"
-        >
-          <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
-            <path
-              fill-rule="evenodd"
-              d="M7.21 14.77a.75.75 0 0 1 .02-1.06L11.168 10 7.23 6.29a.75.75 0 1 1 1.04-1.08l4.5 4.25a.75.75 0 0 1 0 1.08l-4.5 4.25a.75.75 0 0 1-1.06-.02Z"
-              clip-rule="evenodd"
-            ></path>
-          </svg>
-        </button>
-      </div>
-    </div>
+    <h2 class="text-balance text-2xl sm:text-3xl">Что говорят после занятий</h2>
+    <a
+      href={withBase("/otzyvy")}
+      class="link-underline inline-flex min-h-8 shrink-0 items-center text-[16px] text-ink-soft hover:text-ink"
+    >
+      Все отзывы
+    </a>
   </div>
 
-  <div
-    class="mt-8 flex snap-x snap-mandatory gap-5 overflow-x-auto overflow-y-hidden overscroll-x-contain pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-    id="home-reviews"
-    role="region"
-    aria-label="Отзывы учениц"
-    tabindex="0"
-  >
+  <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
     {
-      reviews.map((review) => (
-        <figure
-          class={`card flex w-[85%] shrink-0 snap-start flex-col p-6 sm:w-[calc((100%-1.25rem)/2)] sm:p-7 lg:w-[calc((100%-2.5rem)/3)] ${review.tone}`}
-        >
+      previewReviews.map((review) => (
+        <figure class={`card flex flex-col p-6 sm:p-7 ${review.tone}`}>
           <svg
             viewBox="0 0 24 24"
             fill="currentColor"
             class="h-6 w-6 text-mustard-deep"
             aria-hidden="true"
           >
-            <path
-              d="M9.6 5C6.5 6.3 4.8 8.8 4.8 12c0 3.6 2 6.2 5.2 6.2 2.2 0 3.9-1.5 3.9-3.6 0-2-1.4-3.4-3.3-3.4-.4 0-.8 0-1 .1.3-1.6 1.6-3.2 3.4-4.2L9.6 5Zm9.2 0c-3.1 1.3-4.8 3.8-4.8 7 0 3.6 2 6.2 5.2 6.2 2.2 0 3.9-1.5 3.9-3.6 0-2-1.4-3.4-3.3-3.4-.4 0-.8 0-1 .1.3-1.6 1.6-3.2 3.4-4.2L18.8 5Z"
-            ></path>
+            <path d="M9.6 5C6.5 6.3 4.8 8.8 4.8 12c0 3.6 2 6.2 5.2 6.2 2.2 0 3.9-1.5 3.9-3.6 0-2-1.4-3.4-3.3-3.4-.4 0-.8 0-1 .1.3-1.6 1.6-3.2 3.4-4.2L9.6 5Zm9.2 0c-3.1 1.3-4.8 3.8-4.8 7 0 3.6 2 6.2 5.2 6.2 2.2 0 3.9-1.5 3.9-3.6 0-2-1.4-3.4-3.3-3.4-.4 0-.8 0-1 .1.3-1.6 1.6-3.2 3.4-4.2L18.8 5Z"></path>
           </svg>
           <blockquote class="mt-4 flex-1 text-[16px] leading-relaxed text-ink-soft text-pretty">
             {review.text}
           </blockquote>
           <figcaption class="mt-5 flex items-center gap-3 border-t border-ink/5 pt-4">
-            {
-              review.avatar ? (
-                <img
-                  src={withBase(review.avatar)}
-                  alt=""
-                  width="40"
-                  height="40"
-                  loading="lazy"
-                  class="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-ink/5"
-                />
-              ) : (
-                <span
-                  class:list={[
-                    "grid h-10 w-10 shrink-0 place-items-center rounded-full font-display text-[13px] font-semibold uppercase tracking-wide text-primary-deep ring-1 ring-ink/5",
-                    review.avatarTone,
-                  ]}
-                >
-                  {review.name
-                    .split(/\s+/)
-                    .slice(0, 2)
-                    .map((word) => word[0])
-                    .join("")}
-                </span>
-              )
-            }
+            {review.avatar ? (
+              <img
+                src={withBase(review.avatar)}
+                alt=""
+                width="40"
+                height="40"
+                loading="lazy"
+                class="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-ink/5"
+              />
+            ) : (
+              <span
+                class:list={[
+                  "grid h-10 w-10 shrink-0 place-items-center rounded-full font-display text-[13px] font-semibold uppercase tracking-wide text-primary-deep ring-1 ring-ink/5",
+                  review.avatarTone,
+                ]}
+              >
+                {review.name
+                  .split(/\s+/)
+                  .slice(0, 2)
+                  .map((word) => word[0])
+                  .join("")}
+              </span>
+            )}
             <span class="text-sm">
               <span class="block font-medium text-ink">{review.name}</span>
               <span class="block text-sm text-ink-mute">{review.meta}</span>
@@ -350,58 +345,9 @@ const toneClass = {
       ))
     }
   </div>
-
-  <script is:inline>
-    (function () {
-      var track = document.getElementById("home-reviews");
-      var controls = document.querySelector("[data-carousel-controls]");
-      if (!track || !controls) return;
-
-      var prev = controls.querySelector("[data-carousel-prev]");
-      var next = controls.querySelector("[data-carousel-next]");
-      var reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-      var desktop = window.matchMedia("(min-width: 640px)");
-
-      function update() {
-        var max = track.scrollWidth - track.clientWidth;
-        var show = desktop.matches && max > 4;
-        controls.style.display = show ? "flex" : "none";
-        if (!show) return;
-        prev.disabled = track.scrollLeft <= 2;
-        next.disabled = track.scrollLeft >= max - 2;
-      }
-
-      function go(direction) {
-        var card = track.querySelector("figure");
-        if (!card) return;
-        var styles = window.getComputedStyle(track);
-        var gap = parseFloat(styles.columnGap || styles.gap) || 20;
-        track.scrollBy({
-          left: direction * (card.getBoundingClientRect().width + gap),
-          behavior: reduced.matches ? "auto" : "smooth",
-        });
-      }
-
-      prev.addEventListener("click", function () {
-        go(-1);
-      });
-      next.addEventListener("click", function () {
-        go(1);
-      });
-      track.addEventListener("scroll", update, { passive: true });
-      window.addEventListener("resize", update);
-      if (desktop.addEventListener) desktop.addEventListener("change", update);
-      window.addEventListener("load", update);
-      update();
-      if (window.requestAnimationFrame) {
-        requestAnimationFrame(function () {
-          requestAnimationFrame(update);
-        });
-      }
-    })();
-  </script>
 </section>
 
+<!-- Блок 8. Завершение страницы -->
 <section class="wrap pb-16 sm:pb-20">
   <div
     class="card relative overflow-hidden bg-ink px-7 py-12 text-center text-sand-50 sm:px-12 sm:py-16"

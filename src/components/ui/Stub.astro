@@ -1,0 +1,32 @@
+---
+/**
+ * Нейтральная заглушка на месте ещё не полученной фотографии.
+ * Размер и пропорции задаются через class, чтобы замена на реальное
+ * фото не требовала изменения вёрстки.
+ */
+export interface Props {
+  /** Подпись внутри заглушки (для крупных блоков). */
+  label?: string;
+  /** Описание для скринридеров. */
+  alt?: string;
+  class?: string;
+}
+
+const {
+  label,
+  alt = label ?? "Фотография",
+  class: className = "",
+} = Astro.props;
+---
+
+<div
+  class:list={["flex items-center justify-center overflow-hidden rounded-2xl bg-sand-100", className]}
+  role="img"
+  aria-label={alt}
+>
+  {
+    label && (
+      <span class="px-4 text-center text-xs leading-snug text-ink-mute">{label}</span>
+    )
+  }
+</div>

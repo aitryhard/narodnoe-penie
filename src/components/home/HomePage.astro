@@ -15,9 +15,6 @@ const toneClass = {
   sand: "bg-sand-200 text-ink",
   mustard: "bg-mustard/30 text-mustard-deep",
 };
-
-/** Первые три отзыва - для компактного блока на главной. */
-const previewReviews = reviews.slice(0, 3);
 ---
 
 <!-- Блок 1. Первый экран -->
@@ -32,7 +29,7 @@ const previewReviews = reviews.slice(0, 3);
       height={1092}
       loading="eager"
       fetchpriority="high"
-      class="aspect-[4/3] w-full lg:absolute lg:inset-0 lg:h-full lg:w-full lg:rounded-none lg:shadow-none"
+      class="aspect-[4/3] w-full lg:absolute lg:inset-y-0 lg:left-0 lg:h-full lg:w-[130%] lg:rounded-none lg:shadow-none"
       imgClass="lg:object-[center_25%]"
     />
 
@@ -226,7 +223,8 @@ const previewReviews = reviews.slice(0, 3);
       alt="Занятие школы: участницы поют в зале"
       width={952}
       height={634}
-      class="aspect-[4/3] lg:aspect-[3/2]"
+      class="aspect-[16/10] lg:aspect-[16/9]"
+      imgClass="object-top"
     />
 
     <div>
@@ -290,18 +288,58 @@ const previewReviews = reviews.slice(0, 3);
 
   <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <h2 class="text-balance text-2xl sm:text-3xl">Что говорят после занятий</h2>
-    <a
-      href={withBase("/otzyvy")}
-      class="link-underline inline-flex min-h-8 shrink-0 items-center text-[16px] text-ink-soft hover:text-ink"
-    >
-      Все отзывы
-    </a>
+    <div class="flex items-center gap-4">
+      <a
+        href={withBase("/otzyvy")}
+        class="link-underline inline-flex min-h-8 shrink-0 items-center text-[16px] text-ink-soft hover:text-ink"
+      >
+        Все отзывы
+      </a>
+      <div class="hidden items-center gap-2.5" data-carousel-controls>
+        <button
+          type="button"
+          data-carousel-prev
+          aria-label="Предыдущий отзыв"
+          class="grid h-10 w-10 place-items-center rounded-full border border-ink/10 bg-surface text-ink-soft shadow-soft transition-all hover:border-ink/20 hover:bg-sand-50 hover:text-ink disabled:pointer-events-none disabled:opacity-40"
+        >
+          <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
+            <path
+              fill-rule="evenodd"
+              d="M12.79 5.23a.75.75 0 0 1-.02 1.06L8.832 10l3.938 3.71a.75.75 0 1 1-1.04 1.08l-4.5-4.25a.75.75 0 0 1 0-1.08l4.5-4.25a.75.75 0 0 1 1.06.02Z"
+              clip-rule="evenodd"
+            ></path>
+          </svg>
+        </button>
+        <button
+          type="button"
+          data-carousel-next
+          aria-label="Следующий отзыв"
+          class="grid h-10 w-10 place-items-center rounded-full border border-ink/10 bg-surface text-ink-soft shadow-soft transition-all hover:border-ink/20 hover:bg-sand-50 hover:text-ink disabled:pointer-events-none disabled:opacity-40"
+        >
+          <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
+            <path
+              fill-rule="evenodd"
+              d="M7.21 14.77a.75.75 0 0 1 .02-1.06L11.168 10 7.23 6.29a.75.75 0 1 1 1.04-1.08l4.5 4.25a.75.75 0 0 1 0 1.08l-4.5 4.25a.75.75 0 0 1-1.06-.02Z"
+              clip-rule="evenodd"
+            ></path>
+          </svg>
+        </button>
+      </div>
+    </div>
   </div>
 
-  <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+  <div
+    class="mt-8 flex snap-x snap-mandatory gap-5 overflow-x-auto overflow-y-hidden overscroll-x-contain pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    id="home-reviews"
+    role="region"
+    aria-label="Отзывы учениц"
+    tabindex="0"
+  >
     {
-      previewReviews.map((review) => (
-        <figure class={`card flex flex-col p-6 sm:p-7 ${review.tone}`}>
+      reviews.map((review) => (
+        <figure
+          class={`card flex w-[85%] shrink-0 snap-start flex-col p-6 sm:w-[calc((100%-1.25rem)/2)] sm:p-7 lg:w-[calc((100%-2.5rem)/3)] ${review.tone}`}
+        >
           <svg
             viewBox="0 0 24 24"
             fill="currentColor"
@@ -314,29 +352,31 @@ const previewReviews = reviews.slice(0, 3);
             {review.text}
           </blockquote>
           <figcaption class="mt-5 flex items-center gap-3 border-t border-ink/5 pt-4">
-            {review.avatar ? (
-              <img
-                src={withBase(review.avatar)}
-                alt=""
-                width="40"
-                height="40"
-                loading="lazy"
-                class="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-ink/5"
-              />
-            ) : (
-              <span
-                class:list={[
-                  "grid h-10 w-10 shrink-0 place-items-center rounded-full font-display text-[13px] font-semibold uppercase tracking-wide text-primary-deep ring-1 ring-ink/5",
-                  review.avatarTone,
-                ]}
-              >
-                {review.name
-                  .split(/\s+/)
-                  .slice(0, 2)
-                  .map((word) => word[0])
-                  .join("")}
-              </span>
-            )}
+            {
+              review.avatar ? (
+                <img
+                  src={withBase(review.avatar)}
+                  alt=""
+                  width="40"
+                  height="40"
+                  loading="lazy"
+                  class="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-ink/5"
+                />
+              ) : (
+                <span
+                  class:list={[
+                    "grid h-10 w-10 shrink-0 place-items-center rounded-full font-display text-[13px] font-semibold uppercase tracking-wide text-primary-deep ring-1 ring-ink/5",
+                    review.avatarTone,
+                  ]}
+                >
+                  {review.name
+                    .split(/\s+/)
+                    .slice(0, 2)
+                    .map((word) => word[0])
+                    .join("")}
+                </span>
+              )
+            }
             <span class="text-sm">
               <span class="block font-medium text-ink">{review.name}</span>
               <span class="block text-sm text-ink-mute">{review.meta}</span>
@@ -346,6 +386,56 @@ const previewReviews = reviews.slice(0, 3);
       ))
     }
   </div>
+
+  <script is:inline>
+    (function () {
+      var track = document.getElementById("home-reviews");
+      var controls = document.querySelector("[data-carousel-controls]");
+      if (!track || !controls) return;
+
+      var prev = controls.querySelector("[data-carousel-prev]");
+      var next = controls.querySelector("[data-carousel-next]");
+      var reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+      var desktop = window.matchMedia("(min-width: 640px)");
+
+      function update() {
+        var max = track.scrollWidth - track.clientWidth;
+        var show = desktop.matches && max > 4;
+        controls.style.display = show ? "flex" : "none";
+        if (!show) return;
+        prev.disabled = track.scrollLeft <= 2;
+        next.disabled = track.scrollLeft >= max - 2;
+      }
+
+      function go(direction) {
+        var card = track.querySelector("figure");
+        if (!card) return;
+        var styles = window.getComputedStyle(track);
+        var gap = parseFloat(styles.columnGap || styles.gap) || 20;
+        track.scrollBy({
+          left: direction * (card.getBoundingClientRect().width + gap),
+          behavior: reduced.matches ? "auto" : "smooth",
+        });
+      }
+
+      prev.addEventListener("click", function () {
+        go(-1);
+      });
+      next.addEventListener("click", function () {
+        go(1);
+      });
+      track.addEventListener("scroll", update, { passive: true });
+      window.addEventListener("resize", update);
+      if (desktop.addEventListener) desktop.addEventListener("change", update);
+      window.addEventListener("load", update);
+      update();
+      if (window.requestAnimationFrame) {
+        requestAnimationFrame(function () {
+          requestAnimationFrame(update);
+        });
+      }
+    })();
+  </script>
 </section>
 
 <!-- Блок 8. Завершение страницы -->

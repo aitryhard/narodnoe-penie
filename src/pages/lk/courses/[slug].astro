@@ -127,12 +127,12 @@ const { course } = Astro.props as { course: Course };
           <div class="mt-5 grid gap-6 lg:grid-cols-[auto_minmax(340px,1fr)] lg:items-start lg:gap-5">
             <!-- Видео: ширина блока задаётся в JS из пропорций видео -->
             <div class="mx-auto max-w-full lg:mx-0" data-video-frame>
-              <div data-video-stack class="grid"></div>
               <div
                 data-video-switch
-                class="mt-3 flex flex-wrap justify-center gap-1.5 lg:justify-start"
+                class="mb-3 flex flex-wrap justify-center gap-1.5 lg:justify-start"
               >
               </div>
+              <div data-video-stack class="grid"></div>
               <p data-video-error hidden class="text-mustard-deep mt-3 text-sm font-medium">
                 Не удалось загрузить видео. Попробуйте обновить страницу.
               </p>
@@ -141,7 +141,7 @@ const { course } = Astro.props as { course: Course };
             <!-- Панель материалов -->
             <div data-panel class="min-w-0">
               <div
-                class="border-ink/10 flex gap-5 overflow-x-auto border-b sm:gap-6"
+                class="border-ink/10 flex gap-5 overflow-x-auto border-b sm:gap-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                 role="tablist"
                 aria-label="Материалы урока"
               >
@@ -561,12 +561,16 @@ const { course } = Astro.props as { course: Course };
 
             let currentVideoIndex = 0;
 
-            // Ширина блока = min(высота × пропорция, реально доступное место в
-            // колонке) - чтобы на телефонах и узких ноутбуках ничего не вылезало.
+            // Ширина и высота блока считаются по самому широкому видео урока и
+            // не меняются при переключении - ничего не прыгает.
             const applyFrameWidth = () => {
               if (!videoFrame) return;
-              const active = lessonVideos[currentVideoIndex];
-              const ratio = active?.dataset.ratio ? Number(active.dataset.ratio) : 9 / 16;
+              let ratio = 0;
+              for (const video of lessonVideos) {
+                const r = Number(video.dataset.ratio);
+                if (Number.isFinite(r) && r > ratio) ratio = r;
+              }
+              if (!ratio) ratio = 9 / 16;
               const byHeight = Math.min(window.innerHeight * 0.75, 720) * ratio;
               const grid = videoFrame.parentElement;
               const wide = window.matchMedia("(min-width: 1024px)").matches;
@@ -574,6 +578,11 @@ const { course } = Astro.props as { course: Course };
               const available = (grid?.clientWidth ?? 0) - (wide ? 360 : 0);
               const width = available > 120 ? Math.min(byHeight, available) : byHeight;
               videoFrame.style.width = `${Math.floor(width)}px`;
+              // Единая высота для всех видео урока: узкие видео центрируются.
+              const height = Math.floor(width / ratio);
+              for (const video of lessonVideos) {
+                video.style.height = `${height}px`;
+              }
             };
 
             const setVideo = (index: number) => {
@@ -584,7 +593,6 @@ const { course } = Astro.props as { course: Course };
                 video.style.display = isActive ? "" : "none";
                 if (!isActive && !video.paused) video.pause();
               });
-              applyFrameWidth();
               if (videoSwitch) {
                 Array.from(videoSwitch.children).forEach((chip, chipIndex) => {
                   const button = chip as HTMLButtonElement;
@@ -622,14 +630,14 @@ const { course } = Astro.props as { course: Course };
                 video.src = resolve(block.src);
                 video.setAttribute("playsinline", "");
                 // 9/16 до загрузки метаданных, затем фактические пропорции - без обрезки и полос.
-                video.className = "bg-ink block h-auto w-full max-w-full rounded-2xl shadow-soft";
+                video.className = "bg-ink mx-auto block rounded-2xl shadow-soft";
                 video.style.aspectRatio = "9 / 16";
                 video.setAttribute("aria-label", cleanTitle(block.title ?? `Видео ${index + 1}`));
                 video.addEventListener("loadedmetadata", () => {
                   if (video.videoWidth && video.videoHeight) {
                     video.style.aspectRatio = `${video.videoWidth} / ${video.videoHeight}`;
                     video.dataset.ratio = String(video.videoWidth / video.videoHeight);
-                    if (index === currentVideoIndex) applyFrameWidth();
+                    applyFrameWidth();
                   }
                 });
                 video.addEventListener("error", () => {
@@ -639,6 +647,8 @@ const { course } = Astro.props as { course: Course };
                 videoStack.append(video);
                 lessonVideos.push(video);
               });
+
+              applyFrameWidth();
 
               if (videos.length > 1) {
                 videos.forEach((block, index) => {

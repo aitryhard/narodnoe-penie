@@ -235,24 +235,38 @@ const toneClass = {
       imgClass="object-top"
     />
 
-    <div>
-      <h2 class="text-balance text-2xl sm:text-3xl">Как проходят занятия</h2>
-      <div class="prose-body mt-4 text-pretty">
-        <p>
-          Мы собираем женщин, которым интересно петь настоящее: календарные,
-          свадебные и обрядовые песни.
-        </p>
-        <p>
-          Занятия строятся от слуха - без переводов и упрощения, но с бережным
-          отношением к тому, как песня звучала в традиции.
-        </p>
-      </div>
-      <a
-        href={withBase("/o-shkole")}
-        class="link-underline mt-6 inline-flex min-h-8 items-center gap-2 text-[16px] font-medium text-primary-deep"
+    <div class="relative">
+      <svg
+        class="pointer-events-none absolute inset-0 h-full w-full"
+        viewBox="0 0 600 300"
+        preserveAspectRatio="none"
+        aria-hidden="true"
       >
-        Подробнее о школе
-      </a>
+        <path
+          d="M14 50 C 90 28, 165 46, 245 34 C 325 22, 415 44, 495 30 C 535 24, 570 32, 588 46 C 596 52, 597 64, 595 76 L 595 238 C 566 258, 505 244, 432 256 C 352 270, 262 248, 182 260 C 112 270, 52 258, 14 268 C 5 212, 5 106, 14 50 Z"
+          fill="rgb(var(--c-rose-50) / 0.88)"></path>
+      </svg>
+
+      <div class="relative px-6 py-7 sm:px-9 sm:py-9">
+        <Ornament class="mb-4" />
+        <h2 class="text-balance text-2xl sm:text-3xl">Как проходят занятия</h2>
+        <div class="prose-body mt-4 text-pretty">
+          <p>
+            Мы собираем женщин, которым интересно петь настоящее: календарные,
+            свадебные и обрядовые песни.
+          </p>
+          <p>
+            Занятия строятся от слуха - без переводов и упрощения, но с бережным
+            отношением к тому, как песня звучала в традиции.
+          </p>
+        </div>
+        <a
+          href={withBase("/o-shkole")}
+          class="link-underline mt-6 inline-flex min-h-8 items-center gap-2 text-[16px] font-medium text-primary-deep"
+        >
+          Подробнее о школе
+        </a>
+      </div>
     </div>
   </div>
 </section>
@@ -260,24 +274,38 @@ const toneClass = {
 <!-- Блок 6. О ведущей -->
 <section class="wrap pb-16 sm:pb-20">
   <div class="grid gap-8 lg:grid-cols-[1fr_minmax(0,420px)] lg:items-center lg:gap-12">
-    <div>
-      <h2 class="text-balance text-2xl sm:text-3xl">О ведущей</h2>
-      <div class="prose-body mt-4 text-pretty">
-        <p>
-          Ведущая - фольклорист и певица. Она собирает и поёт материал, разбирает
-          песни по частям.
-        </p>
-        <p>
-          На занятиях не ставит оценок и не просит «петь как в записи» - ищет
-          естественное звучание каждого голоса.
-        </p>
-      </div>
-      <a
-        href={withBase("/o-veduschej")}
-        class="link-underline mt-6 inline-flex min-h-8 items-center gap-2 text-[16px] font-medium text-primary-deep"
+    <div class="relative">
+      <svg
+        class="pointer-events-none absolute inset-0 h-full w-full"
+        viewBox="0 0 600 300"
+        preserveAspectRatio="none"
+        aria-hidden="true"
       >
-        Прочитать историю
-      </a>
+        <path
+          d="M14 50 C 90 28, 165 46, 245 34 C 325 22, 415 44, 495 30 C 535 24, 570 32, 588 46 C 596 52, 597 64, 595 76 L 595 238 C 566 258, 505 244, 432 256 C 352 270, 262 248, 182 260 C 112 270, 52 258, 14 268 C 5 212, 5 106, 14 50 Z"
+          fill="rgb(var(--c-rose-50) / 0.88)"></path>
+      </svg>
+
+      <div class="relative px-6 py-7 sm:px-9 sm:py-9">
+        <Ornament class="mb-4" />
+        <h2 class="text-balance text-2xl sm:text-3xl">О ведущей</h2>
+        <div class="prose-body mt-4 text-pretty">
+          <p>
+            Ведущая - фольклорист и певица. Она собирает и поёт материал, разбирает
+            песни по частям.
+          </p>
+          <p>
+            На занятиях не ставит оценок и не просит «петь как в записи» - ищет
+            естественное звучание каждого голоса.
+          </p>
+        </div>
+        <a
+          href={withBase("/o-veduschej")}
+          class="link-underline mt-6 inline-flex min-h-8 items-center gap-2 text-[16px] font-medium text-primary-deep"
+        >
+          Прочитать историю
+        </a>
+      </div>
     </div>
 
     <Photo

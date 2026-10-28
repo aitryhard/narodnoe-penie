@@ -124,7 +124,10 @@ const { course } = Astro.props as { course: Course };
           <h2 data-lesson-eyebrow-title class="font-display text-ink text-xl font-semibold sm:text-2xl">
           </h2>
 
-          <div class="mt-5 grid gap-6 lg:grid-cols-[auto_minmax(340px,1fr)] lg:items-start lg:gap-5">
+          <div
+            data-lesson-grid
+            class="mt-5 grid gap-6 lg:grid-cols-[auto_minmax(340px,1fr)] lg:items-start lg:gap-5"
+          >
             <!-- Видео: ширина блока задаётся в JS из пропорций видео -->
             <div class="mx-auto max-w-full lg:mx-0" data-video-frame>
               <div
@@ -472,6 +475,21 @@ const { course } = Astro.props as { course: Course };
             let currentTab: TabName = "text";
             let lessonVideos: HTMLVideoElement[] = [];
 
+            const createLinkRow = (block: Block) => {
+              const a = document.createElement("a");
+              a.href = block.src ?? "#";
+              a.target = "_blank";
+              a.rel = "noopener noreferrer";
+              a.className =
+                "group text-ink hover:text-primary-deep flex items-center gap-2.5 py-3 text-[15px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40";
+              a.append(el("span", "bg-mustard h-1.5 w-1.5 shrink-0 rounded-full"));
+              a.append(el("span", "min-w-0 flex-1", cleanTitle(block.text ?? block.src ?? "")));
+              a.append(
+                el("span", "text-ink-mute group-hover:text-primary-deep shrink-0 text-sm", "↗"),
+              );
+              return a;
+            };
+
             const renderTab = () => {
               if (!tabPanel) return;
               tabPanel.replaceChildren();
@@ -484,18 +502,26 @@ const { course } = Astro.props as { course: Course };
               const isSong = lesson.title.startsWith("Песня");
 
               if (currentTab === "text") {
-                if (texts.length === 0) {
+                if (texts.length === 0 && links.length === 0) {
                   tabPanel.append(emptyMessage("В этом уроке нет текстовых материалов."));
                   return;
                 }
-                const stack = el("div", "space-y-3");
-                for (const block of texts) {
-                  const text = block.text ?? "";
-                  if (isSong) renderLyrics(text, stack);
-                  else if (isBulletList(text)) renderList(text, stack);
-                  else renderNote(text, stack);
+                if (texts.length > 0) {
+                  const stack = el("div", "space-y-3");
+                  for (const block of texts) {
+                    const text = block.text ?? "";
+                    if (isSong) renderLyrics(text, stack);
+                    else if (isBulletList(text)) renderList(text, stack);
+                    else renderNote(text, stack);
+                  }
+                  tabPanel.append(stack);
                 }
-                tabPanel.append(stack);
+                // Дополнительные материалы - сразу под текстом, в два столбца.
+                if (links.length > 0) {
+                  const gridLinks = el("div", "mt-4 grid gap-x-6 gap-y-1 sm:grid-cols-2");
+                  for (const block of links) gridLinks.append(createLinkRow(block));
+                  tabPanel.append(gridLinks);
+                }
                 return;
               }
 
@@ -537,18 +563,7 @@ const { course } = Astro.props as { course: Course };
               }
               const list = el("div", "divide-ink/10 divide-y");
               for (const block of links) {
-                const a = document.createElement("a");
-                a.href = block.src;
-                a.target = "_blank";
-                a.rel = "noopener noreferrer";
-                a.className =
-                  "group text-ink hover:text-primary-deep flex items-center gap-2.5 py-3 text-[15px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40";
-                a.append(el("span", "bg-mustard h-1.5 w-1.5 shrink-0 rounded-full"));
-                a.append(el("span", "min-w-0 flex-1", block.text ?? block.src));
-                a.append(
-                  el("span", "text-ink-mute group-hover:text-primary-deep shrink-0 text-sm", "↗"),
-                );
-                list.append(a);
+                list.append(createLinkRow(block));
               }
               tabPanel.append(list);
             };
@@ -718,10 +733,20 @@ const { course } = Astro.props as { course: Course };
               const hasText = lesson.blocks.some((block) => block.type === "text");
               const hasAudio = lesson.blocks.some((block) => block.type === "audio");
               const hasLinks = lesson.blocks.some((block) => block.type === "link");
+
+              // Урок «только видео» (например, завершение курса): панель
+              // вкладок не нужна, видео размещаем по центру.
+              const panelEl = $<HTMLElement>("[data-panel]");
+              const lessonGrid = $<HTMLElement>("[data-lesson-grid]");
+              const videoOnly = !hasText && !hasAudio && !hasLinks;
+              if (panelEl) panelEl.hidden = videoOnly;
+              if (lessonGrid) lessonGrid.style.gridTemplateColumns = videoOnly ? "1fr" : "";
+              if (videoFrame) videoFrame.style.marginInline = videoOnly ? "auto" : "";
+
               const visibility: Record<TabName, boolean> = {
-                text: true,
+                text: hasText || hasLinks,
                 audio: hasAudio,
-                materials: hasLinks,
+                materials: hasLinks && !hasText,
               };
               tabButtons.forEach((button) => {
                 const name = button.dataset.tab as TabName;

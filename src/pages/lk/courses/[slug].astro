@@ -144,6 +144,7 @@ const { course } = Astro.props as { course: Course };
             <!-- Панель материалов -->
             <div data-panel class="min-w-0">
               <div
+                data-tablist
                 class="border-ink/10 flex gap-5 overflow-x-auto border-b sm:gap-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                 role="tablist"
                 aria-label="Материалы урока"
@@ -695,10 +696,13 @@ const { course } = Astro.props as { course: Course };
               const hasNext = currentLesson < lessons.length - 1;
               if (prevButton) {
                 prevButton.toggleAttribute("hidden", !hasPrev);
+                // Класс flex перебивает атрибут hidden - гасим инлайн-стилем.
+                prevButton.style.display = hasPrev ? "" : "none";
                 if (hasPrev && prevTitle) prevTitle.textContent = lessonTitle(currentLesson - 1);
               }
               if (nextButton) {
                 nextButton.toggleAttribute("hidden", !hasNext);
+                nextButton.style.display = hasNext ? "" : "none";
                 if (hasNext && nextTitle) nextTitle.textContent = lessonTitle(currentLesson + 1);
               }
             };
@@ -752,6 +756,11 @@ const { course } = Astro.props as { course: Course };
                 const name = button.dataset.tab as TabName;
                 button.toggleAttribute("hidden", !visibility[name]);
               });
+
+              // Одна вкладка - заголовок с вкладкой не нужен.
+              const tabListEl = $<HTMLElement>("[data-tablist]");
+              const visibleTabs = Object.values(visibility).filter(Boolean).length;
+              if (tabListEl) tabListEl.style.display = visibleTabs > 1 ? "" : "none";
 
               const defaultTab: TabName = hasText ? "text" : hasAudio ? "audio" : hasLinks ? "materials" : "text";
               setActiveTab(defaultTab);

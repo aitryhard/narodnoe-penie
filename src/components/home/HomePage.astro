@@ -162,10 +162,18 @@ const toneClass = {
 
   <div class="mt-8 grid gap-5 sm:grid-cols-2">
     {
-      lessonCards.map((lesson) => {
+      lessonCards.map((lesson, index) => {
         const photo = images.formats[lesson.anchor];
+        const alone =
+          lessonCards.length % 2 === 1 && index === lessonCards.length - 1;
         return (
-          <article class="flex flex-col gap-5 rounded-3xl bg-surface p-5 sm:flex-row sm:items-start sm:gap-5 sm:p-6">
+          <article
+            class:list={[
+              "flex flex-col gap-5 rounded-3xl bg-surface p-5 sm:flex-row sm:items-start sm:gap-5 sm:p-6",
+              alone &&
+                "sm:col-span-2 sm:w-[calc((100%_-_1.25rem)/2)] sm:justify-self-center",
+            ]}
+          >
             {photo ? (
               <img
                 src={withBase(photo)}
